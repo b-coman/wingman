@@ -1,22 +1,24 @@
-const express = require('express');
-const { getConnection } = require('./database');
+require('dotenv').config();
 
+const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Middleware to parse JSON bodies
 app.use(express.json());
 
+// Import routes from routes.js
+const routes = require('./routes');
+
+// Use the routes
+app.use('/api', routes);
+
+// Home route for basic API check
 app.get('/', (req, res) => {
-  res.send('DB Admin Interface is running');
+  res.send('Wingman DB Admin Interface is running');
 });
 
-// Test database connection
-app.get('/test-db', async (req, res) => {
-  const pool = await getConnection();
-  const result = await pool.request().query('SELECT 1 AS number');
-  res.json(result.recordset);
-});
-
+// Start the server
 app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
+  console.log(`Server listening at http://localhost:${port}`);
 });

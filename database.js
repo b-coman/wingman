@@ -1,12 +1,12 @@
 const sql = require('mssql');
 
 const config = {
-  user: 'wingman',
-  password: 'vodgek-jUdge1-qohhyz',
-  server: 'wingman-server.database.windows.net',
-  database: 'wingman-db',
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  server: process.env.DB_SERVER,
+  database: process.env.DB_DATABASE,
   options: {
-    encrypt: true, // Necessary for Azure SQL
+    encrypt: true,
     enableArithAbort: true
   }
 };
