@@ -1,9 +1,10 @@
 {
   "name": "wingman",
   "version": "1.0.0",
-  "description": "more to come how",
-  "main": "index.js",
+  "description": "more to come",
+  "main": "app.js", 
   "scripts": {
+    "start": "node app.js", 
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -12,8 +13,7 @@
   "dependencies": {
     "dotenv": "^16.4.5",
     "express": "^4.18.3",
-    "msql": "^1.0.3",
-    "mssql": "^10.0.2"
+    "mssql": "^10.0.2" 
   },
   "devDependencies": {
     "nodemon": "^3.1.0"
