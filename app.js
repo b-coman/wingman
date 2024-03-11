@@ -3,6 +3,10 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
+const cors = require('cors');
+
+// Enable CORS for all origins
+app.use(cors());
 
 // Middleware to parse JSON bodies
 app.use(express.json());
@@ -17,6 +21,9 @@ app.use('/api', routes);
 app.get('/', (req, res) => {
   res.send('Wingman DB Admin Interface is running');
 });
+
+// for the publich files , like index.html
+app.use(express.static('public'));
 
 // Start the server
 app.listen(port, () => {
