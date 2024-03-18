@@ -1,31 +1,30 @@
-require('dotenv').config();
+// /app.js
 
+const cors = require('cors');
 const express = require('express');
 const app = express();
-const port = process.env.PORT || 3000;
-const cors = require('cors');
+const bodyParser = require('body-parser');
+const generalRouter = require('./src/api/routes');
+const logger = require('./logger'); // Import the Winston logger
 
-// Enable CORS for all origins
-app.use(cors());
+app.use(cors()); // This will allow all origins. For production, configure allowed origins appropriately.
 
-// Middleware to parse JSON bodies
-app.use(express.json());
+// Middlewares
+app.use(bodyParser.json()); // for parsing application/json
+app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+app.use('/api', generalRouter); // Mount the routes.js
 
-// Import routes from routes.js
-const routes = require('./routes');
-
-// Use the routes
-app.use('/api', routes);
-
-// Home route for basic API check
-app.get('/', (req, res) => {
-  res.send('Wingman DB Admin Interface is running');
+// Error handling middleware
+app.use((err, req, res, next) => {
+    logger.error('Error stack: %o', err.stack); // Use Winston to log the error stack
+    res.status(500).send('Something broke!');
 });
 
-// for the publich files , like index.html
+// Serve static files from the 'public' directory
 app.use(express.static('public'));
 
-// Start the server
-app.listen(port, () => {
-  console.log(`Server listening at http://localhost:${port}`);
+// Listen on a port
+const PORT = process.env.PORT || 3000; // Use the PORT environment variable or default to 3000
+app.listen(PORT, () => {
+    logger.info(`Server is running on port ${PORT}`); // Use Winston for logging
 });

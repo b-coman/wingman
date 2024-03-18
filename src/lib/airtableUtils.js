@@ -1,0 +1,328 @@
+// /src/lib/airtableUtils.js
+
+require('dotenv').config();
+const Airtable = require('airtable');
+const logger = require('../../logger');
+
+Airtable.configure({
+    apiKey: process.env.AIRTABLE_API_KEY,
+});
+const base = Airtable.base(process.env.AIRTABLE_BASE_ID);
+
+
+// -------------- COMPANY check/create 
+/**
+ * Checks for an existing company by name and domain or creates a new one in Airtable.
+ * @param {string} companyName - The name of the company.
+ * @param {string} companyDomain - The domain of the company.
+ * @returns {Promise<string>} The ID of the existing or newly created company.
+ */
+
+exports.checkOrCreateCompany = async (companyName, companyDomain) => {
+    const companyTable = base('Companies');
+    try {
+        // Search for existing company by name and domain
+        const records = await companyTable.select({
+            filterByFormula: `AND({CompanyName} = '${companyName}', {CompanyDomain} = '${companyDomain}')`,
+            maxRecords: 1
+        }).firstPage();
+
+        if (records.length > 0) {
+            // Company exists, return its ID
+            return records[0].getId();
+        } else {
+            // Company does not exist, create a new one
+            const createdRecords = await companyTable.create([{
+                fields: {
+                    'CompanyName': companyName,
+                    'CompanyDomain': companyDomain,
+                    'CompanyCurrentFlowStage': 'registration' // Adjust field names as necessary
+                }
+            }]);
+            // Return new company's ID
+            return createdRecords[0].getId();
+        }
+    } catch (error) {
+        console.error('Error in checkOrCreateCompany:', error);
+        throw error; // Re-throw the error to handle it in the calling function
+    }
+};
+
+
+// -------------- CONTACT check/create 
+
+exports.checkOrCreateContact = async (CompanyID, ContactFirstName, ContactLastName, ContactEmail, ContactType) => {
+    const contactsTable = base('Contacts'); // Adjust 'Contacts' if your table name is different
+    try {
+        // Search for existing contact by email
+        const records = await contactsTable.select({
+            filterByFormula: `{ContactEmail} = '${ContactEmail}'`,
+            maxRecords: 1
+        }).firstPage();
+
+        if (records.length > 0) {
+            // Contact exists, return its ID
+            return records[0].getId();
+        } else {
+            // Contact does not exist, create a new one
+            const createdRecords = await contactsTable.create([{
+                fields: {
+                    'ContactFirstName': ContactFirstName,
+                    'ContactLastName': ContactLastName,
+                    'ContactEmail': ContactEmail,
+                    'ContactType': 'primary',
+                    'CompanyID': [CompanyID] // Assumes 'Company' is a linked record field to 'Companies' table
+                }
+            }]);
+            // Return new contact's ID
+            return createdRecords[0].getId();
+        }
+    } catch (error) {
+        console.error('Error in checkOrCreateContact:', error);
+        throw error;
+    }
+};
+
+
+// -------------- ENGAGEMENT create 
+exports.createEngagement = async (companyId, sourceIdentifier, engagementInitialContext) => {
+    const engagementsTable = base('Engagements');
+    try {
+        // Use the generic function to find the actual Airtable record ID for the source
+        const sourceId = await exports.findRecordIdByIdentifier('WingmanSources', 'SourceID', sourceIdentifier);
+
+        // Find the Airtable record ID for the Engagement Type "WET-002"
+        const engagementTypeId = await exports.findRecordIdByIdentifier('WingmanEngagementTypes', 'EngagementTypeID', 'WET-002');
+        
+        // Create a new engagement record with the resolved sourceId and engagementTypeId
+        const createdRecords = await engagementsTable.create([{
+            fields: {
+                'CompanyID': [companyId],
+                'SourceID': [sourceId],
+                'EngagementTypeID': [engagementTypeId], // Set the EngagementTypeID field
+                'EngagementInitialContext': engagementInitialContext,
+                // Add other necessary fields here
+            }
+        }]);
+        // Return new engagement's ID
+        return createdRecords[0].getId();
+    } catch (error) {
+        console.error('Error in createEngagement:', error);
+        throw error; // Propagate the error for external handling
+    }
+};
+
+
+exports.findEngagementSourceOwnerUserId = async (sourceId) => {
+    const wingmanSourcesTable = base('WingmanSources');
+    try {
+        const records = await wingmanSourcesTable.select({
+            filterByFormula: `{SourceID} = '${sourceId}'`
+        }).firstPage();
+
+        if (records.length > 0 && records[0].fields.EngagementSourceOwner) {
+            // Assuming EngagementSourceOwner links directly to a single UserID
+            return records[0].fields.EngagementSourceOwner[0];
+        } else {
+            throw new Error('Engagement source owner not found.');
+        }
+    } catch (error) {
+        console.error('Error finding engagement source owner UserID:', error);
+        throw error;
+    }
+};
+
+
+exports.findUserEmailByUserId = async (userId) => {
+    const usersTable = base('Users');
+    try {
+        const record = await usersTable.find(userId);
+        if (record && record.fields.UserEmail) {
+            return record.fields.UserEmail;
+        } else {
+            throw new Error('User email not found.');
+        }
+    } catch (error) {
+        console.error('Error finding user email:', error);
+        throw error;
+    }
+};
+
+
+exports.insertEngagementPrompt = async (engagementId, statement, description, confidenceScore) => {
+    const engagementPromptsTable = base('EngagementPrompts');
+    try {
+        await engagementPromptsTable.create([{
+            fields: {
+                'EngagementID': [engagementId], 
+                'EngagementPromptStatement': statement,
+                'EngagementPromptDescription': description,
+                'EngagementPromptConfidence': confidenceScore,
+                'EngagementPromptStatus': 'pending',
+            }
+        }]);
+        logger.info('Engagement prompt inserted successfully.');
+    } catch (error) {
+        logger.error('Error inserting engagement prompt:', error);
+        throw error;
+    }
+};
+
+exports.createAgentActivityRecord = async (companyID, crewName, taskDescription, taskPrompt) => {
+    const table = base('_agentRuns');
+    try {
+        const createResponse = await table.create({
+            "CompanyID": [companyID], // Notice that companyID is now inside an array
+            "CrewName": crewName,
+            "TaskDescription": taskDescription,
+            "TaskPrompt": taskPrompt,
+            "Timestamp": new Date().toISOString() // Or format it according to your needs
+        });
+
+        // Return the ID of the newly created record to be used as the 'runID'
+        return createResponse.getId();
+    } catch (error) {
+        console.error('Error creating agent activity record:', error);
+        throw error;
+    }
+};
+
+exports.updateAgentActivityRecord = async (runID, output) => {
+    const table = base('_agentRuns');
+    const stringOutput = JSON.stringify(output);
+
+    try {
+        await table.update(runID, {
+            "runOutput": stringOutput
+        });
+    } catch (error) {
+        console.error('Error updating agent activity record:', error);
+        throw error;
+    }
+};
+
+
+
+// handle the insert for flow tracking
+exports.updateFlowStatus = async ({ flowName, flowStatus, flowStep, stepStatus, timestamp, engagementId = null, assessmentId = null, additionalInfo = {} }) => {
+    const table = base('FlowTracking'); // Adjust with the correct table name as needed
+
+    // Initialize the fields object with the data to be sent to Airtable
+    const fields = {
+        FlowName: flowName,
+        FlowStatus: flowStatus,
+        FlowStep: flowStep,
+        StepStatus: stepStatus,
+        Timestamp: timestamp,
+        // Conditionally add engagementId and assessmentId only if they are provided
+        ...(engagementId && { EngagementID: [engagementId] }),
+        ...(assessmentId && { AssessmentID: [assessmentId] }),
+        // AdditionalInfo needs to be a string or structured in a way Airtable expects
+        AdditionalInfo: JSON.stringify(additionalInfo)
+    };
+
+    //logger.info(`Logging engagementId: ${engagementId}`);
+
+    try {
+        // Create a new record in the FlowTracking table with the specified fields
+        const record = await table.create(fields); // Note: 'fields' is passed directly
+        //logger.info('Flow status updated successfully in Airtable:', record.getId());
+        return record.getId();
+    } catch (error) {
+        logger.error('Error creating or updating record in Airtable:', error);
+        throw error;
+    }
+};
+
+
+// Function to fetch the assessment type name by assessment ID from Airtable
+exports.getAssessmentTypeById = async (assessmentId) => {
+    logger.info(`Fetching AssessmentType for AssessmentID: ${assessmentId}`);
+    let assessmentRecord, assessmentTypeId;
+    try {
+        // Fetch the assessment to get its AssessmentTypeID
+        assessmentRecord = await base('Assessments').find(assessmentId);
+        assessmentTypeId = assessmentRecord.fields.AssessmentTypeID;
+
+    if (!assessmentTypeId || assessmentTypeId.length === 0) {
+        logger.error(`AssessmentTypeID not found for AssessmentID: ${assessmentId}`);
+        throw new Error(`AssessmentTypeID not found for AssessmentID: ${assessmentId}`);
+    }
+
+    // Fetch the AssessmentTypeName from WingmanAssessmentTypes using the AssessmentTypeID
+    // Note: Assuming the linked field returns an array of IDs, we take the first one
+    const typeId = assessmentTypeId[0]; // Adjust if your setup might include multiple IDs
+    const typeRecord = await base('WingmanAssessmentTypes').find(typeId);
+    const assessmentTypeName = typeRecord.fields.AssessmentTypeName;
+
+    logger.info(`Fetched AssessmentTypeName: ${assessmentTypeName} for AssessmentID: ${assessmentId} with TypeID: ${typeId}`);
+    return assessmentTypeName;
+} catch (error) {
+    logger.error(`Error fetching AssessmentTypeName for AssessmentID ${assessmentId}: ${error}`);
+    throw error;
+}
+}
+
+
+//------------- FIND --> IMPORTANT (reuse everytime possible)!! Generic function to extract all fields and values for a record based on its primary key
+exports.getAllFieldsForRecord = async (tableName, primaryKeyField, primaryKeyValue) => {
+    const table = base(tableName);
+    try {
+        const records = await table.select({
+            filterByFormula: `{${primaryKeyField}} = '${primaryKeyValue}'`
+        }).firstPage();
+
+        if (records.length > 0) {
+            // Return the fields of the first matching record
+            return records[0].fields;
+        } else {
+            // No record found
+            console.log(`No record found with ${primaryKeyField} = ${primaryKeyValue} in ${tableName}`);
+            return null;
+        }
+    } catch (error) {
+        console.error('Error retrieving record from Airtable:', error);
+        throw error;
+    }
+};
+
+
+//------------- FIND --> two IMPORTANT functions below (reuse everytime possible)
+
+// Function to find a the value of a certain field based on the value of the primary key (e.g. email address)
+exports.findRecordIdByIdentifier = async (tableName, fieldName, identifier) => {
+    const targetTable = base(tableName);
+    try {
+        const records = await targetTable.select({
+            filterByFormula: `{${fieldName}} = '${identifier}'`,
+            maxRecords: 1
+        }).firstPage();
+
+        if (records.length > 0) {
+            return records[0].id; // Return the Airtable record ID of the matched record
+        } else {
+            throw new Error(`Record with identifier ${identifier} not found in ${tableName}.`);
+        }
+    } catch (error) {
+        console.error(`Error finding record ID in ${tableName}:`, error);
+        throw error;
+    }
+};
+
+// Function to find the value of a certain field based on the Airtable record ID
+exports.findFieldValueByRecordId = async (tableName, recordId, fieldName) => {
+    const targetTable = base(tableName);
+    try {
+        const record = await targetTable.find(recordId);
+
+        if (record && record.fields[fieldName]) {
+            return record.fields[fieldName]; // Return the value of the specified field
+        } else {
+            throw new Error(`Field ${fieldName} not found for Record ID: ${recordId} in ${tableName}.`);
+        }
+    } catch (error) {
+        console.error(`Error finding field value by Record ID in ${tableName}:`, error);
+        throw error;
+    }
+};
+
