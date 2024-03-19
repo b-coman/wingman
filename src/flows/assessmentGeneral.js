@@ -9,20 +9,30 @@ const logFlowTracking = require('../services/flowTrackingService');
 const flowName = 'AssessmentGeneralFlow';
 const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentRecordId, assessmentId, approvedPromptId) => { 
     try {
+        await logFlowTracking({flowName: flowName, flowStatus: 'Started', flowStep: 'initialization', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: { approvedPromptId }});
+
         logger.info(`Starting general assessment flow for AssessmentRecordID=${assessmentRecordId}, AssessmentID ${assessmentId}`);
         logger.info(`   EngagementRecordID: ${engagementRecordId}`);
         logger.info(`   EngagementID: ${engagementId}`);
+        logger.info(`   AssessmentRecordID: ${assessmentRecordId}`);
+        logger.info(`   AssessmentID: ${assessmentId}`);
         logger.info(`   ApprovedPromptID: ${approvedPromptId}`);
-        logger.info(`   Source Owner ID: ${sourceOwnerId}`);
-        logger.info(`   Client Email: ${clientEmail}`);
 
-        await logFlowTracking({flowName: flowName, flowStatus: 'Started', flowStep: 'initialization', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: { approvedPromptId, sourceOwnerId, clientEmail }});
+        //Step 1 - identify contact details
+        const contactFirstName = await airtableUtils.findFieldValueByRecordId('Engagements', engagementRecordId, '*PrimaryContactFirstName (from CompanyID)');
+        const contactLastName = await airtableUtils.findFieldValueByRecordId('Engagements', engagementRecordId, '*PrimaryContactLastName (from CompanyID)');
+        const contactEmail = await airtableUtils.findFieldValueByRecordId('Engagements', engagementRecordId, '*PrimaryContactEmail (from CompanyID)');
+        
+        await logFlowTracking({flowName: flowName, flowStatus: 'In Progress', flowStep: 'identify contact details', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: { contactFirstName, contactLastName, contactEmail }});
+
+        //logger.info(`Contact details for EngagementID ${engagementId}: ${contactFirstName}, ${contactLastName}, ${contactEmail}`);
 
         //Step 1 - Send an onboarding email to the client
         const onboardingContent = 'Your personalized onboarding content here'; // Placeholder: Define the content or fetch it from a predefined template
         await sendEmail(clientEmail, "Subject for onboading email", `Hello, ${clientEmail}. This is your onboarding email for the EngagementID ${engagementId}. ${onboardingContent}`);
         logger.info(`Onboarding email sent to client for AssessmentID ${assessmentId}`);
-        await logFlowTracking({flowName: flowName, flowStatus: 'In Progress', flowStep: 'Email sent to the client', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {clientEmail}});
+        
+        await logFlowTracking({flowName: flowName, flowStatus: 'In Progress', flowStep: 'Email sent to the client', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {contactFirstName, contactLastName, contactEmail}});
 
         // Step 2 - Make a call to wingman-agents app for the assessment creation
        // const assessmentReport = await wingmanAgentsService.callWingmanAgentsApp(assessmentId);
