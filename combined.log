@@ -3757,3 +3757,72 @@
 {"timestamp":"[2024-03-19 09:45:18]","level":"info","message":"Server is running on port 3000"}
 {"timestamp":"[2024-03-19 09:45:21]","level":"info","message":"Server is running on port 3000"}
 {"timestamp":"[2024-03-19 09:45:27]","level":"info","message":"Server is running on port 3000"}
+{"timestamp":"[2024-03-19 11:58:05]","level":"info","message":"Server is running on port 3000"}
+{"timestamp":"[2024-03-19 11:59:00]","level":"info","message":"Starting assessment flow for AssessmentID: rec3LPYqcmK2hqwYq"}
+{"timestamp":"[2024-03-19 11:59:00]","level":"info","message":"Fetching AssessmentType for AssessmentID: rec3LPYqcmK2hqwYq"}
+{"timestamp":"[2024-03-19 11:59:02]","level":"info","message":"Fetched AssessmentTypeName: General for AssessmentID: rec3LPYqcmK2hqwYq with TypeID: recYyTiJLonkZ0jad"}
+{"timestamp":"[2024-03-19 11:59:02]","level":"info","message":"Starting case=General for AssessmentRecordID: rec3LPYqcmK2hqwYq"}
+{"timestamp":"[2024-03-19 11:59:03]","level":"info","message":"assessmentId: 38"}
+{"timestamp":"[2024-03-19 11:59:03]","level":"info","message":"engagementRecordId: reccF8v8sC01HbxQ5"}
+{"timestamp":"[2024-03-19 11:59:03]","level":"info","message":"Engagement record ID: reccF8v8sC01HbxQ5"}
+{"timestamp":"[2024-03-19 11:59:03]","level":"info","message":"engagementId: 137"}
+{"timestamp":"[2024-03-19 11:59:03]","level":"info","message":"promptsIDs: recSqJ2uHJMrPEsBq,recXWTGVN8ePi6zuT,recAfUKiIN7uZdi9w"}
+{"timestamp":"[2024-03-19 11:59:04]","level":"info","message":"approvedPromptId: recSqJ2uHJMrPEsBq"}
+{"timestamp":"[2024-03-19 11:59:04]","level":"info","message":"Flow tracking log --> Flow: AssessmentGeneralFlow, Status: Started, Step: initialization, Step Status: OK"}
+{"timestamp":"[2024-03-19 11:59:05]","level":"info","message":"Starting general assessment flow for AssessmentRecordID=rec3LPYqcmK2hqwYq, AssessmentID 38"}
+{"timestamp":"[2024-03-19 11:59:05]","level":"info","message":"   EngagementRecordID: reccF8v8sC01HbxQ5"}
+{"timestamp":"[2024-03-19 11:59:05]","level":"info","message":"   EngagementID: 137"}
+{"timestamp":"[2024-03-19 11:59:05]","level":"info","message":"   AssessmentRecordID: rec3LPYqcmK2hqwYq"}
+{"timestamp":"[2024-03-19 11:59:05]","level":"info","message":"   AssessmentID: 38"}
+{"timestamp":"[2024-03-19 11:59:05]","level":"info","message":"   ApprovedPromptID: recSqJ2uHJMrPEsBq"}
+{"timestamp":"[2024-03-19 11:59:06]","level":"info","message":"Flow tracking log --> Flow: AssessmentGeneralFlow, Status: In Progress, Step: identify contact details, Step Status: OK"}
+{"timestamp":"[2024-03-19 11:59:06]","level":"error","message":"Error in general assessment flow for AssessmentID 38: ReferenceError: clientEmail is not defined"}
+{"timestamp":"[2024-03-19 11:59:06]","level":"error","message":"Failed to start assessment flow: assessmentId is not defined assessmentId is not defined","stack":"ReferenceError: assessmentId is not defined\n    at exports.executeAssessmentFlow (/Users/bogdanionutcoman/dev-projects/GitHub/wingman/src/services/assessmentTypeService.js:63:92)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async /Users/bogdanionutcoman/dev-projects/GitHub/wingman/src/api/routes.js:43:9"}
+{"timestamp":"[2024-03-19 11:59:45]","level":"info","message":"Server is running on port 3000"}
+{"timestamp":"[2024-03-19 11:59:47]","level":"info","message":"Server is running on port 3000"}
+{"timestamp":"[2024-03-19 12:00:00]","level":"info","message":"Starting assessment flow for AssessmentID: rec3LPYqcmK2hqwYq"}
+{"timestamp":"[2024-03-19 12:00:00]","level":"info","message":"Fetching AssessmentType for AssessmentID: rec3LPYqcmK2hqwYq"}
+{"timestamp":"[2024-03-19 12:00:02]","level":"info","message":"Fetched AssessmentTypeName: General for AssessmentID: rec3LPYqcmK2hqwYq with TypeID: recYyTiJLonkZ0jad"}
+{"timestamp":"[2024-03-19 12:00:02]","level":"info","message":"Starting case=General for AssessmentRecordID: rec3LPYqcmK2hqwYq"}
+{"timestamp":"[2024-03-19 12:00:02]","level":"info","message":"assessmentId: 38"}
+{"timestamp":"[2024-03-19 12:00:03]","level":"info","message":"engagementRecordId: reccF8v8sC01HbxQ5"}
+{"timestamp":"[2024-03-19 12:00:03]","level":"info","message":"Engagement record ID: reccF8v8sC01HbxQ5"}
+{"timestamp":"[2024-03-19 12:00:03]","level":"info","message":"engagementId: 137"}
+{"timestamp":"[2024-03-19 12:00:03]","level":"info","message":"promptsIDs: recSqJ2uHJMrPEsBq,recXWTGVN8ePi6zuT,recAfUKiIN7uZdi9w"}
+{"timestamp":"[2024-03-19 12:00:04]","level":"info","message":"approvedPromptId: recSqJ2uHJMrPEsBq"}
+{"timestamp":"[2024-03-19 12:00:04]","level":"info","message":"Flow tracking log --> Flow: AssessmentGeneralFlow, Status: Started, Step: initialization, Step Status: OK"}
+{"timestamp":"[2024-03-19 12:00:05]","level":"info","message":"Starting general assessment flow for AssessmentRecordID=rec3LPYqcmK2hqwYq, AssessmentID 38"}
+{"timestamp":"[2024-03-19 12:00:05]","level":"info","message":"   EngagementRecordID: reccF8v8sC01HbxQ5"}
+{"timestamp":"[2024-03-19 12:00:05]","level":"info","message":"   EngagementID: 137"}
+{"timestamp":"[2024-03-19 12:00:05]","level":"info","message":"   AssessmentRecordID: rec3LPYqcmK2hqwYq"}
+{"timestamp":"[2024-03-19 12:00:05]","level":"info","message":"   AssessmentID: 38"}
+{"timestamp":"[2024-03-19 12:00:05]","level":"info","message":"   ApprovedPromptID: recSqJ2uHJMrPEsBq"}
+{"timestamp":"[2024-03-19 12:00:05]","level":"info","message":"Flow tracking log --> Flow: AssessmentGeneralFlow, Status: In Progress, Step: identify contact details, Step Status: OK"}
+{"timestamp":"[2024-03-19 12:00:06]","level":"error","message":"Error in general assessment flow for AssessmentID 38: ReferenceError: clientEmail is not defined"}
+{"timestamp":"[2024-03-19 12:00:06]","level":"error","message":"Failed to start assessment flow: assessmentId is not defined assessmentId is not defined","stack":"ReferenceError: assessmentId is not defined\n    at exports.executeAssessmentFlow (/Users/bogdanionutcoman/dev-projects/GitHub/wingman/src/services/assessmentTypeService.js:63:92)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async /Users/bogdanionutcoman/dev-projects/GitHub/wingman/src/api/routes.js:43:9"}
+{"timestamp":"[2024-03-19 12:00:18]","level":"info","message":"Server is running on port 3000"}
+{"timestamp":"[2024-03-19 12:00:19]","level":"info","message":"Server is running on port 3000"}
+{"timestamp":"[2024-03-19 12:00:25]","level":"info","message":"Starting assessment flow for AssessmentID: rec3LPYqcmK2hqwYq"}
+{"timestamp":"[2024-03-19 12:00:25]","level":"info","message":"Fetching AssessmentType for AssessmentID: rec3LPYqcmK2hqwYq"}
+{"timestamp":"[2024-03-19 12:00:26]","level":"info","message":"Fetched AssessmentTypeName: General for AssessmentID: rec3LPYqcmK2hqwYq with TypeID: recYyTiJLonkZ0jad"}
+{"timestamp":"[2024-03-19 12:00:26]","level":"info","message":"Starting case=General for AssessmentRecordID: rec3LPYqcmK2hqwYq"}
+{"timestamp":"[2024-03-19 12:00:26]","level":"info","message":"assessmentId: 38"}
+{"timestamp":"[2024-03-19 12:00:27]","level":"info","message":"engagementRecordId: reccF8v8sC01HbxQ5"}
+{"timestamp":"[2024-03-19 12:00:27]","level":"info","message":"Engagement record ID: reccF8v8sC01HbxQ5"}
+{"timestamp":"[2024-03-19 12:00:27]","level":"info","message":"engagementId: 137"}
+{"timestamp":"[2024-03-19 12:00:27]","level":"info","message":"promptsIDs: recSqJ2uHJMrPEsBq,recXWTGVN8ePi6zuT,recAfUKiIN7uZdi9w"}
+{"timestamp":"[2024-03-19 12:00:28]","level":"info","message":"approvedPromptId: recSqJ2uHJMrPEsBq"}
+{"timestamp":"[2024-03-19 12:00:28]","level":"info","message":"Flow tracking log --> Flow: AssessmentGeneralFlow, Status: Started, Step: initialization, Step Status: OK"}
+{"timestamp":"[2024-03-19 12:00:28]","level":"info","message":"Starting general assessment flow for AssessmentRecordID=rec3LPYqcmK2hqwYq, AssessmentID 38"}
+{"timestamp":"[2024-03-19 12:00:28]","level":"info","message":"   EngagementRecordID: reccF8v8sC01HbxQ5"}
+{"timestamp":"[2024-03-19 12:00:28]","level":"info","message":"   EngagementID: 137"}
+{"timestamp":"[2024-03-19 12:00:28]","level":"info","message":"   AssessmentRecordID: rec3LPYqcmK2hqwYq"}
+{"timestamp":"[2024-03-19 12:00:28]","level":"info","message":"   AssessmentID: 38"}
+{"timestamp":"[2024-03-19 12:00:28]","level":"info","message":"   ApprovedPromptID: recSqJ2uHJMrPEsBq"}
+{"timestamp":"[2024-03-19 12:00:29]","level":"info","message":"Flow tracking log --> Flow: AssessmentGeneralFlow, Status: In Progress, Step: identify contact details, Step Status: OK"}
+{"timestamp":"[2024-03-19 12:00:33]","level":"info","message":"Email sent successfully: <48190ec1-e676-8176-b0e6-da0535c3e3a0@gmail.com>"}
+{"timestamp":"[2024-03-19 12:00:33]","level":"info","message":"Onboarding email sent to client for AssessmentID 38"}
+{"timestamp":"[2024-03-19 12:00:33]","level":"info","message":"Flow tracking log --> Flow: AssessmentGeneralFlow, Status: In Progress, Step: Email sent to the client, Step Status: OK"}
+{"timestamp":"[2024-03-19 12:00:33]","level":"yay","message":"General assessment flow completed successfully for AssessmentID=rec3LPYqcmK2hqwYq, AssessmentID=38"}
+{"timestamp":"[2024-03-19 12:00:33]","level":"info","message":"Flow tracking log --> Flow: AssessmentGeneralFlow, Status: Completed, Step: closing, Step Status: OK"}
+{"timestamp":"[2024-03-19 12:00:34]","level":"error","message":"Failed to start assessment flow: assessmentId is not defined assessmentId is not defined","stack":"ReferenceError: assessmentId is not defined\n    at exports.executeAssessmentFlow (/Users/bogdanionutcoman/dev-projects/GitHub/wingman/src/services/assessmentTypeService.js:63:92)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async /Users/bogdanionutcoman/dev-projects/GitHub/wingman/src/api/routes.js:43:9"}

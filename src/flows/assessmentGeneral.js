@@ -29,7 +29,7 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
 
         //Step 1 - Send an onboarding email to the client
         const onboardingContent = 'Your personalized onboarding content here'; // Placeholder: Define the content or fetch it from a predefined template
-        await sendEmail(clientEmail, "Subject for onboading email", `Hello, ${clientEmail}. This is your onboarding email for the EngagementID ${engagementId}. ${onboardingContent}`);
+        await sendEmail(contactEmail, "Subject for onboading email", `Hello, ${contactEmail}. This is your onboarding email for the EngagementID ${engagementId}. ${onboardingContent}`);
         logger.info(`Onboarding email sent to client for AssessmentID ${assessmentId}`);
         
         await logFlowTracking({flowName: flowName, flowStatus: 'In Progress', flowStep: 'Email sent to the client', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {contactFirstName, contactLastName, contactEmail}});
