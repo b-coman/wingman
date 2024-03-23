@@ -1,6 +1,7 @@
 #custom
 sourceCode.js
 sourceCode.txt
+.DS_Store
 
 # Logs
 logs
