@@ -1,17 +1,18 @@
 // Filename: /src/services/wingmanAgentsService.js
 
-const config = require('../../config');
+const {agents} = require('../../config');
 const axios = require('axios');
 const logger = require('../../logger'); // Ensure the path to your logger is correct
+const { log } = require('winston');
 
 
-exports.callWingmanAgentsApp = async (crewName, taskDescription, taskPrompt) => {
+exports.callWingmanAgentsApp = async (crewName, taskDescription, taskPrompt, route) => {
     let data = JSON.stringify({
         description: taskDescription,
         expected_output: taskPrompt,
     });
 
-    let urlEndpoint = `${config.agentsBaseURL}${config.marketingAgentEndpoint}`;
+    let urlEndpoint = `${agents.agentsBaseURL}${route}`;
     let configAxios = {
         method: 'post',
         maxBodyLength: Infinity,

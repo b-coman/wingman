@@ -92,7 +92,8 @@ exports.createEngagement = async (companyId, sourceIdentifier, engagementInitial
         const sourceId = await exports.findRecordIdByIdentifier('WingmanSources', 'SourceID', sourceIdentifier);
 
         // Find the Airtable record ID for the Engagement Type "WET-002"
-        const engagementTypeId = await exports.findRecordIdByIdentifier('WingmanEngagementTypes', 'EngagementTypeID', 'WET-002');
+        // !! envDeafultEngagementType is set in .env file
+        const engagementTypeId = await exports.findRecordIdByIdentifier('WingmanEngagementTypes', 'EngagementTypeID', process.env.envDeafultEngagementType);
         
         // Create a new engagement record with the resolved sourceId and engagementTypeId
         const createdRecords = await engagementsTable.create([{
@@ -192,9 +193,7 @@ exports.updateAgentActivityRecord = async (runID, output) => {
     const stringOutput = JSON.stringify(output);
 
     try {
-        await table.update(runID, {
-            "runOutput": stringOutput
-        });
+        await table.update(runID, {"runOutput": stringOutput});
     } catch (error) {
         console.error('Error updating agent activity record:', error);
         throw error;
@@ -263,6 +262,31 @@ exports.getAssessmentTypeById = async (assessmentId) => {
 }
 }
 
+// identify the place where the raw result returned by general assess agent will be placed
+exports.findAssessDetailsByAssessIDAndTemplate = async (assessmentId, templateValue) => {
+    const table = base('AssessmentDetails');
+
+    try {
+        const records = await table.select({
+            filterByFormula: `AND({AssessmentID} = '${assessmentId}', FIND('${templateValue}', {WingmanAssessmentItemsTemplate (from AssessmentItemID)}))`
+        }).firstPage();
+
+        // Map the records to extract the Airtable record ID and fields
+        const mappedRecords = records.map(record => {
+            return {
+                id: record.id, // This is the Airtable-generated record ID starting with "rec"
+                ...record.fields // Spread all fields into the result object
+            };
+        });
+
+        return mappedRecords;
+    } catch (error) {
+        console.error('Error querying AssessmentDetails:', error);
+        throw error;
+    }
+};
+
+
 
 //------------- FIND --> IMPORTANT (reuse everytime possible)!! Generic function to extract all fields and values for a record based on its primary key
 exports.getAllFieldsForRecord = async (tableName, primaryKeyField, primaryKeyValue) => {
@@ -322,6 +346,34 @@ exports.findFieldValueByRecordId = async (tableName, recordId, fieldName) => {
         }
     } catch (error) {
         console.error(`Error finding field value by Record ID in ${tableName}:`, error);
+        throw error;
+    }
+};
+
+
+
+/**
+ * --------------------- IMPORTANT Function --> generic function for uptating a single field value in a record.
+ * 
+ * @param {String} tableName - The name of the table to update.
+ * @param {String} recordId - The ID of the record to update.
+ * @param {Object} fieldName - An object containing field names and their new values.
+ * @param {String} newValue - The new value of the field to update.
+ * @returns {Promise<Object>} - The updated record object.
+ */
+exports.updateRecordField = async (tableName, recordId, fieldName, newValue) => {
+    const table = base(tableName);
+    try {
+        // Construct the update object dynamically using the fieldName
+        const updateObject = {};
+        updateObject[fieldName] = newValue;
+
+        // Perform the update operation
+        const updatedRecord = await table.update(recordId, updateObject);
+        //console.log('Record updated successfully:', updatedRecord);
+        return updatedRecord;
+    } catch (error) {
+        console.error('Error updating record:', error);
         throw error;
     }
 };

@@ -1,33 +1,5058 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Submission</title>
-    <!-- Other head elements -->
+
+  <style>
+    .style-0 {
+      cursor: auto;
+      background-color: rgb(255, 255, 255);
+      color: rgb(89, 106, 127);
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 17px;
+      font-weight: 400;
+      line-height: 22.1px;
+      font-style: normal;
+      padding: 0px;
+      overflow-wrap: break-word;
+      box-sizing: border-box;
+      margin: 0px;
+      --wp--preset--color--black: #000000;
+      --wp--preset--color--cyan-bluish-gray: #abb8c3;
+      --wp--preset--color--white: #ffffff;
+      --wp--preset--color--pale-pink: #f78da7;
+      --wp--preset--color--vivid-red: #cf2e2e;
+      --wp--preset--color--luminous-vivid-orange: #ff6900;
+      --wp--preset--color--luminous-vivid-amber: #fcb900;
+      --wp--preset--color--light-green-cyan: #7bdcb5;
+      --wp--preset--color--vivid-green-cyan: #00d084;
+      --wp--preset--color--pale-cyan-blue: #8ed1fc;
+      --wp--preset--color--vivid-cyan-blue: #0693e3;
+      --wp--preset--color--vivid-purple: #9b51e0;
+      --wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg, rgba(6, 147, 227, 1) 0%, rgb(155, 81, 224) 100%);
+      --wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg, rgb(122, 220, 180) 0%, rgb(0, 208, 130) 100%);
+      --wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg, rgba(252, 185, 0, 1) 0%, rgba(255, 105, 0, 1) 100%);
+      --wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg, rgba(255, 105, 0, 1) 0%, rgb(207, 46, 46) 100%);
+      --wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg, rgb(238, 238, 238) 0%, rgb(169, 184, 195) 100%);
+      --wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg, rgb(74, 234, 220) 0%, rgb(151, 120, 209) 20%, rgb(207, 42, 186) 40%, rgb(238, 44, 130) 60%, rgb(251, 105, 98) 80%, rgb(254, 248, 76) 100%);
+      --wp--preset--gradient--blush-light-purple: linear-gradient(135deg, rgb(255, 206, 236) 0%, rgb(152, 150, 240) 100%);
+      --wp--preset--gradient--blush-bordeaux: linear-gradient(135deg, rgb(254, 205, 165) 0%, rgb(254, 45, 45) 50%, rgb(107, 0, 62) 100%);
+      --wp--preset--gradient--luminous-dusk: linear-gradient(135deg, rgb(255, 203, 112) 0%, rgb(199, 81, 192) 50%, rgb(65, 88, 208) 100%);
+      --wp--preset--gradient--pale-ocean: linear-gradient(135deg, rgb(255, 245, 203) 0%, rgb(182, 227, 212) 50%, rgb(51, 167, 181) 100%);
+      --wp--preset--gradient--electric-grass: linear-gradient(135deg, rgb(202, 248, 128) 0%, rgb(113, 206, 126) 100%);
+      --wp--preset--gradient--midnight: linear-gradient(135deg, rgb(2, 3, 129) 0%, rgb(40, 116, 252) 100%);
+      --wp--preset--font-size--small: 13px;
+      --wp--preset--font-size--medium: 20px;
+      --wp--preset--font-size--large: 36px;
+      --wp--preset--font-size--x-large: 42px;
+      --wp--preset--spacing--20: 0.44rem;
+      --wp--preset--spacing--30: 0.67rem;
+      --wp--preset--spacing--40: 1rem;
+      --wp--preset--spacing--50: 1.5rem;
+      --wp--preset--spacing--60: 2.25rem;
+      --wp--preset--spacing--70: 3.38rem;
+      --wp--preset--spacing--80: 5.06rem;
+      --wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);
+      --wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);
+      --wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);
+      --wp--preset--shadow--outlined: 6px 6px 0px -3px rgba(255, 255, 255, 1), 6px 6px rgba(0, 0, 0, 1);
+      --wp--preset--shadow--crisp: 6px 6px 0px rgba(0, 0, 0, 1);
+    }
+
+    .style-1 {
+      box-sizing: border-box;
+      position: relative;
+      overflow: hidden;
+      display: none;
+    }
+
+    .style-2 {
+      position: static;
+      box-sizing: border-box;
+    }
+
+    .style-3 {
+      box-sizing: border-box;
+      touch-action: manipulation;
+      outline: rgb(89, 106, 127) none 0px;
+      display: none;
+      background: rgba(97, 108, 125, 0.92) none repeat scroll 0% 0% / auto padding-box border-box;
+      backdrop-filter: blur(4px);
+      position: fixed;
+      inset: 0px;
+      z-index: 9999998;
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+      transition: opacity 0.14s ease 0s, backdrop-filter 0.14s ease 0s;
+    }
+
+    .style-4 {
+      box-sizing: border-box;
+      touch-action: manipulation;
+      outline: rgb(89, 106, 127) none 0px;
+      height: 0px;
+      left: 50%;
+      margin-left: -320px;
+      position: fixed;
+      text-align: center;
+      top: 15%;
+      width: 640px;
+      z-index: 9999999;
+      transition: transform 0.14s ease 0s, opacity 0.14s ease 0s;
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+      display: none;
+    }
+
+    .style-5 {
+      box-sizing: content-box;
+      touch-action: manipulation;
+      outline: rgb(0, 0, 0) none 0px;
+      background: rgb(255, 255, 255) none repeat scroll 0% 0% / auto padding-box border-box;
+      border: 1px solid rgb(255, 255, 255);
+      cursor: pointer;
+      margin-top: 15%;
+      font: 24px sans-serif-light, HelveticaNeue-Light, 'Helvetica Neue Light', 'Helvetica Neue', Arial, Helvetica, 'Liberation Sans', sans-serif;
+      position: relative;
+      height: auto;
+      width: auto;
+      border-radius: 6px;
+      display: none;
+      direction: ltr;
+      color: rgb(0, 0, 0);
+      vertical-align: baseline;
+      overflow: hidden;
+      float: none;
+      margin: 15% 0px 0px;
+      padding: 0px;
+    }
+
+    .style-6 {
+      box-sizing: content-box;
+      border-radius: 0px;
+      background-repeat: no-repeat;
+      display: block;
+      overflow: hidden;
+      height: 48px;
+      line-height: 48px;
+      padding: 0px;
+      pointer-events: none;
+      width: 32px;
+      background-size: 48px;
+      left: 0px;
+      margin: 0px 3px 0px 0px;
+      position: absolute;
+      vertical-align: top;
+      float: none;
+      background-color: rgb(37, 126, 182);
+    }
+
+    .style-7 {
+      box-sizing: content-box;
+      overflow: hidden;
+      background-repeat: no-repeat;
+      background-position: 50% 50%;
+      border: 0px none rgb(0, 0, 0);
+      display: block;
+      left: 0px;
+      margin: 0px auto;
+      padding: 0px;
+      position: relative;
+      top: 0px;
+      width: auto;
+      height: auto;
+      float: none;
+    }
+
+    .style-8 {
+      box-sizing: content-box;
+      float: none;
+      margin: 0px;
+      padding: 0px;
+      position: static;
+      height: auto;
+      width: auto;
+    }
+
+    .style-9 {
+      display: block;
+      width: 100%;
+      padding: 0px;
+      font-size: 24px;
+      line-height: normal;
+      color: rgb(42, 42, 42);
+      vertical-align: middle;
+      background-color: rgba(0, 0, 0, 0);
+      background-image: none;
+      border: 0px none rgb(42, 42, 42);
+      transition: all 0.15s ease-in-out 0s;
+      box-shadow: none;
+      border-radius: 4px;
+      font-family: sans-serif-light, HelveticaNeue-Light, 'Helvetica Neue Light', 'Helvetica Neue', Arial, Helvetica, 'Liberation Sans', sans-serif;
+      box-sizing: content-box;
+      margin: 0px;
+      outline: rgb(42, 42, 42) none 0px;
+      overflow: hidden;
+      appearance: none;
+      cursor: pointer;
+      height: 48px;
+      left: 62px;
+      max-width: none;
+      min-height: auto;
+      position: relative;
+      float: none;
+    }
+
+    .style-10 {
+      box-sizing: content-box;
+      background-color: rgb(1, 102, 255);
+      color: rgb(255, 255, 255);
+      display: none;
+      font-style: normal;
+      font-variant: normal;
+      font-weight: 400;
+      font-stretch: 100%;
+      line-height: normal;
+      font-family: sans-serif-light, HelveticaNeue-Light, 'Helvetica Neue Light', 'Helvetica Neue', Arial, Helvetica, 'Liberation Sans', sans-serif;
+      font-optical-sizing: auto;
+      font-kerning: auto;
+      font-feature-settings: normal;
+      font-variation-settings: normal;
+      font-size: 16px;
+      margin-top: 1px;
+      padding: 3px 8px;
+      float: none;
+      margin: 1px 0px 0px;
+      position: static;
+      height: auto;
+      width: auto;
+    }
+
+    .style-11 {
+      box-sizing: content-box;
+      touch-action: manipulation;
+      outline: rgb(255, 255, 255) none 0px;
+      color: rgb(255, 255, 255);
+      height: auto;
+      margin-top: 20px;
+      width: auto;
+      background: rgba(0, 0, 0, 0) none repeat scroll 0px 0px / auto padding-box border-box;
+      border: 0px none rgb(255, 255, 255);
+      font: 24px sans-serif-light, HelveticaNeue-Light, 'Helvetica Neue Light', 'Helvetica Neue', Arial, Helvetica, 'Liberation Sans', sans-serif;
+      position: relative;
+      border-radius: 6px;
+      display: none;
+      direction: ltr;
+      vertical-align: baseline;
+      overflow: hidden;
+      float: none;
+      margin: 20px 0px 0px;
+      padding: 0px;
+    }
+
+    .style-12 {
+      box-sizing: content-box;
+      margin: 0px 0px 40px;
+      float: none;
+      padding: 0px;
+      position: static;
+      height: auto;
+      width: auto;
+    }
+
+    .style-13 {
+      box-sizing: content-box;
+      touch-action: manipulation;
+      outline: rgb(0, 0, 0) none 0px;
+      background: rgb(255, 255, 255) none repeat scroll 0% 0% / auto padding-box border-box;
+      border: 1px solid rgb(255, 255, 255);
+      box-shadow: rgba(42, 42, 42, 0.1) 0px 0px 20px 10px;
+      height: 320px;
+      top: 15%;
+      left: 50%;
+      margin-left: -320px;
+      position: fixed;
+      text-align: center;
+      width: 640px;
+      z-index: 9999999;
+      transition: transform 0.14s ease 0s, opacity 0.14s ease 0s;
+      border-radius: 6px;
+      display: none;
+      direction: ltr;
+      font: 16px / 12px sans-serif-light, HelveticaNeue-Light, 'Helvetica Neue Light', 'Helvetica Neue', Arial, Helvetica, 'Liberation Sans', sans-serif;
+      color: rgb(0, 0, 0);
+      vertical-align: baseline;
+      overflow: hidden;
+      float: none;
+      margin: 0px 0px 0px -320px;
+      padding: 0px;
+    }
+
+    .style-14 {
+      box-sizing: border-box;
+      padding-bottom: 8px;
+      border: 0px none rgb(0, 0, 0);
+      margin: 0px;
+      padding: 12px 12px 8px;
+      float: none;
+      position: static;
+      height: auto;
+      width: auto;
+    }
+
+    .style-15 {
+      box-sizing: content-box;
+      border: 1px solid rgb(204, 204, 204);
+      border-radius: 6px;
+      padding: 2px 24px 2px 0px;
+      position: relative;
+      text-align: left;
+      float: none;
+      margin: 0px;
+      height: auto;
+      width: auto;
+    }
+
+    .style-16 {
+      display: block;
+      width: 100%;
+      padding: 2px 0px;
+      font-size: 16px;
+      line-height: 20px;
+      color: rgb(42, 42, 42);
+      vertical-align: middle;
+      background-color: rgba(0, 0, 0, 0);
+      background-image: none;
+      border: 0px none rgb(42, 42, 42);
+      transition: all 0.15s ease-in-out 0s;
+      box-shadow: none;
+      border-radius: 4px;
+      font-family: sans-serif-light, HelveticaNeue-Light, 'Helvetica Neue Light', 'Helvetica Neue', Arial, Helvetica, 'Liberation Sans', sans-serif;
+      box-sizing: content-box;
+      margin: 0px;
+      float: none;
+      font-style: normal;
+      font-variant: normal;
+      font-weight: 400;
+      font-stretch: 100%;
+      font-optical-sizing: auto;
+      font-kerning: auto;
+      font-feature-settings: normal;
+      font-variation-settings: normal;
+      height: 28px;
+      left: 38px;
+      outline: rgb(42, 42, 42) none 0px;
+      max-width: none;
+      min-height: 0px;
+      position: relative;
+      overflow: hidden;
+      appearance: none;
+    }
+
+    .style-17 {
+      box-sizing: content-box;
+      border-radius: 4px;
+      background-repeat: no-repeat;
+      display: block;
+      overflow: hidden;
+      height: 24px;
+      line-height: 32px;
+      padding: 0px;
+      pointer-events: none;
+      width: 32px;
+      background-size: 24px;
+      left: 8px;
+      position: absolute;
+      top: 7px;
+      float: none;
+      margin: 0px;
+    }
+
+    .style-18 {
+      box-sizing: content-box;
+      overflow: hidden;
+      background-repeat: no-repeat;
+      background-position: 50% 50%;
+      border: 0px none rgb(0, 0, 0);
+      display: block;
+      left: 0px;
+      margin: 0px auto;
+      padding: 0px;
+      position: relative;
+      top: 0px;
+      width: auto;
+      height: auto;
+      background-color: rgb(255, 255, 255);
+      float: none;
+    }
+
+    .style-19 {
+      box-sizing: content-box;
+      fill: rgb(204, 204, 204);
+      float: none;
+      margin: 0px;
+      padding: 0px;
+      position: static;
+      height: auto;
+      width: auto;
+    }
+
+    .style-20 {
+      box-sizing: border-box;
+      height: 280px;
+      overflow-y: scroll;
+      padding: 0px 12px;
+      border: 0px none rgb(0, 0, 0);
+      margin: 0px;
+      float: none;
+      position: static;
+      width: auto;
+    }
+
+    .style-21 {
+      box-sizing: border-box;
+      font-size: 12px;
+      text-align: center;
+      padding: 8px 14px;
+      border: 0px none rgb(0, 0, 0);
+      margin: 0px;
+      float: none;
+      position: static;
+      height: auto;
+      width: auto;
+    }
+
+    .style-22 {
+      color: rgb(1, 102, 255);
+      text-decoration: none solid rgb(1, 102, 255);
+      box-sizing: content-box;
+      background-color: rgba(0, 0, 0, 0);
+      font: 12px / 14px sans-serif-light, HelveticaNeue-Light, 'Helvetica Neue Light', 'Helvetica Neue', Arial, Helvetica, 'Liberation Sans', sans-serif;
+      height: auto;
+      width: auto;
+      outline: rgb(1, 102, 255) none 0px;
+      display: inline;
+      font-size: 12px;
+      line-height: 14px;
+      padding: 8px 14px;
+      float: none;
+      margin: 0px;
+      position: static;
+    }
+
+    .style-23 {
+      box-sizing: content-box;
+      border-radius: 3px;
+      background-repeat: no-repeat;
+      display: inline-block;
+      overflow: hidden;
+      height: 14px;
+      line-height: 14px;
+      padding: 0px;
+      pointer-events: none;
+      width: 32px;
+      background-size: 14px;
+      margin: 0px 3px 0px 0px;
+      vertical-align: top;
+      float: none;
+      position: static;
+      background-color: rgb(37, 126, 182);
+    }
+
+    .style-24 {
+      box-sizing: content-box;
+      overflow: hidden;
+      background-repeat: no-repeat;
+      background-position: 50% 50%;
+      border: 0px none rgb(1, 102, 255);
+      display: block;
+      left: 0px;
+      margin: 0px auto;
+      padding: 0px;
+      position: relative;
+      top: 0px;
+      width: auto;
+      height: auto;
+      float: none;
+    }
+
+    .style-25 {
+      box-sizing: content-box;
+      float: none;
+      margin: 0px;
+      padding: 0px;
+      position: static;
+      height: auto;
+      width: auto;
+    }
+
+    .style-26 {
+      box-sizing: content-box;
+      float: none;
+      margin: 0px;
+      padding: 0px;
+      position: static;
+      height: auto;
+      width: auto;
+    }
+
+    .style-27 {
+      box-sizing: content-box;
+      float: none;
+      margin: 0px;
+      padding: 0px;
+      position: static;
+      height: auto;
+      width: auto;
+    }
+
+    .style-28 {
+      box-sizing: content-box;
+      touch-action: manipulation;
+      outline: rgb(0, 0, 0) none 0px;
+      min-width: 200px;
+      position: absolute;
+      width: 300px;
+      z-index: 9999997;
+      border-radius: 6px;
+      display: none;
+      direction: ltr;
+      background: rgb(255, 255, 255) none repeat scroll 0% 0% / auto padding-box border-box;
+      font: 16px / 12px sans-serif-light, HelveticaNeue-Light, 'Helvetica Neue Light', 'Helvetica Neue', Arial, Helvetica, 'Liberation Sans', sans-serif;
+      color: rgb(0, 0, 0);
+      border: 1px solid rgb(204, 204, 204);
+      vertical-align: baseline;
+      overflow: hidden;
+      float: none;
+      margin: 0px;
+      padding: 0px;
+      height: auto;
+    }
+
+    .style-29 {
+      box-sizing: content-box;
+      float: none;
+      margin: 0px;
+      padding: 0px;
+      position: static;
+      height: auto;
+      width: auto;
+    }
+
+    .style-30 {
+      box-sizing: content-box;
+      float: none;
+      margin: 0px;
+      padding: 0px;
+      position: static;
+      height: auto;
+      width: auto;
+    }
+
+    .style-31 {
+      box-sizing: content-box;
+      overflow: hidden auto;
+      float: none;
+      margin: 0px;
+      padding: 0px;
+      position: static;
+      height: auto;
+      width: auto;
+    }
+
+    .style-32 {
+      box-sizing: content-box;
+      float: none;
+      margin: 0px;
+      padding: 0px;
+      position: static;
+      height: auto;
+      width: auto;
+      display: none;
+    }
+
+    .style-33 {
+      box-sizing: content-box;
+      clear: both;
+      float: none;
+      margin: 0px;
+      padding: 0px;
+      position: static;
+      height: auto;
+      width: auto;
+    }
+
+    .style-34 {
+      box-sizing: content-box;
+      float: none;
+      margin: 0px;
+      padding: 0px;
+      position: static;
+      height: auto;
+      width: auto;
+    }
+
+    .style-35 {
+      color: rgb(1, 102, 255);
+      text-decoration: none solid rgb(1, 102, 255);
+      box-sizing: content-box;
+      background-color: rgba(0, 0, 0, 0);
+      display: block;
+      margin-top: 3px;
+      border-top: 1px solid rgb(238, 238, 238);
+      text-align: center;
+      border-bottom: 1px solid rgb(255, 255, 255);
+      border-left: 0px none rgb(1, 102, 255);
+      border-right: 0px none rgb(1, 102, 255);
+      line-height: 24px;
+      margin: 3px 0px 0px;
+      padding: 6px;
+      font: 16px / 24px sans-serif-light, HelveticaNeue-Light, 'Helvetica Neue Light', 'Helvetica Neue', Arial, Helvetica, 'Liberation Sans', sans-serif;
+      height: auto;
+      width: auto;
+      outline: rgb(1, 102, 255) none 0px;
+      float: none;
+      position: static;
+    }
+
+    .style-36 {
+      box-sizing: content-box;
+      border-radius: 4px;
+      height: 24px;
+      margin: 0px 6px 0px 0px;
+      background-size: 24px;
+      line-height: 24px;
+      width: 24px;
+      display: inline-block;
+      overflow: hidden;
+      vertical-align: top;
+      background-repeat: no-repeat;
+      padding: 0px;
+      pointer-events: none;
+      float: none;
+      position: static;
+      background-color: rgb(37, 126, 182);
+    }
+
+    .style-37 {
+      box-sizing: content-box;
+      overflow: hidden;
+      background-repeat: no-repeat;
+      background-position: 50% 50%;
+      border: 0px none rgb(1, 102, 255);
+      display: block;
+      left: 0px;
+      margin: 0px auto;
+      padding: 0px;
+      position: relative;
+      top: 0px;
+      width: auto;
+      height: auto;
+      float: none;
+    }
+
+    .style-38 {
+      box-sizing: content-box;
+      float: none;
+      margin: 0px;
+      padding: 0px;
+      position: static;
+      height: auto;
+      width: auto;
+    }
+
+    .style-39 {
+      box-sizing: content-box;
+      float: none;
+      margin: 0px;
+      padding: 0px;
+      position: static;
+      height: auto;
+      width: auto;
+    }
+
+    .style-40 {
+      box-sizing: content-box;
+      float: none;
+      margin: 0px;
+      padding: 0px;
+      position: static;
+      height: auto;
+      width: auto;
+    }
+
+    .style-41 {
+      box-sizing: content-box;
+      height: 24px;
+      margin: 0px 6px 0px 0px;
+      display: inline-block;
+      overflow: hidden;
+      vertical-align: top;
+      float: none;
+      padding: 0px;
+      position: static;
+      width: auto;
+    }
+
+    .style-42 {
+      height: 1px;
+      width: 1px;
+      position: absolute;
+      z-index: 100000;
+      top: 0px;
+      visibility: hidden;
+      width: 1px;
+      position: absolute;
+      z-index: 100000;
+      top: 0px;
+      visibility: hidden;
+      box-sizing: border-box;
+    }
+
+    .style-43 {
+      height: 1px;
+      width: 1px;
+      border: 0px;
+      left: 0px;
+      top: 0px;
+      position: absolute;
+      z-index: 100000;
+      display: none;
+      width: 1px;
+      border: 0px none rgb(89, 106, 127);
+      left: 0px;
+      top: 0px;
+      position: absolute;
+      z-index: 100000;
+      display: none;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+
+    .style-44 {
+      box-sizing: border-box;
+    }
+
+    .style-45 {
+      position: absolute;
+      left: -10000px;
+      top: auto;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-46 {
+      width: auto;
+      box-shadow: none;
+      position: relative;
+      margin: 0px auto;
+      box-sizing: border-box;
+    }
+
+    .style-47 {
+      display: block;
+      text-align: right;
+      left: auto;
+      top: 0px;
+      width: 100%;
+      z-index: 100;
+      border-color: rgb(230, 230, 230);
+      background-color: rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 7px 0px;
+      position: fixed;
+      box-sizing: border-box;
+    }
+
+    .style-48 {
+      border-bottom: 0px none rgb(255, 255, 255);
+      position: relative;
+      color: rgb(255, 255, 255);
+      box-sizing: border-box;
+    }
+
+    .style-49 {
+      padding-top: 8px;
+      padding-bottom: 8px;
+      padding-left: 0px;
+      padding-right: 0px;
+      width: 1600px;
+      max-width: 96%;
+      position: relative;
+      color: rgb(255, 255, 255);
+      margin-right: auto;
+      margin-left: auto;
+      box-sizing: border-box;
+    }
+
+    .style-50 {
+      display: table;
+      table-layout: fixed;
+      width: 100%;
+      margin-left: 0px;
+      margin-right: 0px;
+      color: rgb(255, 255, 255);
+      box-sizing: border-box;
+    }
+
+    .style-51 {
+      padding-left: 0px;
+      display: table-cell;
+      float: none;
+      vertical-align: middle;
+      width: 25%;
+      color: rgb(255, 255, 255);
+      position: relative;
+      min-height: 1px;
+      padding-right: 15px;
+      box-sizing: border-box;
+    }
+
+    .style-52 {
+      padding: 0px;
+      text-align: left;
+      padding-left: 0px;
+      padding-right: 0px;
+      padding-bottom: 0px;
+      color: rgb(255, 255, 255);
+      box-sizing: border-box;
+    }
+
+    .style-53 {
+      color: rgb(0, 0, 0);
+      text-decoration: none solid rgb(0, 0, 0);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-54 {
+      font-size: 28px;
+      color: rgb(0, 0, 0);
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-weight: 400;
+      box-sizing: border-box;
+    }
+
+    .style-55 {
+      transition: none 0s ease 0s;
+      margin-left: 0px;
+      line-height: 28px;
+      position: relative;
+      display: inline-block;
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+    }
+
+    .style-56 {
+      margin-bottom: 2px;
+      width: 8.62rem;
+      height: 55px;
+      transition: all 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s;
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    .style-57 {
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+    }
+
+    .style-58 {
+      transform-origin: 220px 105px;
+      transition: transform 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s, fill 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s;
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+    }
+
+    .style-59 {
+      transform-origin: 220px 105px;
+      fill: rgb(0, 0, 0);
+      transition: transform 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s, fill 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s;
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+    }
+
+    .style-60 {
+      transform-origin: 220px 105px;
+      fill: rgb(0, 0, 0);
+      transition: transform 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s, fill 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s;
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+    }
+
+    .style-61 {
+      transform-origin: 108px 36px;
+      transition: transform 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s, fill 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s;
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+    }
+
+    .style-62 {
+      transform-origin: 108px 36px;
+      fill: rgb(0, 0, 0);
+      transition: transform 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s, fill 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s;
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+    }
+
+    .style-63 {
+      transform-origin: 108px 36px;
+      fill: rgb(0, 0, 0);
+      transition: transform 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s, fill 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s;
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+    }
+
+    .style-64 {
+      transform-origin: 16px 114px;
+      transition: transform 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s, fill 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s;
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+    }
+
+    .style-65 {
+      transform-origin: 16px 114px;
+      fill: rgb(0, 0, 0);
+      transition: transform 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s, fill 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s;
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+    }
+
+    .style-66 {
+      top: 50%;
+      right: 0px;
+      font-weight: 700;
+      text-transform: uppercase;
+      transform: matrix(1, 0, 0, 1, 0, 0);
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+    }
+
+    .style-67 {
+      enable-background: new 0 0 1493.8 400;
+      margin: 0px 0px -8px -16px;
+      width: 240px;
+      height: 65px;
+      transition: all 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s;
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+      overflow: hidden;
+      vertical-align: bottom;
+    }
+
+    .style-68 {
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+    }
+
+    .style-69 {
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+    }
+
+    .style-70 {
+      fill-rule: evenodd;
+      clip-rule: evenodd;
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+    }
+
+    .style-71 {
+      display: table-cell;
+      float: none;
+      vertical-align: middle;
+      padding-right: 0px;
+      position: static;
+      width: 75%;
+      color: rgb(255, 255, 255);
+      min-height: 1px;
+      padding-left: 15px;
+      box-sizing: border-box;
+    }
+
+    .style-72 {
+      color: rgb(255, 255, 255);
+      border: 0px none rgb(255, 255, 255);
+      margin-left: 0px;
+      margin-right: 0px;
+      border-bottom: 0px none rgb(255, 255, 255);
+      border-top: 0px none rgb(255, 255, 255);
+      padding: 0px;
+      border-right-color: rgb(255, 255, 255);
+      border-left-color: rgb(255, 255, 255);
+      background-color: rgba(0, 0, 0, 0);
+      padding-bottom: 0px;
+      box-sizing: border-box;
+    }
+
+    .style-73 {
+      border: 0px none rgb(255, 255, 255);
+      margin: 0px;
+      color: rgb(255, 255, 255);
+      position: static;
+      background: rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box;
+      border-radius: 0px;
+      min-height: 0px;
+      margin-bottom: 0px;
+      background-color: rgba(0, 0, 0, 0);
+      border-color: rgb(255, 255, 255);
+      box-sizing: border-box;
+      display: block;
+    }
+
+    .style-74 {
+      color: rgb(255, 255, 255);
+      display: none;
+      padding: 0px;
+      border: 0px none rgb(255, 255, 255);
+      border-radius: 0px;
+      text-decoration: none solid rgb(255, 255, 255);
+      transition: background 0.5s ease 0s;
+      font-weight: 400;
+      background-color: rgba(0, 0, 0, 0);
+      font-size: 15px;
+      line-height: 21px;
+      text-shadow: none;
+      box-shadow: none;
+      float: none;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      text-transform: uppercase;
+      margin: 3px 0px 0px;
+      width: 100%;
+      border-color: rgb(255, 255, 255);
+      position: relative;
+      margin-right: 0px;
+      margin-top: 3px;
+      margin-bottom: 0px;
+      background-image: url('https://themoduscreate.wpenginepowered.com/wp-content/uploads/2022/05/menu.png');
+      box-sizing: border-box;
+      appearance: button;
+      cursor: pointer;
+      overflow: visible;
+      background: rgba(0, 0, 0, 0) url('https://themoduscreate.wpenginepowered.com/wp-content/uploads/2022/05/menu.png') no-repeat scroll 50% 50% / contain padding-box border-box;
+    }
+
+    .style-75 {
+      color: rgb(255, 255, 255);
+      box-sizing: border-box;
+    }
+
+    .style-76 {
+      color: rgb(255, 255, 255);
+      font-family: linearicons;
+      box-sizing: border-box;
+      font-weight: 900;
+      -webkit-font-smoothing: antialiased;
+      display: inline-block;
+      font-style: normal;
+      font-variant: normal;
+      text-rendering: auto;
+      line-height: 15px;
+    }
+
+    .style-77 {
+      color: rgb(255, 255, 255);
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0px;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0px, 0px, 0px, 0px);
+      border: 0px none rgb(255, 255, 255);
+      box-sizing: border-box;
+      white-space: nowrap;
+    }
+
+    .style-78 {
+      color: rgb(255, 255, 255);
+      padding-bottom: 0px;
+      display: inline-flex;
+      height: auto !important;
+      overflow: visible;
+      width: auto;
+      border-top: 0px none rgb(231, 231, 231);
+      box-shadow: none;
+      align-items: center;
+      justify-content: flex-end;
+      border: 0px none rgb(231, 231, 231);
+      max-height: none;
+      padding: 0px;
+      border-color: rgb(231, 231, 231);
+      padding-right: 0px;
+      padding-left: 0px;
+      overflow-x: visible;
+      box-sizing: border-box;
+    }
+
+    .style-79 {
+      float: right;
+      color: rgb(255, 255, 255);
+      margin-right: 0px;
+      margin: 0px;
+      font-weight: 500;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 21px;
+      text-transform: uppercase;
+      padding-left: 0px;
+      margin-bottom: 0px;
+      list-style: outside none none;
+      margin-top: 0px;
+      box-sizing: border-box;
+    }
+
+    .style-80 {
+      display: block;
+      float: left;
+      color: rgb(255, 255, 255);
+      border: 0px none rgb(255, 255, 255);
+      position: relative;
+      border-bottom: 0px none rgb(255, 255, 255);
+      box-sizing: border-box;
+    }
+
+    .style-81 {
+      color: rgb(0, 0, 0);
+      padding: 15px 15px 17px;
+      padding-top: 15px;
+      padding-bottom: 17px;
+      font-weight: 500;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 21px;
+      text-transform: uppercase;
+      position: relative;
+      display: block;
+      text-decoration: none solid rgb(0, 0, 0);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-82 {
+      display: block;
+      float: left;
+      color: rgb(255, 255, 255);
+      border: 0px none rgb(255, 255, 255);
+      position: relative;
+      border-bottom: 0px none rgb(255, 255, 255);
+      box-sizing: border-box;
+    }
+
+    .style-83 {
+      color: rgb(0, 0, 0);
+      padding: 15px 15px 17px;
+      padding-top: 15px;
+      padding-bottom: 17px;
+      font-weight: 500;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 21px;
+      text-transform: uppercase;
+      position: relative;
+      display: block;
+      text-decoration: none solid rgb(0, 0, 0);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-84 {
+      display: block;
+      float: left;
+      color: rgb(255, 255, 255);
+      border: 0px none rgb(255, 255, 255);
+      position: relative;
+      border-bottom: 0px none rgb(255, 255, 255);
+      box-sizing: border-box;
+    }
+
+    .style-85 {
+      color: rgb(0, 0, 0);
+      padding: 15px 15px 17px;
+      padding-top: 15px;
+      padding-bottom: 17px;
+      font-weight: 500;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 21px;
+      text-transform: uppercase;
+      position: relative;
+      display: block;
+      text-decoration: none solid rgb(0, 0, 0);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-86 {
+      display: block;
+      float: left;
+      color: rgb(255, 255, 255);
+      border: 0px none rgb(255, 255, 255);
+      position: relative;
+      border-bottom: 0px none rgb(255, 255, 255);
+      box-sizing: border-box;
+    }
+
+    .style-87 {
+      color: rgb(0, 0, 0);
+      padding: 15px 15px 17px;
+      padding-top: 15px;
+      padding-bottom: 17px;
+      font-weight: 500;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 21px;
+      text-transform: uppercase;
+      position: relative;
+      display: block;
+      text-decoration: none solid rgb(0, 0, 0);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-88 {
+      display: block;
+      float: left;
+      color: rgb(255, 255, 255);
+      border: 0px none rgb(255, 255, 255);
+      position: relative;
+      border-bottom: 0px none rgb(255, 255, 255);
+      box-sizing: border-box;
+    }
+
+    .style-89 {
+      color: rgb(0, 0, 0);
+      padding: 15px 15px 17px;
+      padding-top: 15px;
+      padding-bottom: 17px;
+      font-weight: 500;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 21px;
+      text-transform: uppercase;
+      position: relative;
+      display: block;
+      text-decoration: none solid rgb(0, 0, 0);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-90 {
+      display: block;
+      float: left;
+      color: rgb(255, 255, 255);
+      border: 0px none rgb(255, 255, 255);
+      position: relative;
+      border-bottom: 0px none rgb(255, 255, 255);
+      box-sizing: border-box;
+    }
+
+    .style-91 {
+      color: rgb(0, 0, 0);
+      padding: 15px 15px 17px;
+      padding-top: 15px;
+      padding-bottom: 17px;
+      font-weight: 500;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 21px;
+      text-transform: uppercase;
+      position: relative;
+      display: block;
+      text-decoration: none solid rgb(0, 0, 0);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-92 {
+      display: block;
+      float: left;
+      color: rgb(255, 255, 255);
+      border: 0px none rgb(255, 255, 255);
+      position: relative;
+      border-bottom: 0px none rgb(255, 255, 255);
+      box-sizing: border-box;
+    }
+
+    .style-93 {
+      color: rgb(0, 0, 0);
+      padding: 15px 15px 17px;
+      padding-top: 15px;
+      padding-bottom: 17px;
+      font-weight: 500;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 21px;
+      text-transform: uppercase;
+      position: relative;
+      display: block;
+      text-decoration: none solid rgb(0, 0, 0);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-94 {
+      padding-top: 0px;
+      padding-bottom: 0px;
+      padding-left: 0px;
+      padding-right: 0px;
+      width: 1600px;
+      max-width: 100%;
+      position: absolute;
+      bottom: -76px;
+      display: none;
+      left: 0px;
+      right: 0px;
+      color: rgb(255, 255, 255);
+      margin-right: auto;
+      margin-left: auto;
+      box-sizing: border-box;
+    }
+
+    .style-95 {
+      display: table;
+      table-layout: fixed;
+      width: 100%;
+      margin-left: 0px;
+      margin-right: 0px;
+      color: rgb(255, 255, 255);
+      box-sizing: border-box;
+    }
+
+    .style-96 {
+      display: block;
+      float: none;
+      vertical-align: baseline;
+      background: rgb(255, 255, 255) none repeat scroll 0% 0% / auto padding-box border-box;
+      position: relative;
+      color: rgb(102, 102, 102);
+      box-sizing: border-box;
+      clear: both;
+      border-radius: 0px;
+      transition: none 0s ease 0s;
+      box-shadow: none;
+      border: 0px none rgb(102, 102, 102);
+      inset: auto;
+      clip: auto;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 14px;
+      height: auto;
+      line-height: 23.8px;
+      list-style-type: none;
+      margin: 0px;
+      min-height: auto;
+      max-height: none;
+      min-width: auto;
+      max-width: none;
+      opacity: 1;
+      outline: rgb(102, 102, 102) none 0px;
+      overflow: visible;
+      padding: 0px;
+      pointer-events: auto;
+      text-align: left;
+      text-decoration: none solid rgb(102, 102, 102);
+      text-indent: 0px;
+      text-transform: none;
+      transform: none;
+      visibility: visible;
+      width: auto;
+      overflow-wrap: break-word;
+      white-space: normal;
+    }
+
+    .style-97 {
+      color: rgb(255, 255, 255);
+      box-sizing: border-box;
+      display: none;
+      z-index: 1;
+      cursor: pointer;
+      background: rgb(255, 255, 255) none repeat scroll 0% 0% / auto padding-box border-box;
+      border-radius: 2px;
+      line-height: 40px;
+      height: 40px;
+      text-align: left;
+      user-select: none;
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+      outline: rgb(255, 255, 255) none 0px;
+      white-space: nowrap;
+    }
+
+    .style-98 {
+      color: rgb(255, 255, 255);
+      box-sizing: border-box;
+      -webkit-box-flex: 1;
+      flex: 1 1 0%;
+      -webkit-box-pack: start;
+      justify-content: flex-start;
+      display: flex;
+      flex-basis: 0%;
+    }
+
+    .style-99 {
+      color: rgb(255, 255, 255);
+      box-sizing: border-box;
+      -webkit-box-pack: center;
+      justify-content: center;
+      display: flex;
+      flex-basis: 33.33%;
+    }
+
+    .style-100 {
+      color: rgb(255, 255, 255);
+      box-sizing: border-box;
+      -webkit-box-flex: 1;
+      flex: 1 1 0%;
+      -webkit-box-pack: end;
+      justify-content: flex-end;
+      display: flex;
+      flex-basis: 0%;
+    }
+
+    .style-101 {
+      color: rgb(255, 255, 255);
+      box-sizing: border-box;
+      cursor: pointer;
+      display: flex;
+      height: 100%;
+      outline: rgb(255, 255, 255) none 0px;
+      align-self: center;
+      flex-shrink: 0;
+      margin-left: 6px;
+      margin-right: 6px;
+    }
+
+    .style-102 {
+      color: rgb(255, 255, 255);
+      padding: 0px;
+      border: 0px none rgb(255, 255, 255);
+      border-radius: 40px;
+      text-decoration: none solid rgb(255, 255, 255);
+      transition: opacity 0.15s linear 0s, filter 0.15s linear 0s;
+      font-weight: 400;
+      background-color: rgba(0, 0, 0, 0);
+      font-size: 14px;
+      line-height: 40px;
+      text-shadow: none;
+      box-shadow: none;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      box-sizing: border-box;
+      appearance: button;
+      cursor: pointer;
+      text-transform: none;
+      overflow: visible;
+      margin: 0px;
+      display: flex;
+      transition-property: opacity, filter;
+      transition-duration: 0.15s;
+      transition-timing-function: linear;
+      transform: none;
+      align-self: center;
+      outline: rgb(255, 255, 255) none 0px;
+    }
+
+    .style-103 {
+      color: rgb(255, 255, 255);
+      box-sizing: border-box;
+      width: 40px;
+      height: 24px;
+      display: block;
+      position: relative;
+      outline: rgb(255, 255, 255) none 0px;
+    }
+
+    .style-104 {
+      color: rgb(255, 255, 255);
+      box-sizing: border-box;
+      top: 2px;
+      width: 40px;
+      height: 4px;
+      background-color: rgb(221, 221, 221);
+      border-radius: 4px;
+      position: absolute;
+      transition-property: transform;
+      transition-duration: 0.15s;
+      transition-timing-function: ease;
+      display: block;
+      margin-top: -2px;
+    }
+
+    .style-105 {
+      text-align: right;
+      color: rgb(102, 102, 102);
+      margin-top: 0px;
+      margin-bottom: 0px;
+      box-sizing: border-box;
+      visibility: visible;
+      padding: 0px 30px;
+      transition: none 0s ease 0s;
+      border-radius: 0px;
+      box-shadow: none;
+      border: 0px none rgb(102, 102, 102);
+      inset: auto;
+      clip: auto;
+      display: block;
+      float: none;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 14px;
+      height: auto;
+      line-height: 23.8px;
+      list-style-type: none;
+      margin: 0px;
+      min-height: auto;
+      max-height: none;
+      min-width: auto;
+      max-width: none;
+      opacity: 1;
+      outline: rgb(102, 102, 102) none 0px;
+      overflow: visible;
+      position: relative;
+      pointer-events: auto;
+      text-decoration: none solid rgb(102, 102, 102);
+      text-indent: 0px;
+      text-transform: none;
+      transform: none;
+      vertical-align: baseline;
+      width: auto;
+      overflow-wrap: break-word;
+      white-space: normal;
+    }
+
+    .style-106 {
+      padding-left: 90px;
+      margin-right: 100px;
+      position: relative;
+      color: rgb(102, 102, 102);
+      box-sizing: border-box;
+      margin: 0px 100px 0px 0px;
+      display: inline-block;
+      height: auto;
+      vertical-align: middle;
+      transition: none 0s ease 0s;
+      border-radius: 0px;
+      box-shadow: none;
+      border: 0px none rgb(102, 102, 102);
+      inset: auto;
+      clip: auto;
+      float: none;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 14px;
+      line-height: 23.8px;
+      list-style-type: none;
+      min-height: auto;
+      max-height: none;
+      min-width: auto;
+      max-width: none;
+      opacity: 1;
+      outline: rgb(102, 102, 102) none 0px;
+      overflow: visible;
+      pointer-events: auto;
+      text-align: left;
+      text-decoration: none solid rgb(102, 102, 102);
+      text-indent: 0px;
+      text-transform: none;
+      transform: none;
+      visibility: visible;
+      width: auto;
+      overflow-wrap: break-word;
+      white-space: normal;
+    }
+
+    .style-107 {
+      height: auto !important;
+      color: rgb(0, 0, 0);
+      text-decoration: none solid rgb(0, 0, 0);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+      line-height: 62px;
+      padding: 10px 0px;
+      vertical-align: baseline;
+      width: auto;
+      display: block;
+      text-transform: none;
+      text-align: left;
+      background: rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box;
+      border: 0px none rgb(0, 0, 0);
+      border-radius: 0px;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      outline: rgb(0, 0, 0) none 0px;
+      cursor: pointer;
+      transition: none 0s ease 0s;
+      box-shadow: none;
+      inset: auto;
+      clip: auto;
+      float: none;
+      list-style-type: none;
+      margin: 0px;
+      min-height: auto;
+      max-height: none;
+      min-width: auto;
+      max-width: none;
+      opacity: 1;
+      overflow: visible;
+      position: relative;
+      pointer-events: auto;
+      text-indent: 0px;
+      transform: none;
+      visibility: visible;
+      overflow-wrap: break-word;
+      white-space: normal;
+    }
+
+    .style-108 {
+      display: block;
+      color: rgb(129, 125, 125);
+      line-height: normal;
+      font-size: 9px;
+      box-sizing: border-box;
+    }
+
+    .style-109 {
+      height: 38px;
+      width: 100%;
+      max-width: 140px;
+      color: rgb(0, 0, 0);
+      vertical-align: middle;
+      box-sizing: border-box;
+      border: 0px none rgb(0, 0, 0);
+    }
+
+    .style-110 {
+      margin-right: 100px;
+      position: relative;
+      color: rgb(102, 102, 102);
+      box-sizing: border-box;
+      display: inline-block;
+      height: auto;
+      vertical-align: middle;
+      transition: none 0s ease 0s;
+      border-radius: 0px;
+      box-shadow: none;
+      border: 0px none rgb(102, 102, 102);
+      inset: auto;
+      clip: auto;
+      float: none;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 14px;
+      line-height: 23.8px;
+      list-style-type: none;
+      min-height: auto;
+      max-height: none;
+      min-width: auto;
+      max-width: none;
+      opacity: 1;
+      outline: rgb(102, 102, 102) none 0px;
+      overflow: visible;
+      padding: 0px;
+      pointer-events: auto;
+      text-align: left;
+      text-decoration: none solid rgb(102, 102, 102);
+      text-indent: 0px;
+      text-transform: none;
+      transform: none;
+      visibility: visible;
+      width: auto;
+      overflow-wrap: break-word;
+      white-space: normal;
+    }
+
+    .style-111 {
+      height: auto !important;
+      color: rgb(0, 0, 0);
+      text-decoration: none solid rgb(0, 0, 0);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+      line-height: 62px;
+      padding: 10px 0px;
+      vertical-align: baseline;
+      width: auto;
+      display: block;
+      text-transform: none;
+      text-align: left;
+      background: rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box;
+      border: 0px none rgb(0, 0, 0);
+      border-radius: 0px;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      outline: rgb(0, 0, 0) none 0px;
+      cursor: pointer;
+      transition: none 0s ease 0s;
+      box-shadow: none;
+      inset: auto;
+      clip: auto;
+      float: none;
+      list-style-type: none;
+      margin: 0px;
+      min-height: auto;
+      max-height: none;
+      min-width: auto;
+      max-width: none;
+      opacity: 1;
+      overflow: visible;
+      position: relative;
+      pointer-events: auto;
+      text-indent: 0px;
+      transform: none;
+      visibility: visible;
+      overflow-wrap: break-word;
+      white-space: normal;
+    }
+
+    .style-112 {
+      display: block;
+      color: rgb(129, 125, 125);
+      line-height: normal;
+      font-size: 9px;
+      box-sizing: border-box;
+    }
+
+    .style-113 {
+      height: 38px;
+      width: 100%;
+      max-width: 140px;
+      color: rgb(0, 0, 0);
+      vertical-align: middle;
+      box-sizing: border-box;
+      border: 0px none rgb(0, 0, 0);
+    }
+
+    .style-114 {
+      position: relative;
+      color: rgb(102, 102, 102);
+      box-sizing: border-box;
+      margin: 0px;
+      display: inline-block;
+      height: auto;
+      vertical-align: middle;
+      transition: none 0s ease 0s;
+      border-radius: 0px;
+      box-shadow: none;
+      border: 0px none rgb(102, 102, 102);
+      inset: auto;
+      clip: auto;
+      float: none;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 14px;
+      line-height: 23.8px;
+      list-style-type: none;
+      min-height: auto;
+      max-height: none;
+      min-width: auto;
+      max-width: none;
+      opacity: 1;
+      outline: rgb(102, 102, 102) none 0px;
+      overflow: visible;
+      padding: 0px;
+      pointer-events: auto;
+      text-align: left;
+      text-decoration: none solid rgb(102, 102, 102);
+      text-indent: 0px;
+      text-transform: none;
+      transform: none;
+      visibility: visible;
+      width: auto;
+      overflow-wrap: break-word;
+      white-space: normal;
+    }
+
+    .style-115 {
+      height: auto !important;
+      color: rgb(0, 0, 0);
+      text-decoration: none solid rgb(0, 0, 0);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+      line-height: 62px;
+      padding: 10px 0px;
+      vertical-align: baseline;
+      width: auto;
+      display: block;
+      text-transform: none;
+      text-align: left;
+      background: rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box;
+      border: 0px none rgb(0, 0, 0);
+      border-radius: 0px;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      outline: rgb(0, 0, 0) none 0px;
+      cursor: pointer;
+      transition: none 0s ease 0s;
+      box-shadow: none;
+      inset: auto;
+      clip: auto;
+      float: none;
+      list-style-type: none;
+      margin: 0px;
+      min-height: auto;
+      max-height: none;
+      min-width: auto;
+      max-width: none;
+      opacity: 1;
+      overflow: visible;
+      position: relative;
+      pointer-events: auto;
+      text-indent: 0px;
+      transform: none;
+      visibility: visible;
+      overflow-wrap: break-word;
+      white-space: normal;
+    }
+
+    .style-116 {
+      display: block;
+      color: rgb(129, 125, 125);
+      line-height: normal;
+      font-size: 9px;
+      box-sizing: border-box;
+    }
+
+    .style-117 {
+      height: 38px;
+      width: 100%;
+      max-width: 140px;
+      color: rgb(0, 0, 0);
+      vertical-align: middle;
+      box-sizing: border-box;
+      border: 0px none rgb(0, 0, 0);
+    }
+
+    .style-118 {
+      text-align: right;
+      position: relative;
+      z-index: 99;
+      border-color: rgb(230, 230, 230);
+      background-color: rgb(255, 255, 255);
+      color: rgb(255, 255, 255);
+      box-sizing: border-box;
+      display: block;
+    }
+
+    .style-119 {
+      border-bottom: 0px none rgb(255, 255, 255);
+      position: relative;
+      color: rgb(255, 255, 255);
+      box-sizing: border-box;
+    }
+
+    .style-120 {
+      padding-top: 10px;
+      padding-bottom: 8px;
+      padding-left: 0px;
+      padding-right: 0px;
+      width: 1600px;
+      max-width: 96%;
+      position: relative;
+      color: rgb(255, 255, 255);
+      margin-right: auto;
+      margin-left: auto;
+      box-sizing: border-box;
+    }
+
+    .style-121 {
+      display: table;
+      table-layout: fixed;
+      width: 100%;
+      margin-left: 0px;
+      margin-right: 0px;
+      color: rgb(255, 255, 255);
+      box-sizing: border-box;
+    }
+
+    .style-122 {
+      padding-left: 0px;
+      display: table-cell;
+      float: none;
+      vertical-align: middle;
+      width: 33.3333%;
+      color: rgb(255, 255, 255);
+      position: relative;
+      min-height: 1px;
+      padding-right: 15px;
+      box-sizing: border-box;
+    }
+
+    .style-123 {
+      padding: 0px;
+      text-align: left;
+      padding-left: 0px;
+      padding-right: 0px;
+      padding-bottom: 0px;
+      color: rgb(255, 255, 255);
+      box-sizing: border-box;
+    }
+
+    .style-124 {
+      text-decoration: none solid rgb(0, 0, 0);
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-125 {
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-weight: 400;
+      font-size: 10px;
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+    }
+
+    .style-126 {
+      transition: none 0s ease 0s;
+      margin-left: 0px;
+      line-height: 10px;
+      position: relative;
+      display: inline-block;
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+    }
+
+    .style-127 {
+      margin-bottom: 2px;
+      width: 8.62rem;
+      height: 55px;
+      transition: all 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s;
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    .style-128 {
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+    }
+
+    .style-129 {
+      transform-origin: 220px 105px;
+      transition: transform 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s, fill 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s;
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+    }
+
+    .style-130 {
+      transform-origin: 220px 105px;
+      fill: rgb(0, 0, 0);
+      transition: transform 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s, fill 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s;
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+    }
+
+    .style-131 {
+      transform-origin: 220px 105px;
+      fill: rgb(0, 0, 0);
+      transition: transform 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s, fill 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s;
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+    }
+
+    .style-132 {
+      transform-origin: 108px 36px;
+      transition: transform 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s, fill 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s;
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+    }
+
+    .style-133 {
+      transform-origin: 108px 36px;
+      fill: rgb(0, 0, 0);
+      transition: transform 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s, fill 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s;
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+    }
+
+    .style-134 {
+      transform-origin: 108px 36px;
+      fill: rgb(0, 0, 0);
+      transition: transform 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s, fill 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s;
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+    }
+
+    .style-135 {
+      transform-origin: 16px 114px;
+      transition: transform 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s, fill 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s;
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+    }
+
+    .style-136 {
+      transform-origin: 16px 114px;
+      fill: rgb(0, 0, 0);
+      transition: transform 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s, fill 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s;
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+    }
+
+    .style-137 {
+      top: 50%;
+      right: 0px;
+      font-weight: 700;
+      text-transform: uppercase;
+      transform: matrix(1, 0, 0, 1, 0, 0);
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+    }
+
+    .style-138 {
+      enable-background: new 0 0 1493.8 400;
+      margin: 0px 0px -8px -16px;
+      width: 240px;
+      height: 65px;
+      transition: all 0.2s cubic-bezier(0.215, 0.61, 0.355, 1) 0s;
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+      overflow: hidden;
+      vertical-align: bottom;
+    }
+
+    .style-139 {
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+    }
+
+    .style-140 {
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+    }
+
+    .style-141 {
+      fill-rule: evenodd;
+      clip-rule: evenodd;
+      color: rgb(0, 0, 0);
+      box-sizing: border-box;
+    }
+
+    .style-142 {
+      padding-right: 0px;
+      display: table-cell;
+      float: none;
+      vertical-align: middle;
+      position: static;
+      width: 66.6667%;
+      color: rgb(255, 255, 255);
+      min-height: 1px;
+      padding-left: 15px;
+      box-sizing: border-box;
+    }
+
+    .style-143 {
+      color: rgb(255, 255, 255);
+      border: 0px none rgb(255, 255, 255);
+      margin-left: 0px;
+      margin-right: 0px;
+      border-bottom: 0px none rgb(255, 255, 255);
+      border-top: 0px none rgb(255, 255, 255);
+      padding: 0px;
+      border-right-color: rgb(255, 255, 255);
+      border-left-color: rgb(255, 255, 255);
+      background-color: rgba(0, 0, 0, 0);
+      padding-bottom: 0px;
+      box-sizing: border-box;
+    }
+
+    .style-144 {
+      border: 0px none rgb(255, 255, 255);
+      margin: 0px;
+      color: rgb(255, 255, 255);
+      position: static;
+      background: rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box;
+      border-radius: 0px;
+      min-height: 0px;
+      margin-bottom: 0px;
+      background-color: rgba(0, 0, 0, 0);
+      border-color: rgb(255, 255, 255);
+      box-sizing: border-box;
+      display: block;
+    }
+
+    .style-145 {
+      color: rgb(255, 255, 255);
+      display: none;
+      padding: 0px;
+      border: 0px none rgb(255, 255, 255);
+      border-radius: 0px;
+      text-decoration: none solid rgb(255, 255, 255);
+      transition: background 0.5s ease 0s;
+      font-weight: 400;
+      background-color: rgba(0, 0, 0, 0);
+      font-size: 15px;
+      line-height: 21px;
+      text-shadow: none;
+      box-shadow: none;
+      float: none;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      text-transform: uppercase;
+      margin: 3px 0px 0px;
+      width: 100%;
+      border-color: rgb(255, 255, 255);
+      position: relative;
+      margin-right: 0px;
+      margin-top: 3px;
+      margin-bottom: 0px;
+      background-image: url('https://themoduscreate.wpenginepowered.com/wp-content/uploads/2022/05/menu.png');
+      box-sizing: border-box;
+      appearance: button;
+      cursor: pointer;
+      overflow: visible;
+      background: rgba(0, 0, 0, 0) url('https://themoduscreate.wpenginepowered.com/wp-content/uploads/2022/05/menu.png') no-repeat scroll 50% 50% / contain padding-box border-box;
+    }
+
+    .style-146 {
+      color: rgb(255, 255, 255);
+      box-sizing: border-box;
+    }
+
+    .style-147 {
+      color: rgb(255, 255, 255);
+      font-family: linearicons;
+      box-sizing: border-box;
+      font-weight: 900;
+      -webkit-font-smoothing: antialiased;
+      display: inline-block;
+      font-style: normal;
+      font-variant: normal;
+      text-rendering: auto;
+      line-height: 15px;
+    }
+
+    .style-148 {
+      color: rgb(255, 255, 255);
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0px;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0px, 0px, 0px, 0px);
+      border: 0px none rgb(255, 255, 255);
+      box-sizing: border-box;
+      white-space: nowrap;
+    }
+
+    .style-149 {
+      color: rgb(255, 255, 255);
+      padding-bottom: 0px;
+      display: inline-flex;
+      height: auto !important;
+      overflow: visible;
+      width: auto;
+      border-top: 0px none rgb(231, 231, 231);
+      box-shadow: none;
+      align-items: center;
+      justify-content: flex-end;
+      border: 0px none rgb(231, 231, 231);
+      max-height: none;
+      padding: 0px;
+      border-color: rgb(231, 231, 231);
+      padding-right: 0px;
+      padding-left: 0px;
+      overflow-x: visible;
+      box-sizing: border-box;
+    }
+
+    .style-150 {
+      float: right;
+      color: rgb(255, 255, 255);
+      margin-right: 0px;
+      margin: 0px;
+      font-weight: 500;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 21px;
+      text-transform: uppercase;
+      padding-left: 0px;
+      margin-bottom: 0px;
+      list-style: outside none none;
+      margin-top: 0px;
+      box-sizing: border-box;
+    }
+
+    .style-151 {
+      display: block;
+      float: left;
+      color: rgb(255, 255, 255);
+      border: 0px none rgb(255, 255, 255);
+      position: relative;
+      border-bottom: 0px none rgb(255, 255, 255);
+      box-sizing: border-box;
+    }
+
+    .style-152 {
+      color: rgb(0, 0, 0);
+      padding: 15px 15px 17px;
+      padding-top: 15px;
+      padding-bottom: 17px;
+      font-weight: 500;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 21px;
+      text-transform: uppercase;
+      position: relative;
+      display: block;
+      text-decoration: none solid rgb(0, 0, 0);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-153 {
+      display: block;
+      float: left;
+      color: rgb(255, 255, 255);
+      border: 0px none rgb(255, 255, 255);
+      position: relative;
+      border-bottom: 0px none rgb(255, 255, 255);
+      box-sizing: border-box;
+    }
+
+    .style-154 {
+      color: rgb(0, 0, 0);
+      padding: 15px 15px 17px;
+      padding-top: 15px;
+      padding-bottom: 17px;
+      font-weight: 500;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 21px;
+      text-transform: uppercase;
+      position: relative;
+      display: block;
+      text-decoration: none solid rgb(0, 0, 0);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-155 {
+      display: block;
+      float: left;
+      color: rgb(255, 255, 255);
+      border: 0px none rgb(255, 255, 255);
+      position: relative;
+      border-bottom: 0px none rgb(255, 255, 255);
+      box-sizing: border-box;
+    }
+
+    .style-156 {
+      color: rgb(0, 0, 0);
+      padding: 15px 15px 17px;
+      padding-top: 15px;
+      padding-bottom: 17px;
+      font-weight: 500;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 21px;
+      text-transform: uppercase;
+      position: relative;
+      display: block;
+      text-decoration: none solid rgb(0, 0, 0);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-157 {
+      display: block;
+      float: left;
+      color: rgb(255, 255, 255);
+      border: 0px none rgb(255, 255, 255);
+      position: relative;
+      border-bottom: 0px none rgb(255, 255, 255);
+      box-sizing: border-box;
+    }
+
+    .style-158 {
+      color: rgb(0, 0, 0);
+      padding: 15px 15px 17px;
+      padding-top: 15px;
+      padding-bottom: 17px;
+      font-weight: 500;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 21px;
+      text-transform: uppercase;
+      position: relative;
+      display: block;
+      text-decoration: none solid rgb(0, 0, 0);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-159 {
+      display: block;
+      float: left;
+      color: rgb(255, 255, 255);
+      border: 0px none rgb(255, 255, 255);
+      position: relative;
+      border-bottom: 0px none rgb(255, 255, 255);
+      box-sizing: border-box;
+    }
+
+    .style-160 {
+      color: rgb(0, 0, 0);
+      padding: 15px 15px 17px;
+      padding-top: 15px;
+      padding-bottom: 17px;
+      font-weight: 500;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 21px;
+      text-transform: uppercase;
+      position: relative;
+      display: block;
+      text-decoration: none solid rgb(0, 0, 0);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-161 {
+      display: block;
+      float: left;
+      color: rgb(255, 255, 255);
+      border: 0px none rgb(255, 255, 255);
+      position: relative;
+      border-bottom: 0px none rgb(255, 255, 255);
+      box-sizing: border-box;
+    }
+
+    .style-162 {
+      color: rgb(0, 0, 0);
+      padding: 15px 15px 17px;
+      padding-top: 15px;
+      padding-bottom: 17px;
+      font-weight: 500;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 21px;
+      text-transform: uppercase;
+      position: relative;
+      display: block;
+      text-decoration: none solid rgb(0, 0, 0);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-163 {
+      display: block;
+      float: left;
+      color: rgb(255, 255, 255);
+      border: 0px none rgb(255, 255, 255);
+      position: relative;
+      border-bottom: 0px none rgb(255, 255, 255);
+      box-sizing: border-box;
+    }
+
+    .style-164 {
+      color: rgb(0, 0, 0);
+      padding: 15px 15px 17px;
+      padding-top: 15px;
+      padding-bottom: 17px;
+      font-weight: 500;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 21px;
+      text-transform: uppercase;
+      position: relative;
+      display: block;
+      text-decoration: none solid rgb(0, 0, 0);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-165 {
+      padding-top: 0px;
+      padding-bottom: 0px;
+      padding-left: 0px;
+      padding-right: 0px;
+      width: 1600px;
+      max-width: 100%;
+      position: absolute;
+      display: none;
+      left: 0px;
+      bottom: -80.5px;
+      right: 0px;
+      color: rgb(255, 255, 255);
+      margin-right: auto;
+      margin-left: auto;
+      box-sizing: border-box;
+    }
+
+    .style-166 {
+      display: table;
+      table-layout: fixed;
+      width: 100%;
+      margin-left: 0px;
+      margin-right: 0px;
+      color: rgb(255, 255, 255);
+      box-sizing: border-box;
+    }
+
+    .style-167 {
+      display: block;
+      float: none;
+      vertical-align: baseline;
+      background: rgb(255, 255, 255) none repeat scroll 0% 0% / auto padding-box border-box;
+      position: relative;
+      color: rgb(102, 102, 102);
+      box-sizing: border-box;
+      clear: both;
+      border-radius: 0px;
+      transition: none 0s ease 0s;
+      box-shadow: none;
+      border: 0px none rgb(102, 102, 102);
+      inset: auto;
+      clip: auto;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 14px;
+      height: auto;
+      line-height: 23.8px;
+      list-style-type: none;
+      margin: 0px;
+      min-height: auto;
+      max-height: none;
+      min-width: auto;
+      max-width: none;
+      opacity: 1;
+      outline: rgb(102, 102, 102) none 0px;
+      overflow: visible;
+      padding: 0px;
+      pointer-events: auto;
+      text-align: left;
+      text-decoration: none solid rgb(102, 102, 102);
+      text-indent: 0px;
+      text-transform: none;
+      transform: none;
+      visibility: visible;
+      width: auto;
+      overflow-wrap: break-word;
+      white-space: normal;
+    }
+
+    .style-168 {
+      color: rgb(255, 255, 255);
+      box-sizing: border-box;
+      display: none;
+      z-index: 1;
+      cursor: pointer;
+      background: rgb(255, 255, 255) none repeat scroll 0% 0% / auto padding-box border-box;
+      border-radius: 2px;
+      line-height: 40px;
+      height: 40px;
+      text-align: left;
+      user-select: none;
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+      outline: rgb(255, 255, 255) none 0px;
+      white-space: nowrap;
+    }
+
+    .style-169 {
+      color: rgb(255, 255, 255);
+      box-sizing: border-box;
+      -webkit-box-flex: 1;
+      flex: 1 1 0%;
+      -webkit-box-pack: start;
+      justify-content: flex-start;
+      display: flex;
+      flex-basis: 0%;
+    }
+
+    .style-170 {
+      color: rgb(255, 255, 255);
+      box-sizing: border-box;
+      -webkit-box-pack: center;
+      justify-content: center;
+      display: flex;
+      flex-basis: 33.33%;
+    }
+
+    .style-171 {
+      color: rgb(255, 255, 255);
+      box-sizing: border-box;
+      -webkit-box-flex: 1;
+      flex: 1 1 0%;
+      -webkit-box-pack: end;
+      justify-content: flex-end;
+      display: flex;
+      flex-basis: 0%;
+    }
+
+    .style-172 {
+      color: rgb(255, 255, 255);
+      box-sizing: border-box;
+      cursor: pointer;
+      display: flex;
+      height: 100%;
+      outline: rgb(255, 255, 255) none 0px;
+      align-self: center;
+      flex-shrink: 0;
+      margin-left: 6px;
+      margin-right: 6px;
+    }
+
+    .style-173 {
+      color: rgb(255, 255, 255);
+      padding: 0px;
+      border: 0px none rgb(255, 255, 255);
+      border-radius: 40px;
+      text-decoration: none solid rgb(255, 255, 255);
+      transition: opacity 0.15s linear 0s, filter 0.15s linear 0s;
+      font-weight: 400;
+      background-color: rgba(0, 0, 0, 0);
+      font-size: 14px;
+      line-height: 40px;
+      text-shadow: none;
+      box-shadow: none;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      box-sizing: border-box;
+      appearance: button;
+      cursor: pointer;
+      text-transform: none;
+      overflow: visible;
+      margin: 0px;
+      display: flex;
+      transition-property: opacity, filter;
+      transition-duration: 0.15s;
+      transition-timing-function: linear;
+      transform: none;
+      align-self: center;
+      outline: rgb(255, 255, 255) none 0px;
+    }
+
+    .style-174 {
+      color: rgb(255, 255, 255);
+      box-sizing: border-box;
+      width: 40px;
+      height: 24px;
+      display: block;
+      position: relative;
+      outline: rgb(255, 255, 255) none 0px;
+    }
+
+    .style-175 {
+      color: rgb(255, 255, 255);
+      box-sizing: border-box;
+      top: 2px;
+      width: 40px;
+      height: 4px;
+      background-color: rgb(221, 221, 221);
+      border-radius: 4px;
+      position: absolute;
+      transition-property: transform;
+      transition-duration: 0.15s;
+      transition-timing-function: ease;
+      display: block;
+      margin-top: -2px;
+    }
+
+    .style-176 {
+      text-align: right;
+      color: rgb(102, 102, 102);
+      margin-top: 0px;
+      margin-bottom: 0px;
+      box-sizing: border-box;
+      visibility: visible;
+      padding: 0px 30px;
+      transition: none 0s ease 0s;
+      border-radius: 0px;
+      box-shadow: none;
+      border: 0px none rgb(102, 102, 102);
+      inset: auto;
+      clip: auto;
+      display: block;
+      float: none;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 14px;
+      height: auto;
+      line-height: 23.8px;
+      list-style-type: none;
+      margin: 0px;
+      min-height: auto;
+      max-height: none;
+      min-width: auto;
+      max-width: none;
+      opacity: 1;
+      outline: rgb(102, 102, 102) none 0px;
+      overflow: visible;
+      position: relative;
+      pointer-events: auto;
+      text-decoration: none solid rgb(102, 102, 102);
+      text-indent: 0px;
+      text-transform: none;
+      transform: none;
+      vertical-align: baseline;
+      width: auto;
+      overflow-wrap: break-word;
+      white-space: normal;
+    }
+
+    .style-177 {
+      padding-left: 90px;
+      margin-right: 100px;
+      position: relative;
+      color: rgb(102, 102, 102);
+      box-sizing: border-box;
+      margin: 0px 100px 0px 0px;
+      display: inline-block;
+      height: auto;
+      vertical-align: middle;
+      transition: none 0s ease 0s;
+      border-radius: 0px;
+      box-shadow: none;
+      border: 0px none rgb(102, 102, 102);
+      inset: auto;
+      clip: auto;
+      float: none;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 14px;
+      line-height: 23.8px;
+      list-style-type: none;
+      min-height: auto;
+      max-height: none;
+      min-width: auto;
+      max-width: none;
+      opacity: 1;
+      outline: rgb(102, 102, 102) none 0px;
+      overflow: visible;
+      pointer-events: auto;
+      text-align: left;
+      text-decoration: none solid rgb(102, 102, 102);
+      text-indent: 0px;
+      text-transform: none;
+      transform: none;
+      visibility: visible;
+      width: auto;
+      overflow-wrap: break-word;
+      white-space: normal;
+    }
+
+    .style-178 {
+      height: auto !important;
+      color: rgb(0, 0, 0);
+      text-decoration: none solid rgb(0, 0, 0);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+      line-height: 62px;
+      padding: 10px 0px;
+      vertical-align: baseline;
+      width: auto;
+      display: block;
+      text-transform: none;
+      text-align: left;
+      background: rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box;
+      border: 0px none rgb(0, 0, 0);
+      border-radius: 0px;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      outline: rgb(0, 0, 0) none 0px;
+      cursor: pointer;
+      transition: none 0s ease 0s;
+      box-shadow: none;
+      inset: auto;
+      clip: auto;
+      float: none;
+      list-style-type: none;
+      margin: 0px;
+      min-height: auto;
+      max-height: none;
+      min-width: auto;
+      max-width: none;
+      opacity: 1;
+      overflow: visible;
+      position: relative;
+      pointer-events: auto;
+      text-indent: 0px;
+      transform: none;
+      visibility: visible;
+      overflow-wrap: break-word;
+      white-space: normal;
+    }
+
+    .style-179 {
+      display: block;
+      color: rgb(129, 125, 125);
+      line-height: normal;
+      font-size: 9px;
+      box-sizing: border-box;
+    }
+
+    .style-180 {
+      height: 38px;
+      width: 100%;
+      max-width: 140px;
+      color: rgb(0, 0, 0);
+      vertical-align: middle;
+      box-sizing: border-box;
+      border: 0px none rgb(0, 0, 0);
+    }
+
+    .style-181 {
+      margin-right: 100px;
+      position: relative;
+      color: rgb(102, 102, 102);
+      box-sizing: border-box;
+      display: inline-block;
+      height: auto;
+      vertical-align: middle;
+      transition: none 0s ease 0s;
+      border-radius: 0px;
+      box-shadow: none;
+      border: 0px none rgb(102, 102, 102);
+      inset: auto;
+      clip: auto;
+      float: none;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 14px;
+      line-height: 23.8px;
+      list-style-type: none;
+      min-height: auto;
+      max-height: none;
+      min-width: auto;
+      max-width: none;
+      opacity: 1;
+      outline: rgb(102, 102, 102) none 0px;
+      overflow: visible;
+      padding: 0px;
+      pointer-events: auto;
+      text-align: left;
+      text-decoration: none solid rgb(102, 102, 102);
+      text-indent: 0px;
+      text-transform: none;
+      transform: none;
+      visibility: visible;
+      width: auto;
+      overflow-wrap: break-word;
+      white-space: normal;
+    }
+
+    .style-182 {
+      height: auto !important;
+      color: rgb(0, 0, 0);
+      text-decoration: none solid rgb(0, 0, 0);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+      line-height: 62px;
+      padding: 10px 0px;
+      vertical-align: baseline;
+      width: auto;
+      display: block;
+      text-transform: none;
+      text-align: left;
+      background: rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box;
+      border: 0px none rgb(0, 0, 0);
+      border-radius: 0px;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      outline: rgb(0, 0, 0) none 0px;
+      cursor: pointer;
+      transition: none 0s ease 0s;
+      box-shadow: none;
+      inset: auto;
+      clip: auto;
+      float: none;
+      list-style-type: none;
+      margin: 0px;
+      min-height: auto;
+      max-height: none;
+      min-width: auto;
+      max-width: none;
+      opacity: 1;
+      overflow: visible;
+      position: relative;
+      pointer-events: auto;
+      text-indent: 0px;
+      transform: none;
+      visibility: visible;
+      overflow-wrap: break-word;
+      white-space: normal;
+    }
+
+    .style-183 {
+      display: block;
+      color: rgb(129, 125, 125);
+      line-height: normal;
+      font-size: 9px;
+      box-sizing: border-box;
+    }
+
+    .style-184 {
+      height: 38px;
+      width: 100%;
+      max-width: 140px;
+      color: rgb(0, 0, 0);
+      vertical-align: middle;
+      box-sizing: border-box;
+      border: 0px none rgb(0, 0, 0);
+    }
+
+    .style-185 {
+      position: relative;
+      color: rgb(102, 102, 102);
+      box-sizing: border-box;
+      margin: 0px;
+      display: inline-block;
+      height: auto;
+      vertical-align: middle;
+      transition: none 0s ease 0s;
+      border-radius: 0px;
+      box-shadow: none;
+      border: 0px none rgb(102, 102, 102);
+      inset: auto;
+      clip: auto;
+      float: none;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 14px;
+      line-height: 23.8px;
+      list-style-type: none;
+      min-height: auto;
+      max-height: none;
+      min-width: auto;
+      max-width: none;
+      opacity: 1;
+      outline: rgb(102, 102, 102) none 0px;
+      overflow: visible;
+      padding: 0px;
+      pointer-events: auto;
+      text-align: left;
+      text-decoration: none solid rgb(102, 102, 102);
+      text-indent: 0px;
+      text-transform: none;
+      transform: none;
+      visibility: visible;
+      width: auto;
+      overflow-wrap: break-word;
+      white-space: normal;
+    }
+
+    .style-186 {
+      height: auto !important;
+      color: rgb(0, 0, 0);
+      text-decoration: none solid rgb(0, 0, 0);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+      line-height: 62px;
+      padding: 10px 0px;
+      vertical-align: baseline;
+      width: auto;
+      display: block;
+      text-transform: none;
+      text-align: left;
+      background: rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box;
+      border: 0px none rgb(0, 0, 0);
+      border-radius: 0px;
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      outline: rgb(0, 0, 0) none 0px;
+      cursor: pointer;
+      transition: none 0s ease 0s;
+      box-shadow: none;
+      inset: auto;
+      clip: auto;
+      float: none;
+      list-style-type: none;
+      margin: 0px;
+      min-height: auto;
+      max-height: none;
+      min-width: auto;
+      max-width: none;
+      opacity: 1;
+      overflow: visible;
+      position: relative;
+      pointer-events: auto;
+      text-indent: 0px;
+      transform: none;
+      visibility: visible;
+      overflow-wrap: break-word;
+      white-space: normal;
+    }
+
+    .style-187 {
+      display: block;
+      color: rgb(129, 125, 125);
+      line-height: normal;
+      font-size: 9px;
+      box-sizing: border-box;
+    }
+
+    .style-188 {
+      height: 38px;
+      width: 100%;
+      max-width: 140px;
+      color: rgb(0, 0, 0);
+      vertical-align: middle;
+      box-sizing: border-box;
+      border: 0px none rgb(0, 0, 0);
+    }
+
+    .style-189 {
+      box-sizing: border-box;
+    }
+
+    .style-190 {
+      background-color: rgb(8, 21, 29);
+      box-sizing: border-box;
+      margin-left: auto;
+      margin-right: auto;
+      min-width: 0px;
+    }
+
+    .style-191 {
+      box-sizing: border-box;
+      padding-top: 100px;
+      padding-bottom: 100px;
+      min-height: 239.1px;
+      background-image: url('https://i0.wp.com/moduscreate.com/wp-content/uploads/2023/10/Header-21.png?fit=4002%2C1056&ssl=1');
+      background-repeat: no-repeat;
+      background-position: 50% 50%;
+      background-attachment: scroll;
+      background-size: cover;
+      display: flex;
+      margin: 0px;
+      padding: 100px 20px;
+      align-items: center;
+      -webkit-box-align: center;
+      -webkit-box-pack: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .style-192 {
+      box-sizing: border-box;
+      max-width: 1390px;
+      flex: 1 1 auto;
+      margin-left: auto;
+      margin-right: auto;
+      min-width: 0px;
+    }
+
+    .style-193 {
+      box-sizing: border-box;
+    }
+
+    .style-194 {
+      box-sizing: border-box;
+      width: 100%;
+      float: left;
+      min-height: 1px;
+    }
+
+    .style-195 {
+      box-sizing: border-box;
+      margin: 0px;
+      padding: 0px;
+    }
+
+    .style-196 {
+      animation-duration: 1.5s;
+      box-sizing: border-box;
+      animation-fill-mode: none;
+      opacity: 1;
+    }
+
+    .style-197 {
+      box-sizing: border-box;
+      margin-top: 10px;
+      margin-bottom: 0px;
+      margin: 10px 20px 0px;
+    }
+
+    .style-198 {
+      font-size: 50px;
+      line-height: 55px;
+      letter-spacing: normal;
+      color: rgb(255, 255, 255);
+      font-family: Lato, sans-serif;
+      font-weight: 700;
+      font-style: normal;
+      text-transform: none;
+      margin-top: 0px;
+      margin-bottom: 0px;
+      box-sizing: border-box;
+      margin: 0px;
+      padding: 0px;
+    }
+
+    .style-199 {
+      box-sizing: border-box;
+    }
+
+    .style-200 {
+      animation-duration: 1.5s;
+      box-sizing: border-box;
+      animation-fill-mode: none;
+      opacity: 1;
+    }
+
+    .style-201 {
+      box-sizing: border-box;
+      margin-bottom: 0px;
+      margin: 20px 20px 0px;
+    }
+
+    .style-202 {
+      box-sizing: border-box;
+    }
+
+    .style-203 {
+      display: nonefont-size:21px;
+      box-sizing: border-box;
+      font-size: 21px;
+    }
+
+    .style-204 {
+      font-size: 21px;
+      box-sizing: border-box;
+    }
+
+    .style-205 {
+      box-sizing: border-box;
+    }
+
+    .style-206 {
+      box-sizing: border-box;
+      margin-top: 0px;
+      margin-bottom: 0px;
+      margin: 0px 20px;
+    }
+
+    .style-207 {
+      box-sizing: border-box;
+    }
+
+    .style-208 {
+      margin-top: 6px;
+      color: rgba(0, 0, 0, 0);
+      box-sizing: border-box;
+    }
+
+    .style-209 {
+      padding: 3px 10px 1px;
+      font-weight: 700;
+      margin-right: 2px;
+      font-size: 12px;
+      border-radius: 20px;
+      color: rgb(255, 255, 255);
+      background: rgb(37, 126, 182) none repeat scroll 0% 0% / auto padding-box border-box;
+      text-decoration: none solid rgb(255, 255, 255);
+      box-sizing: border-box;
+      background-color: rgb(37, 126, 182);
+    }
+
+    .style-210 {
+      padding: 3px 10px 1px;
+      font-weight: 700;
+      margin-right: 2px;
+      font-size: 12px;
+      border-radius: 20px;
+      color: rgb(255, 255, 255);
+      background: rgb(37, 126, 182) none repeat scroll 0% 0% / auto padding-box border-box;
+      text-decoration: none solid rgb(255, 255, 255);
+      box-sizing: border-box;
+      background-color: rgb(37, 126, 182);
+    }
+
+    .style-211 {
+      background-color: rgb(255, 255, 255);
+      box-sizing: border-box;
+    }
+
+    .style-212 {
+      box-sizing: border-box;
+    }
+
+    .style-213 {
+      box-sizing: border-box;
+      max-width: 952px;
+      margin-left: auto;
+      margin-right: auto;
+      min-width: 0px;
+    }
+
+    .style-214 {
+      box-sizing: border-box;
+      padding-top: 30px;
+      padding-bottom: 30px;
+      margin: 0px;
+      padding: 30px 20px;
+      align-items: center;
+      -webkit-box-align: center;
+      -webkit-box-pack: center;
+      justify-content: center;
+      min-height: 0px;
+      display: flex;
+      position: relative;
+    }
+
+    .style-215 {
+      box-sizing: border-box;
+      max-width: 952px;
+      flex: 1 1 auto;
+      margin-left: auto;
+      margin-right: auto;
+      min-width: 0px;
+    }
+
+    .style-216 {
+      box-sizing: border-box;
+    }
+
+    .style-217 {
+      box-sizing: border-box;
+      width: 100%;
+      float: left;
+      min-height: 1px;
+    }
+
+    .style-218 {
+      box-sizing: border-box;
+      margin: 0px;
+      padding: 0px;
+    }
+
+    .style-219 {
+      box-sizing: border-box;
+    }
+
+    .style-220 {
+      box-sizing: border-box;
+      margin: 20px;
+    }
+
+    .style-221 {
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-222 {
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-223 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-224 {
+      box-sizing: border-box;
+      font-weight: 700;
+    }
+
+    .style-225 {
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-226 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-227 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-228 {
+      font-size: 30px;
+      line-height: 36px;
+      letter-spacing: normal;
+      color: rgb(0, 0, 0);
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-weight: 700;
+      text-transform: none;
+      font-style: normal;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+
+    .style-229 {
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-230 {
+      box-sizing: border-box;
+      font-weight: 700;
+    }
+
+    .style-231 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-232 {
+      box-sizing: border-box;
+      font-weight: 700;
+    }
+
+    .style-233 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-234 {
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-235 {
+      box-sizing: border-box;
+      font-weight: 700;
+    }
+
+    .style-236 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-237 {
+      box-sizing: border-box;
+      font-weight: 700;
+    }
+
+    .style-238 {
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-239 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-240 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-241 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-242 {
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-243 {
+      font-size: 30px;
+      line-height: 36px;
+      letter-spacing: normal;
+      color: rgb(0, 0, 0);
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-weight: 700;
+      text-transform: none;
+      font-style: normal;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+
+    .style-244 {
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-245 {
+      box-sizing: border-box;
+      font-weight: 700;
+    }
+
+    .style-246 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-247 {
+      box-sizing: border-box;
+      font-weight: 700;
+    }
+
+    .style-248 {
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-249 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-250 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-251 {
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-252 {
+      margin-top: 0px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+
+    .style-253 {
+      box-sizing: border-box;
+    }
+
+    .style-254 {
+      box-sizing: border-box;
+    }
+
+    .style-255 {
+      box-sizing: border-box;
+    }
+
+    .style-256 {
+      box-sizing: border-box;
+    }
+
+    .style-257 {
+      box-sizing: border-box;
+    }
+
+    .style-258 {
+      box-sizing: border-box;
+    }
+
+    .style-259 {
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-260 {
+      box-sizing: border-box;
+    }
+
+    .style-261 {
+      font-size: 30px;
+      line-height: 36px;
+      letter-spacing: normal;
+      color: rgb(0, 0, 0);
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-weight: 700;
+      text-transform: none;
+      font-style: normal;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+
+    .style-262 {
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-263 {
+      box-sizing: border-box;
+      font-weight: 700;
+    }
+
+    .style-264 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-265 {
+      box-sizing: border-box;
+      font-weight: 700;
+    }
+
+    .style-266 {
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-267 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-268 {
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-269 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-270 {
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-271 {
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-272 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-273 {
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-274 {
+      font-size: 30px;
+      line-height: 36px;
+      letter-spacing: normal;
+      color: rgb(0, 0, 0);
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-weight: 700;
+      text-transform: none;
+      font-style: normal;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+
+    .style-275 {
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-276 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-277 {
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-278 {
+      box-sizing: border-box;
+      font-weight: 700;
+    }
+
+    .style-279 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-280 {
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-281 {
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-282 {
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-283 {
+      font-size: 30px;
+      line-height: 36px;
+      letter-spacing: normal;
+      color: rgb(0, 0, 0);
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-weight: 700;
+      text-transform: none;
+      font-style: normal;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+
+    .style-284 {
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-285 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-286 {
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-287 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-288 {
+      box-sizing: border-box;
+      font-weight: 700;
+    }
+
+    .style-289 {
+      box-sizing: border-box;
+      font-weight: 700;
+    }
+
+    .style-290 {
+      box-sizing: border-box;
+    }
+
+    .style-291 {
+      box-sizing: border-box;
+      font-weight: 700;
+    }
+
+    .style-292 {
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-293 {
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-294 {
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-295 {
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-296 {
+      box-sizing: border-box;
+    }
+
+    .style-297 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-298 {
+      box-sizing: border-box;
+    }
+
+    .style-299 {
+      box-sizing: border-box;
+    }
+
+    .style-300 {
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-301 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-302 {
+      margin: 5px 20px 20px 0px;
+      max-width: 100%;
+      height: auto;
+      vertical-align: middle;
+      box-sizing: border-box;
+      border: 0px none rgb(51, 118, 246);
+    }
+
+    .style-303 {
+      box-sizing: border-box;
+    }
+
+    .style-304 {
+      box-sizing: border-box;
+      margin: 20px;
+    }
+
+    .style-305 {
+      box-sizing: border-box;
+      border-top: 1px solid rgb(232, 232, 232);
+      max-width: 100%;
+      margin: auto;
+    }
+
+    .style-306 {
+      box-sizing: border-box;
+    }
+
+    .style-307 {
+      box-sizing: border-box;
+      width: 50%;
+      float: left;
+      min-height: 1px;
+    }
+
+    .style-308 {
+      box-sizing: border-box;
+      margin: 0px;
+      padding: 0px;
+    }
+
+    .style-309 {
+      color: rgb(136, 136, 136);
+      box-sizing: border-box;
+    }
+
+    .style-310 {
+      box-sizing: border-box;
+      margin-top: 5px;
+      margin-bottom: 5px;
+      margin: 5px 20px;
+    }
+
+    .style-311 {
+      box-sizing: border-box;
+    }
+
+    .style-312 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-313 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-314 {
+      box-sizing: border-box;
+      width: 50%;
+      float: left;
+      min-height: 1px;
+    }
+
+    .style-315 {
+      box-sizing: border-box;
+      margin: 0px;
+      padding: 0px;
+    }
+
+    .style-316 {
+      text-align: right;
+      color: rgb(136, 136, 136);
+      box-sizing: border-box;
+    }
+
+    .style-317 {
+      box-sizing: border-box;
+      margin-top: 5px;
+      margin-bottom: 5px;
+      margin: 5px 20px;
+    }
+
+    .style-318 {
+      box-sizing: border-box;
+    }
+
+    .style-319 {
+      display: inline;
+      box-sizing: border-box;
+    }
+
+    .style-320 {
+      float: right;
+      margin-left: 10px;
+      box-sizing: border-box;
+    }
+
+    .style-321 {
+      line-height: 24px;
+      box-sizing: border-box;
+      display: inline;
+      touch-action: manipulation;
+      outline: rgb(136, 136, 136) none 0px;
+    }
+
+    .style-322 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+      border: 0px none rgb(51, 118, 246);
+      box-shadow: none;
+      display: inline-block;
+      font-size: 16px;
+      padding: 0px 4px;
+      vertical-align: middle;
+      cursor: pointer;
+      transition: none 0s ease 0s;
+    }
+
+    .style-323 {
+      background-color: rgb(37, 126, 182);
+      width: 24px;
+      line-height: 24px;
+      height: 24px;
+      background-size: 24px;
+      border-radius: 3px;
+      width: 24px;
+      line-height: 24px;
+      height: 24px;
+      background-size: 24px;
+      border-radius: 3px;
+      box-sizing: border-box;
+      display: inline-block;
+      opacity: 1;
+      float: none;
+      background-repeat: repeat;
+      overflow: hidden;
+      padding: 0px;
+      pointer-events: none;
+    }
+
+    .style-324 {
+      box-sizing: border-box;
+      overflow: hidden;
+      background-repeat: no-repeat;
+      background-position: 50% 50%;
+      border: 0px none rgb(51, 118, 246);
+      display: block;
+      left: 0px;
+      margin: 0px auto;
+      padding: 0px;
+      position: relative;
+      top: 0px;
+      width: auto;
+      height: auto;
+    }
+
+    .style-325 {
+      box-sizing: border-box;
+    }
+
+    .style-326 {
+      box-sizing: border-box;
+      border-radius: 4px;
+      display: block;
+      opacity: 1;
+      float: none;
+      clip-path: polygon(0px 0px, 0px 0px, 0px 0px);
+      overflow: hidden;
+      height: 1px;
+      width: 1px;
+      position: absolute;
+    }
+
+    .style-327 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+      border: 0px none rgb(51, 118, 246);
+      box-shadow: none;
+      display: inline-block;
+      font-size: 16px;
+      padding: 0px 4px;
+      vertical-align: middle;
+      cursor: pointer;
+      transition: none 0s ease 0s;
+    }
+
+    .style-328 {
+      background-color: rgb(37, 126, 182);
+      width: 24px;
+      line-height: 24px;
+      height: 24px;
+      background-size: 24px;
+      border-radius: 3px;
+      width: 24px;
+      line-height: 24px;
+      height: 24px;
+      background-size: 24px;
+      border-radius: 3px;
+      box-sizing: border-box;
+      display: inline-block;
+      opacity: 1;
+      float: none;
+      background-repeat: repeat;
+      overflow: hidden;
+      padding: 0px;
+      pointer-events: none;
+    }
+
+    .style-329 {
+      box-sizing: border-box;
+      overflow: hidden;
+      background-repeat: no-repeat;
+      background-position: 50% 50%;
+      border: 0px none rgb(51, 118, 246);
+      display: block;
+      left: 0px;
+      margin: 0px auto;
+      padding: 0px;
+      position: relative;
+      top: 0px;
+      width: auto;
+      height: auto;
+    }
+
+    .style-330 {
+      box-sizing: border-box;
+    }
+
+    .style-331 {
+      box-sizing: border-box;
+      border-radius: 4px;
+      display: block;
+      opacity: 1;
+      float: none;
+      clip-path: polygon(0px 0px, 0px 0px, 0px 0px);
+      overflow: hidden;
+      height: 1px;
+      width: 1px;
+      position: absolute;
+    }
+
+    .style-332 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+      border: 0px none rgb(51, 118, 246);
+      box-shadow: none;
+      display: inline-block;
+      font-size: 16px;
+      padding: 0px 4px;
+      vertical-align: middle;
+      cursor: pointer;
+      transition: none 0s ease 0s;
+    }
+
+    .style-333 {
+      background-color: rgb(37, 126, 182);
+      width: 24px;
+      line-height: 24px;
+      height: 24px;
+      background-size: 24px;
+      border-radius: 3px;
+      width: 24px;
+      line-height: 24px;
+      height: 24px;
+      background-size: 24px;
+      border-radius: 3px;
+      box-sizing: border-box;
+      display: inline-block;
+      opacity: 1;
+      float: none;
+      background-repeat: repeat;
+      overflow: hidden;
+      padding: 0px;
+      pointer-events: none;
+    }
+
+    .style-334 {
+      box-sizing: border-box;
+      overflow: hidden;
+      background-repeat: no-repeat;
+      background-position: 50% 50%;
+      border: 0px none rgb(51, 118, 246);
+      display: block;
+      left: 0px;
+      margin: 0px auto;
+      padding: 0px;
+      position: relative;
+      top: 0px;
+      width: auto;
+      height: auto;
+    }
+
+    .style-335 {
+      box-sizing: border-box;
+    }
+
+    .style-336 {
+      box-sizing: border-box;
+      border-radius: 4px;
+      display: block;
+      opacity: 1;
+      float: none;
+      clip-path: polygon(0px 0px, 0px 0px, 0px 0px);
+      overflow: hidden;
+      height: 1px;
+      width: 1px;
+      position: absolute;
+    }
+
+    .style-337 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+      border: 0px none rgb(51, 118, 246);
+      box-shadow: none;
+      display: inline-block;
+      font-size: 16px;
+      padding: 0px 4px;
+      vertical-align: middle;
+      cursor: pointer;
+      transition: none 0s ease 0s;
+    }
+
+    .style-338 {
+      background-color: rgb(37, 126, 182);
+      width: 24px;
+      line-height: 24px;
+      height: 24px;
+      background-size: 24px;
+      border-radius: 3px;
+      width: 24px;
+      line-height: 24px;
+      height: 24px;
+      background-size: 24px;
+      border-radius: 3px;
+      box-sizing: border-box;
+      display: inline-block;
+      opacity: 1;
+      float: none;
+      background-repeat: repeat;
+      overflow: hidden;
+      padding: 0px;
+      pointer-events: none;
+    }
+
+    .style-339 {
+      box-sizing: border-box;
+      overflow: hidden;
+      background-repeat: no-repeat;
+      background-position: 50% 50%;
+      border: 0px none rgb(51, 118, 246);
+      display: block;
+      left: 0px;
+      margin: 0px auto;
+      padding: 0px;
+      position: relative;
+      top: 0px;
+      width: auto;
+      height: auto;
+    }
+
+    .style-340 {
+      box-sizing: border-box;
+    }
+
+    .style-341 {
+      box-sizing: border-box;
+      border-radius: 4px;
+      display: block;
+      opacity: 1;
+      float: none;
+      clip-path: polygon(0px 0px, 0px 0px, 0px 0px);
+      overflow: hidden;
+      height: 1px;
+      width: 1px;
+      position: absolute;
+    }
+
+    .style-342 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+      border: 0px none rgb(51, 118, 246);
+      box-shadow: none;
+      display: inline-block;
+      font-size: 16px;
+      padding: 0px 4px;
+      vertical-align: middle;
+      -webkit-user-drag: none;
+      cursor: pointer;
+      transition: none 0s ease 0s;
+    }
+
+    .style-343 {
+      background-color: rgb(37, 126, 182);
+      width: 24px;
+      line-height: 24px;
+      height: 24px;
+      background-size: 24px;
+      border-radius: 3px;
+      width: 24px;
+      line-height: 24px;
+      height: 24px;
+      background-size: 24px;
+      border-radius: 3px;
+      box-sizing: border-box;
+      display: inline-block;
+      opacity: 1;
+      float: none;
+      background-repeat: repeat;
+      overflow: hidden;
+      padding: 0px;
+      pointer-events: none;
+    }
+
+    .style-344 {
+      box-sizing: border-box;
+      overflow: hidden;
+      background-repeat: no-repeat;
+      background-position: 50% 50%;
+      border: 0px none rgb(51, 118, 246);
+      display: block;
+      left: 0px;
+      margin: 0px auto;
+      padding: 0px;
+      position: relative;
+      top: 0px;
+      width: auto;
+      height: auto;
+    }
+
+    .style-345 {
+      box-sizing: border-box;
+    }
+
+    .style-346 {
+      box-sizing: border-box;
+    }
+
+    .style-347 {
+      box-sizing: border-box;
+    }
+
+    .style-348 {
+      box-sizing: border-box;
+      border-radius: 4px;
+      display: block;
+      opacity: 1;
+      float: none;
+      clip-path: polygon(0px 0px, 0px 0px, 0px 0px);
+      overflow: hidden;
+      height: 1px;
+      width: 1px;
+      position: absolute;
+    }
+
+    .style-349 {
+      box-sizing: border-box;
+    }
+
+    .style-350 {
+      box-sizing: border-box;
+      margin: 20px;
+    }
+
+    .style-351 {
+      box-sizing: border-box;
+      border-top: 1px solid rgb(232, 232, 232);
+      max-width: 100%;
+      margin: auto;
+    }
+
+    .style-352 {
+      box-sizing: border-box;
+    }
+
+    .style-353 {
+      padding: 0px;
+      box-sizing: border-box;
+      margin-bottom: 0px;
+      background: rgb(255, 255, 255) none repeat scroll 0% 0% / auto padding-box border-box;
+      display: flex;
+      margin: 20px 20px 0px;
+    }
+
+    .style-354 {
+      box-sizing: border-box;
+      padding-right: 20px;
+    }
+
+    .style-355 {
+      border-radius: 50%;
+      max-height: 100px;
+      min-height: 90px;
+      max-width: none;
+      height: auto;
+      vertical-align: middle;
+      box-sizing: border-box;
+    }
+
+    .style-356 {
+      box-sizing: border-box;
+      width: 100%;
+    }
+
+    .style-357 {
+      font-size: 29px;
+      line-height: 34.8px;
+      letter-spacing: normal;
+      color: rgb(0, 0, 0);
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-weight: 700;
+      text-transform: none;
+      font-style: normal;
+      margin-top: 0px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+      margin: 0px 0px 10px;
+    }
+
+    .style-358 {
+      box-sizing: border-box;
+    }
+
+    .style-359 {
+      box-sizing: border-box;
+      font-weight: 700;
+    }
+
+    .style-360 {
+      box-sizing: border-box;
+    }
+
+    .style-361 {
+      box-sizing: border-box;
+      margin: 20px;
+    }
+
+    .style-362 {
+      box-sizing: border-box;
+    }
+
+    .style-363 {
+      margin-left: 118px;
+      box-sizing: border-box;
+    }
+
+    .style-364 {
+      box-sizing: border-box;
+    }
+
+    .style-365 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-366 {
+      box-sizing: border-box;
+      font-weight: 400;
+      font-family: 'Font Awesome 5 Brands';
+      -webkit-font-smoothing: antialiased;
+      display: inline-block;
+      font-style: normal;
+      font-variant: normal;
+      text-rendering: auto;
+      line-height: 17px;
+    }
+
+    .style-367 {
+      box-sizing: border-box;
+      margin-left: auto;
+      margin-right: auto;
+      min-width: 0px;
+    }
+
+    .style-368 {
+      box-sizing: border-box;
+      border-style: solid;
+      border-width: 1px 0px 0px;
+      -webkit-background-clip: border-box;
+      border-color: rgb(238, 238, 238);
+      margin: 0px;
+      padding: 20px;
+      align-items: center;
+      -webkit-box-align: center;
+      -webkit-box-pack: center;
+      justify-content: center;
+      min-height: 0px;
+      display: flex;
+      position: relative;
+    }
+
+    .style-369 {
+      box-sizing: border-box;
+      max-width: 1390px;
+      flex: 1 1 auto;
+      margin-left: auto;
+      margin-right: auto;
+      min-width: 0px;
+    }
+
+    .style-370 {
+      box-sizing: border-box;
+    }
+
+    .style-371 {
+      box-sizing: border-box;
+      width: 100%;
+      float: left;
+      min-height: 1px;
+    }
+
+    .style-372 {
+      box-sizing: border-box;
+      margin: 0px;
+      padding: 0px;
+    }
+
+    .style-373 {
+      box-sizing: border-box;
+    }
+
+    .style-374 {
+      box-sizing: border-box;
+      margin: 20px;
+    }
+
+    .style-375 {
+      box-sizing: border-box;
+    }
+
+    .style-376 {
+      box-sizing: border-box;
+    }
+
+    .style-377 {
+      text-align: center;
+      margin-bottom: 50px;
+      font-size: 32px;
+      line-height: 38.4px;
+      letter-spacing: normal;
+      color: rgb(0, 0, 0);
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-weight: 700;
+      text-transform: none;
+      font-style: normal;
+      margin-top: 20px;
+      box-sizing: border-box;
+    }
+
+    .style-378 {
+      margin-top: 0px;
+      margin-bottom: 0px;
+      box-sizing: border-box;
+      width: 100%;
+      padding: 0px;
+      float: left;
+    }
+
+    .style-379 {
+      max-width: 46%;
+      float: left;
+      clear: none;
+      margin: 0px 27px;
+      box-sizing: border-box;
+      list-style: outside none none;
+      padding: 0px 0px 20px;
+    }
+
+    .style-380 {
+      display: block;
+      width: 100%;
+      padding: 0px 0px 10px;
+      float: none;
+      box-sizing: border-box;
+      padding-right: 0px;
+    }
+
+    .style-381 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-382 {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      vertical-align: middle;
+      box-sizing: border-box;
+      border: 0px none rgb(51, 118, 246);
+    }
+
+    .style-383 {
+      box-sizing: border-box;
+    }
+
+    .style-384 {
+      color: rgb(37, 56, 72);
+      display: block;
+      line-height: 28px;
+      font-weight: 700;
+      font-size: 20px;
+      text-decoration: none solid rgb(37, 56, 72);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-385 {
+      font-size: 14px;
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-386 {
+      max-width: 46%;
+      float: left;
+      clear: none;
+      margin: 0px 27px;
+      box-sizing: border-box;
+      list-style: outside none none;
+      padding: 0px 0px 20px;
+    }
+
+    .style-387 {
+      display: block;
+      width: 100%;
+      padding: 0px 0px 10px;
+      float: none;
+      box-sizing: border-box;
+      padding-right: 0px;
+    }
+
+    .style-388 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-389 {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      vertical-align: middle;
+      box-sizing: border-box;
+      border: 0px none rgb(51, 118, 246);
+    }
+
+    .style-390 {
+      box-sizing: border-box;
+    }
+
+    .style-391 {
+      color: rgb(37, 56, 72);
+      display: block;
+      line-height: 28px;
+      font-weight: 700;
+      font-size: 20px;
+      text-decoration: none solid rgb(37, 56, 72);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-392 {
+      font-size: 14px;
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-393 {
+      max-width: 46%;
+      float: left;
+      clear: none;
+      margin: 0px 27px;
+      box-sizing: border-box;
+      list-style: outside none none;
+      padding: 0px 0px 20px;
+    }
+
+    .style-394 {
+      display: block;
+      width: 100%;
+      padding: 0px 0px 10px;
+      float: none;
+      box-sizing: border-box;
+      padding-right: 0px;
+    }
+
+    .style-395 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-396 {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      vertical-align: middle;
+      box-sizing: border-box;
+      border: 0px none rgb(51, 118, 246);
+    }
+
+    .style-397 {
+      box-sizing: border-box;
+    }
+
+    .style-398 {
+      color: rgb(37, 56, 72);
+      display: block;
+      line-height: 28px;
+      font-weight: 700;
+      font-size: 20px;
+      text-decoration: none solid rgb(37, 56, 72);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-399 {
+      font-size: 14px;
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-400 {
+      max-width: 46%;
+      float: left;
+      clear: none;
+      margin: 0px 27px;
+      box-sizing: border-box;
+      list-style: outside none none;
+      padding: 0px 0px 20px;
+    }
+
+    .style-401 {
+      display: block;
+      width: 100%;
+      padding: 0px 0px 10px;
+      float: none;
+      box-sizing: border-box;
+      padding-right: 0px;
+    }
+
+    .style-402 {
+      color: rgb(51, 118, 246);
+      text-decoration: none solid rgb(51, 118, 246);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-403 {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      vertical-align: middle;
+      box-sizing: border-box;
+      border: 0px none rgb(51, 118, 246);
+    }
+
+    .style-404 {
+      box-sizing: border-box;
+    }
+
+    .style-405 {
+      color: rgb(37, 56, 72);
+      display: block;
+      line-height: 28px;
+      font-weight: 700;
+      font-size: 20px;
+      text-decoration: none solid rgb(37, 56, 72);
+      box-sizing: border-box;
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    .style-406 {
+      font-size: 14px;
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-407 {
+      box-sizing: border-box;
+    }
+
+    .style-408 {
+      background-color: rgb(243, 246, 248);
+      box-sizing: border-box;
+      margin-left: auto;
+      margin-right: auto;
+      min-width: 0px;
+    }
+
+    .style-409 {
+      box-sizing: border-box;
+      padding-bottom: 50px;
+      margin: 0px;
+      padding: 20px 20px 50px;
+      align-items: center;
+      -webkit-box-align: center;
+      -webkit-box-pack: center;
+      justify-content: center;
+      min-height: 0px;
+      display: flex;
+      position: relative;
+    }
+
+    .style-410 {
+      box-sizing: border-box;
+      max-width: 1390px;
+      flex: 1 1 auto;
+      margin-left: auto;
+      margin-right: auto;
+      min-width: 0px;
+    }
+
+    .style-411 {
+      box-sizing: border-box;
+    }
+
+    .style-412 {
+      box-sizing: border-box;
+      width: 100%;
+      float: left;
+      min-height: 1px;
+    }
+
+    .style-413 {
+      box-sizing: border-box;
+      margin: 0px;
+      padding: 0px;
+    }
+
+    .style-414 {
+      box-sizing: border-box;
+    }
+
+    .style-415 {
+      box-sizing: border-box;
+      margin-bottom: 0px;
+      margin: 20px 20px 0px;
+    }
+
+    .style-416 {
+      box-sizing: border-box;
+    }
+
+    .style-417 {
+      font-size: 49px;
+      line-height: 58.8px;
+      letter-spacing: normal;
+      color: rgb(0, 0, 0);
+      font-family: 'system-ui', -apple-system, 'system-ui', 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif;
+      font-weight: 700;
+      text-transform: none;
+      font-style: normal;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+
+    .style-418 {
+      font-size: 21px;
+      margin: 0px 0px 10px;
+      box-sizing: border-box;
+    }
+
+    .style-419 {
+      box-sizing: border-box;
+    }
+
+    .style-420 {
+      box-sizing: border-box;
+      margin-top: 0px;
+      margin-bottom: 20px;
+      margin: 0px 20px 20px;
+    }
+
+    .style-421 {
+      box-sizing: border-box;
+    }
+  </style>
+  <title></title>
 </head>
-<body>
 
-<!-- Your form HTML -->
-<form id="submissionForm" action="http://localhost:3000/api/submit-form" method="POST">
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name"><br><br>
-    
-        <label for="company">Company:</label>
-        <input type="text" id="company" name="company"><br><br>
-    
-        <label for="role">Role:</label>
-        <input type="text" id="role" name="role"><br><br>
-    
-        <label for="workEmail">Work Email:</label>
-        <input type="email" id="workEmail" name="workEmail"><br><br>
-    
-        <input type="hidden" id="sourceId" name="sourceId" value="SRC-001">
-        <input type="hidden" id="engagementInitialContext" name="engagementInitialContext" value="{}">
-    
-        <input type="submit" value="Submit">
-</form>
+<body class="style-0" itemscope="itemscope" itemtype="https://schema.org/WebPage">
+  <div class="style-1"></div>
+  <div class="style-2">
+    <div class="style-3"></div>
+    <div aria-label="" class="style-4" role="dialog" tabindex="-1">
+      <div class="style-5">
+        <span class="style-6"><svg class="style-7" viewbox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <path class="style-8" d="M7.591 21.177c0-.36.126-.665.377-.917l2.804-2.804a1.235 1.235 0 0 1 .913-.378c.377 0 .7.144.97.43-.026.028-.11.11-.255.25-.144.14-.24.236-.29.29a2.82 2.82 0 0 0-.2.256 1.056 1.056 0 0 0-.177.344 1.43 1.43 0 0 0-.046.37c0 .36.126.666.377.918a1.25 1.25 0 0 0 .918.377c.126.001.251-.015.373-.047.125-.037.242-.096.345-.175.09-.06.176-.127.256-.2.1-.094.196-.19.29-.29.14-.142.223-.23.25-.254.297.28.445.607.445.984 0 .36-.126.664-.377.916l-2.778 2.79a1.242 1.242 0 0 1-.917.364c-.36 0-.665-.118-.917-.35l-1.982-1.97a1.223 1.223 0 0 1-.378-.9l-.001-.004Zm9.477-9.504c0-.36.126-.665.377-.917l2.777-2.79a1.235 1.235 0 0 1 .913-.378c.35 0 .656.12.917.364l1.984 1.968c.254.252.38.553.38.903 0 .36-.126.665-.38.917l-2.802 2.804a1.238 1.238 0 0 1-.916.364c-.377 0-.7-.14-.97-.418.026-.027.11-.11.255-.25a7.5 7.5 0 0 0 .29-.29c.072-.08.139-.166.2-.255.08-.103.14-.22.176-.344.032-.12.048-.245.047-.37 0-.36-.126-.662-.377-.914a1.247 1.247 0 0 0-.917-.377c-.136 0-.26.015-.37.046-.114.03-.23.09-.346.175a3.868 3.868 0 0 0-.256.2c-.054.05-.15.148-.29.29-.14.146-.222.23-.25.258-.294-.278-.442-.606-.442-.983v-.003ZM5.003 21.177c0 1.078.382 1.99 1.146 2.736l1.982 1.968c.745.75 1.658 1.12 2.736 1.12 1.087 0 2.004-.38 2.75-1.143l2.777-2.79c.75-.747 1.12-1.66 1.12-2.737 0-1.106-.392-2.046-1.183-2.818l1.186-1.185c.774.79 1.708 1.186 2.805 1.186 1.078 0 1.995-.376 2.75-1.13l2.803-2.81c.751-.754 1.128-1.671 1.128-2.748 0-1.08-.382-1.993-1.146-2.738L23.875 6.12C23.13 5.372 22.218 5 21.139 5c-1.087 0-2.004.382-2.75 1.146l-2.777 2.79c-.75.747-1.12 1.66-1.12 2.737 0 1.105.392 2.045 1.183 2.817l-1.186 1.186c-.774-.79-1.708-1.186-2.805-1.186-1.078 0-1.995.377-2.75 1.132L6.13 18.426c-.754.755-1.13 1.672-1.13 2.75l.003.001Z" fill="#FFF"></path>
+          </svg></span><input class="style-9" readonly title="Copy link" type="text">
+        <div class="style-10">
+          ✓
+        </div>
+      </div>
+      <div class="style-11">
+        <div class="style-12" data-a2a-localize="inner,ThanksForSharing">
+          Thanks for sharing!
+        </div>
+      </div>
+    </div>
+    <div aria-label="Share" class="style-13" data-a2a-localize="title,Share" role="dialog" tabindex="-1">
+      <div class="style-14">
+        <div class="style-15">
+          <input autocomplete="off" class="style-16" data-a2a-localize="title,FindAnyServiceToAddTo" title="Find any service" type="text"><span class="style-17"><svg class="style-18" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path class="style-19" d="M19.7 18.2l-4.5-4.5c.7-1.1 1.2-2.3 1.2-3.6 0-3.5-2.8-6.3-6.3-6.3s-6.3 2.8-6.3 6.3 2.8 6.3 6.3 6.3c1.4 0 2.6-.4 3.6-1.2l4.5 4.5c.6.6 1.3.7 1.7.2.5-.4.4-1.1-.2-1.7zm-9.6-3.6c-2.5 0-4.5-2.1-4.5-4.5 0-2.5 2.1-4.5 4.5-4.5 2.5 0 4.5 2.1 4.5 4.5s-2 4.5-4.5 4.5z" fill="#CCC"></path>
+            </svg></span>
+        </div>
+      </div>
+      <div class="style-20" role="presentation"></div>
+      <div class="style-21">
+        <a class="style-22" href="https://www.addtoany.com" rel="noopener" target="_blank" title="Share Buttons"><span class="style-23"><svg class="style-24" viewbox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+              <g class="style-25" fill="#FFF">
+                <path class="style-26" d="M14 7h4v18h-4z"></path>
+                <path class="style-27" d="M7 14h18v4H7z"></path>
+              </g>
+            </svg></span>AddToAny</a>
+      </div>
+    </div>
+    <div aria-label="Share" class="style-28" data-a2a-localize="label,Share" tabindex="-1">
+      <div class="style-29"></div>
+      <div class="style-30">
+        <div class="style-31"></div>
+        <div class="style-32"></div>
+        <div class="style-33"></div>
+      </div>
+      <div class="style-34">
+        <a class="style-35" data-a2a-localize="title,ShowAll" href="#addtoany" title="Show all"><span class="style-36"><svg class="style-37" viewbox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+              <g class="style-38" fill="#FFF">
+                <path class="style-39" d="M14 7h4v18h-4z"></path>
+                <path class="style-40" d="M7 14h18v4H7z"></path>
+              </g>
+            </svg></span><span class="style-41" data-a2a-localize="inner,More">More…</span></a>
+      </div>
+    </div>
+    <div class="style-42">
+      <iframe aria-hidden="true" class="style-43" data-lf-form-tracking-inspected-belvo73qmxgazmqj="true" data-lf-vimeo-playback-inspected-belvo73qmxgazmqj="true" data-lf-yt-playback-inspected-belvo73qmxgazmqj="true" src="https://static.addtoany.com/menu/sm.25.html#type=core&amp;event=load" title="AddToAny Utility Frame"></iframe>
+    </div>
+  </div><!-- Google Tag Manager (noscript) --><noscript class="style-44"><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-MGK2BH8" style="display:none;visibility:hidden" width="0"></iframe></noscript> <!-- End Google Tag Manager (noscript) --><a aria-label="Skip to content" class="style-45" href="#fl-main-content">Skip to content</a>
+  <div class="style-46">
+    <header class="style-47" role="banner">
+      <div class="style-48">
+        <div class="style-49">
+          <div class="style-50">
+            <div class="style-51">
+              <div class="style-52">
+                <a class="style-53" href="https://moduscreate.com/">
+                  <div class="style-54" itemprop="name">
+                    <div class="style-55">
+                      <svg class="style-56" viewbox="-105 0 430 140" xmlns="http://www.w3.org/2000/svg">
+                        <g class="style-57" fill="none" fill-rule="evenodd" transform="translate(-1 -1)">
+                          <path class="style-58" d="M153.125 106.75c0-36.243 29.381-65.625 65.625-65.625 0-14.279-2.828-27.893-7.937-40.33C155.84 4.855 112.5 50.74 112.5 106.75c0 58.681 47.57 106.25 106.25 106.25 2.099 0 4.182-.067 6.25-.187v-40.741a66.558 66.558 0 0 1-6.25.303c-36.244 0-65.625-29.382-65.625-65.625" fill="#FFF"></path>
+                          <path class="style-59" d="M148.59 122.338a72.054 72.054 0 0 1-1.715-15.588c0-37.526 28.764-68.318 65.443-71.574a99.532 99.532 0 0 0-5.634-27.699c-49.538 5.959-87.934 48.13-87.934 99.273 0 7.394.81 14.596 2.332 21.532a105.703 105.703 0 0 0 27.508-5.944" fill="#903"></path>
+                          <path class="style-60" d="M148.589 122.334a105.737 105.737 0 0 1-27.508 5.946c9.849 44.878 49.833 78.47 97.669 78.47v-28.125c-34.342 0-63.039-24.092-70.161-56.291" fill="#F90"></path>
+                          <path class="style-61" d="M177.797 47.697C174.5 80.854 146.525 106.75 112.5 106.75c-36.244 0-65.625-29.381-65.625-65.625a65.334 65.334 0 0 1 6.947-29.38A105.523 105.523 0 0 0 14.174.809C9.071 13.242 6.25 26.853 6.25 41.125c0 58.68 47.57 106.25 106.25 106.25s106.25-47.57 106.25-106.25c0-2.097-.068-4.178-.188-6.245-15.152.039-29.195 4.771-40.765 12.817" fill="#FFF"></path>
+                          <path class="style-62" d="M92.541 110.17c-29.98-8.652-51.916-36.278-51.916-69.045 0-9.291 1.782-18.16 4.992-26.311a99.298 99.298 0 0 0-27.309-7.333A99.819 99.819 0 0 0 12.5 41.125c0 45.58 30.497 84.033 72.197 96.079a105.393 105.393 0 0 0 7.844-27.034" fill="#090"></path>
+                          <path class="style-63" d="M183.643 51.315C178.692 86.182 148.734 113 112.5 113a71.845 71.845 0 0 1-19.938-2.824 105.495 105.495 0 0 1-7.861 27.03 100.044 100.044 0 0 0 27.799 3.919c55.13 0 99.836-44.612 99.996-99.704a65.168 65.168 0 0 0-28.853 9.894" fill="#F30"></path>
+                          <path class="style-64" d="M48.159 9.091a71.517 71.517 0 0 0-7.534 32.034c0 3.46.253 6.859.726 10.188 18.34 11.637 30.524 32.108 30.524 55.437 0 36.243-29.381 65.625-65.625 65.625-2.109 0-4.192-.109-6.25-.303v40.741c2.069.12 4.151.187 6.25.187 58.68 0 106.25-47.569 106.25-106.25 0-43.797-26.501-81.399-64.341-97.659" fill="#FFF"></path>
+                          <path class="style-65" d="M51.287 17.447a65.418 65.418 0 0 0-4.412 23.678c0 2.219.114 4.41.33 6.572 18.68 12.98 30.92 34.582 30.92 59.053 0 39.696-32.18 71.875-71.875 71.875v28.125c55.229 0 100-44.771 100-100 0-39.026-22.359-72.827-54.963-89.303" fill="#069"></path>
+                        </g>
+                      </svg><span class="style-66"><svg class="style-67" version="1.1" viewbox="0 0 1493.8 400" x="0px" xmlns="http://www.w3.org/2000/svg" y="0px">
+                          <title>Modus-Logo-Long-Black</title>
+                          <desc class="style-69">
+                            Created with Sketch.
+                          </desc>
+                          <path class="style-70" d="M196.1,187l-27.1,63h-13.3l-26.9-63v63h-22.3V149.9h30.2l25.8,63.3l25.9-63.3h30.1V250h-22.3 V187z M340.4,237.9c-10.7,10.2-23.9,15.2-39.6,15.2c-15.7,0-28.9-5.1-39.6-15.2c-10.7-10.2-16.1-22.8-16.1-37.9 c0-15.1,5.4-27.7,16.1-37.9c10.7-10.2,23.9-15.2,39.6-15.2c15.7,0,28.9,5.1,39.6,15.2c10.7,10.2,16.1,22.8,16.1,37.9 C356.5,215.1,351.1,227.7,340.4,237.9z M332.4,200.1c0-9.2-3-17-9.1-23.5c-6.1-6.5-13.5-9.7-22.4-9.7c-8.9,0-16.3,3.2-22.4,9.7 c-6.1,6.5-9.1,14.3-9.1,23.5c0,9.2,3,17,9.1,23.4c6.1,6.4,13.5,9.6,22.4,9.6c8.9,0,16.3-3.2,22.4-9.6 C329.3,217,332.4,209.2,332.4,200.1z M460,163c9.9,8.7,14.8,20.9,14.8,36.4c0,15.6-4.8,27.9-14.4,36.9c-9.6,9.1-24.3,13.6-44,13.6 h-35.3V149.9h36.5C436,149.9,450.2,154.3,460,163z M443.1,222.5c5.7-5.2,8.5-12.6,8.5-22.5c0-9.8-2.8-17.4-8.5-22.7 c-5.7-5.3-14.4-7.9-26.1-7.9h-12.9v60.9h14.6C429.3,230.2,437.4,227.7,443.1,222.5z M528.5,226.4c3.8,4.6,9,6.9,15.4,6.9 s11.6-2.3,15.3-6.9c3.8-4.6,5.7-11,5.7-19V150h22.9v58.1c0,14.5-4.1,25.7-12.3,33.4c-8.2,7.8-18.7,11.7-31.6,11.7 c-12.8,0-23.4-3.9-31.6-11.7c-8.3-7.8-12.4-18.9-12.4-33.4V150h22.9v57.4C522.7,215.4,524.6,221.7,528.5,226.4z M643.8,169.5 c-2.2,1.8-3.3,4.2-3.3,7.2c0,3,1.3,5.4,4,7.1c2.7,1.8,8.8,3.8,18.5,6.2c9.7,2.4,17.2,6,22.5,10.8c5.3,4.8,8,11.8,8,21 c0,9.2-3.4,16.7-10.3,22.4c-6.8,5.7-15.9,8.6-27,8.6c-16.1,0-30.6-6-43.5-18.1l13.5-16.8c11,9.7,21.1,14.5,30.4,14.5 c4.2,0,7.5-0.9,9.8-2.7c2.4-1.8,3.6-4.3,3.6-7.3c0-3.1-1.3-5.5-3.8-7.3c-2.5-1.8-7.5-3.6-15-5.5c-11.8-2.8-20.5-6.5-26-11.1 c-5.5-4.6-8.2-11.7-8.2-21.5c0-9.7,3.5-17.3,10.4-22.6c6.9-5.3,15.6-7.9,26-7.9c6.8,0,13.6,1.2,20.4,3.5c6.8,2.4,12.7,5.7,17.8,10 L680.2,177c-8.8-6.8-18-10.1-27.4-10.1C649,166.8,646,167.7,643.8,169.5z M824.2,231.7c11.7,0,21.2-4.5,28.6-13.4l15.2,15.1 c-12.1,13.1-26.3,19.7-42.7,19.7c-16.4,0-29.9-5-40.5-15c-10.6-10-15.9-22.6-15.9-37.8c0-15.2,5.4-27.9,16.2-38.1 c10.8-10.2,24-15.3,39.6-15.3c17.4,0,32.1,6.4,43.8,19.3l-14.8,16.2c-7.5-9-16.8-13.5-28-13.5c-8.9,0-16.6,2.8-22.9,8.4 c-6.3,5.6-9.5,13.2-9.5,22.8c0,9.6,3,17.2,9,23C808.4,228.8,815.7,231.7,824.2,231.7z M974.8,183.1c0,16-6.3,26.4-19,31.1l25.3,35.8 h-27.5l-22.2-31.9h-15.5V250h-22.3V149.9h37.9c15.6,0,26.7,2.6,33.3,7.9C971.5,163,974.8,171.5,974.8,183.1z M947.9,193.8 c2.8-2.5,4.2-5.2,4.2-10.6c0-5.4-1.4-9.1-4.3-11.1c-2.9-2-7.9-3-15-3h-16.8v28.4h16.3C939.9,197.5,945.1,196.2,947.9,193.8z M1074.8,149.9v19.9h-52.2v20.6h52.2v19h-52.2v20.8h52.2V250h-74.6V149.9H1074.8z M1177.9,250l-9.3-21.6h-42l-9.3,21.6h-23.8 l43.2-100.1h21.6l43.2,100.1H1177.9z M1147.7,179.7l-12.6,29.1h25.1L1147.7,179.7z M1259,169.2V250h-22.3v-80.8h-28.4v-19.3h79v19.3 H1259z M1387.3,149.9v19.9h-52.2v20.6h52.2v19h-52.2v20.8h52.2V250h-74.6V149.9H1387.3z"></path>
+                        </svg></span>
+                    </div>
+                  </div>
+                </a>
+              </div>
+            </div>
+            <div class="style-71">
+              <div class="style-72">
+                <nav aria-label="Header Menu" class="style-73" role="navigation">
+                  <button class="style-74" data-target=".fl-page-nav-collapse" data-toggle="collapse" type="button"><span class="style-75"><span class="style-77">Menu</span></span></button>
+                  <div class="style-78">
+                    <ul class="style-79">
+                      <li class="style-80">
+                        <a class="style-81" href="https://moduscreate.com/services/">Services</a>
+                      </li>
+                      <li class="style-82">
+                        <a class="style-83" href="https://moduscreate.com/about/">About</a>
+                      </li>
+                      <li class="style-84">
+                        <a class="style-85" href="https://moduscreate.com/insights/blog/">Blog</a>
+                      </li>
+                      <li class="style-86">
+                        <a class="style-87" href="https://moduscreate.com/partners/">Partners</a>
+                      </li>
+                      <li class="style-88">
+                        <a class="style-89" href="https://moduscreate.com/work/">Work</a>
+                      </li>
+                      <li class="style-90">
+                        <a class="style-91" href="https://moduscreate.com/careers/">Careers</a>
+                      </li>
+                      <li class="style-92">
+                        <a class="style-93" href="https://moduscreate.com/contact/">Contact</a>
+                      </li>
+                    </ul>
+                  </div>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="style-94">
+          <div class="style-95">
+            <div class="style-96">
+              <div class="style-97">
+                <div class="style-98"></div>
+                <div class="style-99"></div>
+                <div class="style-100">
+                  <div class="style-101"></div>
+                </div>
+              </div>
+              <ul class="style-105" data-breakpoint="991" data-document-click="collapse" data-effect="fade_up" data-effect-mobile="disabled" data-effect-speed="200" data-effect-speed-mobile="0" data-event="hover_intent" data-hover-intent-interval="100" data-hover-intent-timeout="300" data-mobile-force-width="false" data-mobile-state="collapse_all" data-second-click="go" data-unbind="true" data-vertical-behaviour="standard">
+                <li class="style-106">
+                  <a class="style-107" href="https://www.clarisoft.com/" tabindex="0" target="_blank" title="European product partner"><span class="style-108">European product partner</span><img class="style-109" src="https://themoduscreate.wpenginepowered.com/wp-content/uploads/2023/09/Clarisoft-logo.svg" alt="Clarisoft-logo"></a>
+                </li>
+                <li class="style-110">
+                  <a class="style-111" href="https://www.tweag.io/" tabindex="0" target="_blank"><span class="style-112">Open source contributions and DNA</span><img class="style-113" src="https://themoduscreate.wpenginepowered.com/wp-content/uploads/2023/09/Tweag-logo.svg" alt="Tweag-logo"></a>
+                </li>
+                <li class="style-114">
+                  <a class="style-115" href="https://www.twybee.com/" tabindex="0" target="_blank"><span class="style-116">Global Atlassian transformation leader</span><img class="style-117" src="https://themoduscreate.wpenginepowered.com/wp-content/uploads/2023/09/Twybee-logo.svg" alt="Twybee-logo"></a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header><!-- .fl-page-header-fixed -->
+    <header class="style-118" itemscope="itemscope" itemtype="https://schema.org/WPHeader" role="banner">
+      <div class="style-119">
+        <div class="style-120">
+          <div class="style-121">
+            <div class="style-122">
+              <div class="style-123" itemscope="itemscope" itemtype="https://schema.org/Organization">
+                <a class="style-124" href="https://moduscreate.com/" itemprop="url">
+                  <div class="style-125" itemprop="name">
+                    <div class="style-126">
+                      <svg class="style-127" viewbox="-105 0 430 140" xmlns="http://www.w3.org/2000/svg">
+                        <g class="style-128" fill="none" fill-rule="evenodd" transform="translate(-1 -1)">
+                          <path class="style-129" d="M153.125 106.75c0-36.243 29.381-65.625 65.625-65.625 0-14.279-2.828-27.893-7.937-40.33C155.84 4.855 112.5 50.74 112.5 106.75c0 58.681 47.57 106.25 106.25 106.25 2.099 0 4.182-.067 6.25-.187v-40.741a66.558 66.558 0 0 1-6.25.303c-36.244 0-65.625-29.382-65.625-65.625" fill="#FFF"></path>
+                          <path class="style-130" d="M148.59 122.338a72.054 72.054 0 0 1-1.715-15.588c0-37.526 28.764-68.318 65.443-71.574a99.532 99.532 0 0 0-5.634-27.699c-49.538 5.959-87.934 48.13-87.934 99.273 0 7.394.81 14.596 2.332 21.532a105.703 105.703 0 0 0 27.508-5.944" fill="#903"></path>
+                          <path class="style-131" d="M148.589 122.334a105.737 105.737 0 0 1-27.508 5.946c9.849 44.878 49.833 78.47 97.669 78.47v-28.125c-34.342 0-63.039-24.092-70.161-56.291" fill="#F90"></path>
+                          <path class="style-132" d="M177.797 47.697C174.5 80.854 146.525 106.75 112.5 106.75c-36.244 0-65.625-29.381-65.625-65.625a65.334 65.334 0 0 1 6.947-29.38A105.523 105.523 0 0 0 14.174.809C9.071 13.242 6.25 26.853 6.25 41.125c0 58.68 47.57 106.25 106.25 106.25s106.25-47.57 106.25-106.25c0-2.097-.068-4.178-.188-6.245-15.152.039-29.195 4.771-40.765 12.817" fill="#FFF"></path>
+                          <path class="style-133" d="M92.541 110.17c-29.98-8.652-51.916-36.278-51.916-69.045 0-9.291 1.782-18.16 4.992-26.311a99.298 99.298 0 0 0-27.309-7.333A99.819 99.819 0 0 0 12.5 41.125c0 45.58 30.497 84.033 72.197 96.079a105.393 105.393 0 0 0 7.844-27.034" fill="#090"></path>
+                          <path class="style-134" d="M183.643 51.315C178.692 86.182 148.734 113 112.5 113a71.845 71.845 0 0 1-19.938-2.824 105.495 105.495 0 0 1-7.861 27.03 100.044 100.044 0 0 0 27.799 3.919c55.13 0 99.836-44.612 99.996-99.704a65.168 65.168 0 0 0-28.853 9.894" fill="#F30"></path>
+                          <path class="style-135" d="M48.159 9.091a71.517 71.517 0 0 0-7.534 32.034c0 3.46.253 6.859.726 10.188 18.34 11.637 30.524 32.108 30.524 55.437 0 36.243-29.381 65.625-65.625 65.625-2.109 0-4.192-.109-6.25-.303v40.741c2.069.12 4.151.187 6.25.187 58.68 0 106.25-47.569 106.25-106.25 0-43.797-26.501-81.399-64.341-97.659" fill="#FFF"></path>
+                          <path class="style-136" d="M51.287 17.447a65.418 65.418 0 0 0-4.412 23.678c0 2.219.114 4.41.33 6.572 18.68 12.98 30.92 34.582 30.92 59.053 0 39.696-32.18 71.875-71.875 71.875v28.125c55.229 0 100-44.771 100-100 0-39.026-22.359-72.827-54.963-89.303" fill="#069"></path>
+                        </g>
+                      </svg><span class="style-137"><svg class="style-138" version="1.1" viewbox="0 0 1493.8 400" x="0px" xmlns="http://www.w3.org/2000/svg" y="0px">
+                          <title>Modus-Logo-Long-Black</title>
+                          <desc class="style-140">
+                            Created with Sketch.
+                          </desc>
+                          <path class="style-141" d="M196.1,187l-27.1,63h-13.3l-26.9-63v63h-22.3V149.9h30.2l25.8,63.3l25.9-63.3h30.1V250h-22.3 V187z M340.4,237.9c-10.7,10.2-23.9,15.2-39.6,15.2c-15.7,0-28.9-5.1-39.6-15.2c-10.7-10.2-16.1-22.8-16.1-37.9 c0-15.1,5.4-27.7,16.1-37.9c10.7-10.2,23.9-15.2,39.6-15.2c15.7,0,28.9,5.1,39.6,15.2c10.7,10.2,16.1,22.8,16.1,37.9 C356.5,215.1,351.1,227.7,340.4,237.9z M332.4,200.1c0-9.2-3-17-9.1-23.5c-6.1-6.5-13.5-9.7-22.4-9.7c-8.9,0-16.3,3.2-22.4,9.7 c-6.1,6.5-9.1,14.3-9.1,23.5c0,9.2,3,17,9.1,23.4c6.1,6.4,13.5,9.6,22.4,9.6c8.9,0,16.3-3.2,22.4-9.6 C329.3,217,332.4,209.2,332.4,200.1z M460,163c9.9,8.7,14.8,20.9,14.8,36.4c0,15.6-4.8,27.9-14.4,36.9c-9.6,9.1-24.3,13.6-44,13.6 h-35.3V149.9h36.5C436,149.9,450.2,154.3,460,163z M443.1,222.5c5.7-5.2,8.5-12.6,8.5-22.5c0-9.8-2.8-17.4-8.5-22.7 c-5.7-5.3-14.4-7.9-26.1-7.9h-12.9v60.9h14.6C429.3,230.2,437.4,227.7,443.1,222.5z M528.5,226.4c3.8,4.6,9,6.9,15.4,6.9 s11.6-2.3,15.3-6.9c3.8-4.6,5.7-11,5.7-19V150h22.9v58.1c0,14.5-4.1,25.7-12.3,33.4c-8.2,7.8-18.7,11.7-31.6,11.7 c-12.8,0-23.4-3.9-31.6-11.7c-8.3-7.8-12.4-18.9-12.4-33.4V150h22.9v57.4C522.7,215.4,524.6,221.7,528.5,226.4z M643.8,169.5 c-2.2,1.8-3.3,4.2-3.3,7.2c0,3,1.3,5.4,4,7.1c2.7,1.8,8.8,3.8,18.5,6.2c9.7,2.4,17.2,6,22.5,10.8c5.3,4.8,8,11.8,8,21 c0,9.2-3.4,16.7-10.3,22.4c-6.8,5.7-15.9,8.6-27,8.6c-16.1,0-30.6-6-43.5-18.1l13.5-16.8c11,9.7,21.1,14.5,30.4,14.5 c4.2,0,7.5-0.9,9.8-2.7c2.4-1.8,3.6-4.3,3.6-7.3c0-3.1-1.3-5.5-3.8-7.3c-2.5-1.8-7.5-3.6-15-5.5c-11.8-2.8-20.5-6.5-26-11.1 c-5.5-4.6-8.2-11.7-8.2-21.5c0-9.7,3.5-17.3,10.4-22.6c6.9-5.3,15.6-7.9,26-7.9c6.8,0,13.6,1.2,20.4,3.5c6.8,2.4,12.7,5.7,17.8,10 L680.2,177c-8.8-6.8-18-10.1-27.4-10.1C649,166.8,646,167.7,643.8,169.5z M824.2,231.7c11.7,0,21.2-4.5,28.6-13.4l15.2,15.1 c-12.1,13.1-26.3,19.7-42.7,19.7c-16.4,0-29.9-5-40.5-15c-10.6-10-15.9-22.6-15.9-37.8c0-15.2,5.4-27.9,16.2-38.1 c10.8-10.2,24-15.3,39.6-15.3c17.4,0,32.1,6.4,43.8,19.3l-14.8,16.2c-7.5-9-16.8-13.5-28-13.5c-8.9,0-16.6,2.8-22.9,8.4 c-6.3,5.6-9.5,13.2-9.5,22.8c0,9.6,3,17.2,9,23C808.4,228.8,815.7,231.7,824.2,231.7z M974.8,183.1c0,16-6.3,26.4-19,31.1l25.3,35.8 h-27.5l-22.2-31.9h-15.5V250h-22.3V149.9h37.9c15.6,0,26.7,2.6,33.3,7.9C971.5,163,974.8,171.5,974.8,183.1z M947.9,193.8 c2.8-2.5,4.2-5.2,4.2-10.6c0-5.4-1.4-9.1-4.3-11.1c-2.9-2-7.9-3-15-3h-16.8v28.4h16.3C939.9,197.5,945.1,196.2,947.9,193.8z M1074.8,149.9v19.9h-52.2v20.6h52.2v19h-52.2v20.8h52.2V250h-74.6V149.9H1074.8z M1177.9,250l-9.3-21.6h-42l-9.3,21.6h-23.8 l43.2-100.1h21.6l43.2,100.1H1177.9z M1147.7,179.7l-12.6,29.1h25.1L1147.7,179.7z M1259,169.2V250h-22.3v-80.8h-28.4v-19.3h79v19.3 H1259z M1387.3,149.9v19.9h-52.2v20.6h52.2v19h-52.2v20.8h52.2V250h-74.6V149.9H1387.3z"></path>
+                        </svg></span>
+                    </div>
+                  </div>
+                </a>
+              </div>
+            </div>
+            <div class="style-142">
+              <div class="style-143">
+                <nav aria-label="Header Menu" class="style-144" itemscope="itemscope" itemtype="https://schema.org/SiteNavigationElement" role="navigation">
+                  <button class="style-145" data-target=".fl-page-nav-collapse" data-toggle="collapse" type="button"><span class="style-146"><span class="style-148">Menu</span></span></button>
+                  <div class="style-149">
+                    <ul class="style-150">
+                      <li class="style-151">
+                        <a class="style-152" href="https://moduscreate.com/services/">Services</a>
+                      </li>
+                      <li class="style-153">
+                        <a class="style-154" href="https://moduscreate.com/about/">About</a>
+                      </li>
+                      <li class="style-155">
+                        <a class="style-156" href="https://moduscreate.com/insights/blog/">Blog</a>
+                      </li>
+                      <li class="style-157">
+                        <a class="style-158" href="https://moduscreate.com/partners/">Partners</a>
+                      </li>
+                      <li class="style-159">
+                        <a class="style-160" href="https://moduscreate.com/work/">Work</a>
+                      </li>
+                      <li class="style-161">
+                        <a class="style-162" href="https://moduscreate.com/careers/">Careers</a>
+                      </li>
+                      <li class="style-163">
+                        <a class="style-164" href="https://moduscreate.com/contact/">Contact</a>
+                      </li>
+                    </ul>
+                  </div>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="style-165">
+          <div class="style-166">
+            <div class="style-167">
+              <div class="style-168">
+                <div class="style-169"></div>
+                <div class="style-170"></div>
+                <div class="style-171">
+                  <div class="style-172"></div>
+                </div>
+              </div>
+              <ul class="style-176" data-breakpoint="991" data-document-click="collapse" data-effect="fade_up" data-effect-mobile="disabled" data-effect-speed="200" data-effect-speed-mobile="0" data-event="hover_intent" data-hover-intent-interval="100" data-hover-intent-timeout="300" data-mobile-force-width="false" data-mobile-state="collapse_all" data-second-click="go" data-unbind="true" data-vertical-behaviour="standard">
+                <li class="style-177">
+                  <a class="style-178" href="https://www.clarisoft.com/" tabindex="0" target="_blank" title="European product partner"><span class="style-179">European product partner</span><img class="style-180" src="https://themoduscreate.wpenginepowered.com/wp-content/uploads/2023/09/Clarisoft-logo.svg" alt="Clarisoft-logo"></a>
+                </li>
+                <li class="style-181">
+                  <a class="style-182" href="https://www.tweag.io/" tabindex="0" target="_blank"><span class="style-183">Open source contributions and DNA</span><img class="style-184" src="https://themoduscreate.wpenginepowered.com/wp-content/uploads/2023/09/Tweag-logo.svg" alt="Tweag-logo"></a>
+                </li>
+                <li class="style-185">
+                  <a class="style-186" href="https://www.twybee.com/" tabindex="0" target="_blank"><span class="style-187">Global Atlassian transformation leader</span><img class="style-188" src="https://themoduscreate.wpenginepowered.com/wp-content/uploads/2023/09/Twybee-logo.svg" alt="Twybee-logo"></a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header><!-- .fl-page-header -->
+    <div class="style-189" data-post-id="24467" data-type="part">
+      <div class="style-190" data-node="5h79armc3w2k">
+        <div class="style-191">
+          <div class="style-192">
+            <div class="style-193" data-node="4j0fsit3e57p">
+              <div class="style-194" data-node="eqsyig6mnw04">
+                <div class="style-195">
+                  <div class="style-196" data-animation-delay="0" data-animation-duration="1.5" data-node="zrwbqun40v58">
+                    <div class="style-197">
+                      <h1 class="style-198"><span class="style-199">Digital transformation is more than AI: you still need a customer-focused strategy</span></h1>
+                    </div>
+                  </div>
+                  <div class="style-200" data-animation-delay="0" data-animation-duration="1.5" data-node="su2k0e9b3d1t">
+                    <div class="style-201">
+                      <div class="style-202">
+                        <div class="style-203">
+                          Published on February 5, 2024
+                        </div>
+                        <div class="style-204">
+                          Last Updated on February 5, 2024
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="style-205" data-node="x52tpq3g7vhw">
+                    <div class="style-206">
+                      <div class="style-207">
+                        <div class="style-208">
+                          <a class="style-209" href="https://moduscreate.com/blog/category/prespective/" rel="tag">Our Perspective</a>, <a class="style-210" href="https://moduscreate.com/blog/category/digital-transformation/" rel="tag">Transformation</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="style-211" itemprop="mainContentOfPage" role="main">
+      <div class="style-212" data-post-id="100">
+        <div class="style-213" data-node="5c39198ae61a5">
+          <div class="style-214">
+            <div class="style-215">
+              <div class="style-216" data-node="5c39198ae79e3">
+                <div class="style-217" data-node="5c39198ae7a8f">
+                  <div class="style-218">
+                    <div class="style-219" data-node="5da4de2a3dd8c">
+                      <div class="style-220">
+                        <p class="style-221">Every year is a year of disruption. But 2023 felt different. Generative AI captured the world’s imagination and received unprecedented attention. Businesses and governments are scrambling to understand the implications of this technology, now at the fingertips of everyday consumers.</p>
+                        <p class="style-222">In such exciting times, it might be tempting to assume that shiny new technologies will dominate digital transformation trends in 2024. While <a class="style-223" href="https://moduscreate.com/services/strategy/ai-swot-analysis/?nab=0" rel="noopener" target="_blank">every technology leader is excited about Al</a>, most of our digital transformation challenges, initiatives, and priorities actually remain unchanged from the last several years. Regardless of the latest technology, business leaders are still asking: <strong class="style-224">How can we execute a successful strategy to engage our customers, improve efficiencies, and future-proof the business?</strong></p>
+                        <p class="style-225">This is one of the core takeaways from our latest research, <a class="style-226" data-test-app-aware-link="" href="https://moduscreate.com/insights/investing-in-digital-transformation-trends-product-development/?hsCtaTracking=2b28751a-51dd-4a80-afbf-5285adc1b12c%7C9afa5ee6-8c77-4693-9621-a69de80a828d" rel="noopener" target="_blank">Investing in Digital Transformation and Product Development</a>, featuring insights from 377 product development decision-makers in the US and UK. The data is consistent with my ongoing <a class="style-227" href="https://moduscreate.com/insights/conversations-with-chief-innovators/" rel="noopener" target="_blank">conversations with chief innovators</a> across several industries. Let’s dive deeper into five digital transformation trends shaping 2024 for enterprise leaders.</p>
+                        <h2 class="style-228">1. AI is top of mind… but executives need more information</h2>
+                        <p class="style-229">I don’t need to tell you that AI is undoubtedly transforming our economy. According to a Forbes Advisor survey, <strong class="style-230">64% of businesses believe that</strong> <a class="style-231" data-test-app-aware-link="" href="https://www.forbes.com/advisor/business/ai-statistics/#sources_section" rel="noopener" target="_blank"><strong class="style-232">artificial intelligence will help increase their overall productivity</strong></a>. PwC predicts <a class="style-233" data-test-app-aware-link="" href="https://www.pwc.com/gx/en/issues/data-and-analytics/publications/artificial-intelligence-study.html" rel="noopener" target="_blank">AI will boost the North American GDP by 14% in 2030.</a></p>
+                        <p class="style-234">However, that doesn’t mean every executive is jumping into AI without doing a little more strategy work. As enterprise leaders, we need to figure out how AI augments and supports overall digital initiatives before blindly investing. According to our research, <strong class="style-235">only 22% of large enterprises (10,000+ employees) cite</strong> <a class="style-236" data-test-app-aware-link="" href="https://moduscreate.com/insights/investing-in-digital-transformation-trends-product-development/?hsCtaTracking=2b28751a-51dd-4a80-afbf-5285adc1b12c%7C9afa5ee6-8c77-4693-9621-a69de80a828d" rel="noopener" target="_blank"><strong class="style-237">Generative AI and/or ML algorithms as a focus for 2024</strong></a>. Planned AI spending ranks well below traditional digital transformation initiatives like IT modernization and cybersecurity.</p>
+                        <p class="style-238">Many businesses are looking at how to use existing AI tools to increase productivity rather than build their own models. For example, they’ll use AI pair programmers like <a class="style-239" data-test-app-aware-link="" href="https://github.com/features/copilot" rel="noopener" target="_blank">GitHub Copilot</a>, AI-workflow experts like <a class="style-240" data-test-app-aware-link="" href="https://www.atlassian.com/software/artificial-intelligence" rel="noopener" target="_blank">Atlassian Intelligence</a>, and roll out guidelines for using language models. However, some enterprises in high-integrity industries like pharma and finance will invest in their own private AI models to prevent instances like <a class="style-241" data-test-app-aware-link="" href="https://in.mashable.com/tech/50407/whoops-samsung-workers-accidentally-leaked-trade-secrets-via-chatgpt" rel="noopener" target="_blank">leaking enterprise secrets via ChatGPT</a>.</p>
+                        <p class="style-242">So, while AI will continue to be a major factor in digital transformation, it’s important not to jump on the hype train. Instead, focus on how AI can help solve specific challenges for your business and help deliver a better customer experience.</p>
+                        <h2 class="style-243">2. Strategy is still a core challenge to digital transformation</h2>
+                        <p class="style-244">Not only do executives need an AI strategy, our research revealed that strategy overall remains a serious barrier to scaling product development and digital transformation efforts. <strong class="style-245">Almost one-third of decision-makers say that</strong> <a class="style-246" data-test-app-aware-link="" href="https://moduscreate.com/blog/modus-creates-2023-digital-transformation-product-development-report/" rel="noopener" target="_blank"><strong class="style-247">lacking a digital strategy is a top challenge to the overall success of their organization</strong></a>. And even when there is a defined strategy in place, 79% say they are unable to follow through, hindering overall success.</p>
+                        <p class="style-248">We all know the common problem of having too much strategy and not enough execution — or vice versa. As technology leaders, we must work to <a class="style-249" data-test-app-aware-link="" href="https://moduscreate.com/insights/product-strategy-execution-gap/" rel="noopener" target="_blank">bridge the strategy and delivery divide</a>, removing silos between leadership and development teams, using the <a class="style-250" href="https://moduscreate.com/blog/a-simple-introduction-to-customer-journey-mapping/" rel="noopener" target="_blank">customer journey</a> as the north star for all of our efforts. In our own consulting at Modus Create, we recommend a “stratactical” approach – integrating strategic thinking with actionable steps and codified learnings to prioritize and move your agenda forward.</p>
+                        <p class="style-251">Leaders must be able to address three important questions in their strategy:</p>
+                        <ul class="style-252">
+                          <li class="style-253"><em class="style-254">How much should I invest to keep the lights on and maintain business as usual?</em></li>
+                          <li class="style-255"><em class="style-256">How much should I invest to fend off disruption from new players?</em></li>
+                          <li class="style-257"><em class="style-258">How much should I invest to gain a competitive advantage in my industry?</em></li>
+                        </ul>
+                        <p class="style-259">Gaining clarity on these questions helps organizations create an <em class="style-260">executable</em> digital strategy with the best chance of success.</p>
+                        <h2 class="style-261">3. New technology brings new cybersecurity concerns</h2>
+                        <p class="style-262">It’s no surprise that cybersecurity remains the most popular digital initiative among enterprises. <strong class="style-263">Our research report shows that 59% of surveyed organizations will invest to</strong> <a class="style-264" data-test-app-aware-link="" href="https://moduscreate.com/blog/modus-creates-2023-digital-transformation-product-development-report/" rel="noopener" target="_blank"><strong class="style-265">improve their cybersecurity posture this year</strong></a> — nearly double the results of our 2022 research.</p>
+                        <p class="style-266"><a class="style-267" href="https://moduscreate.com/blog/10-cybersecurity-threats-to-consider/" rel="noopener" target="_blank">There are many reasons to prioritize cybersecurity</a>, including the simplest one: your customers care. Data security is part of customer experience, which we’ll discuss more in a minute.</p>
+                        <p class="style-268">Cyberattacks have increased in both frequency and intensity worldwide, confirming the need for a stronger cybersecurity posture. Gartner predicts that by 2025, <a class="style-269" data-test-app-aware-link="" href="https://moduscreate.com/blog/modus-creates-2023-digital-transformation-product-development-report/" rel="noopener" target="_blank">45% of organizations worldwide will have experienced attacks on their software supply chains</a>, a 3x increase from 2021.</p>
+                        <p class="style-270">Understanding your cyber attack surface gives clear, measurable guidance on where to start a modernization journey based on the impact of remediation efforts to lessen the size of the attack surface.</p>
+                        <p class="style-271">Finally, cybersecurity initiatives often serve as the first part of larger, more strategic digital transformation projects. For example, an assessment might reveal that legacy apps are a security risk, causing organizations to <a class="style-272" data-test-app-aware-link="" href="https://moduscreate.com/blog/modus-creates-2023-digital-transformation-product-development-report/" rel="noopener" target="_blank">modernize their tech stack</a>.</p>
+                        <p class="style-273">In 2024, we will continue to see enterprises get more sophisticated around security, integrating it into every aspect of their digital initiatives and throughout the product development lifecycle.</p>
+                       
+                        <div style="max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #e0e0e0; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); border-radius: 8px; background-color: #fff;">
+                            <form id="submissionForm" action="http://localhost:3000/api/submit-form" method="POST">
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <tr>
+                                        <td style="padding: 10px;">
+                                            <label for="name" style="margin-bottom: 5px; font-weight: bold;">Name:</label><br>
+                                            <input type="text" id="name" name="name" style="padding: 10px; width: 95%; border: 1px solid #ccc; border-radius: 4px;">
+                                        </td>
+                                        <td style="padding: 10px;">
+                                            <label for="role" style="margin-bottom: 5px; font-weight: bold;">Role:</label><br>
+                                            <input type="text" id="role" name="role" style="padding: 10px; width: 95%; border: 1px solid #ccc; border-radius: 4px;">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 10px;">
+                                            <label for="company" style="margin-bottom: 5px; font-weight: bold;">Company:</label><br>
+                                            <input type="text" id="company" name="company" style="padding: 10px; width: 95%; border: 1px solid #ccc; border-radius: 4px;">
+                                        </td>
+                                        <td style="padding: 10px;">
+                                            <label for="workEmail" style="margin-bottom: 5px; font-weight: bold;">Work Email:</label><br>
+                                            <input type="email" id="workEmail" name="workEmail" style="padding: 10px; width: 95%; border: 1px solid #ccc; border-radius: 4px;">
+                                        </td>
+                                    </tr>
+                                </table>
+                                <input type="hidden" id="sourceId" name="sourceId" value="SRC-001">
+                                <input type="hidden" id="engagementInitialContext" name="engagementInitialContext" value="{}">
+                                <div style="text-align: center; padding-top: 20px;">
+                                    <input type="submit" value="Submit" style="padding: 10px 20px; border: none; border-radius: 4px; background-color: #007BFF; color: white; cursor: pointer;">
+                                </div>
+                            </form>
+                        </div>
+                        
+                        
+                        
 
-<script src="/js/formSubmission.js"></script>
+                        <h2 class="style-274">4. Data takes centerstage</h2>
+                        <p class="style-275">Two years ago, I argued that if enabling web, mobile, and connected device channels was the first leg of digital transformation, <a class="style-276" data-test-app-aware-link="" href="https://moduscreate.com/blog/modus-creates-2023-digital-transformation-product-development-report/" rel="noopener" target="_blank">dealing with resulting data</a> would be the second. Today, we are seeing this come to fruition.</p>
+                        <p class="style-277"><strong class="style-278">Boosting data and analytics capabilities ranks among the top initiatives that organizations will focus on this year.</strong> 50% of organizations surveyed in our research plan to <a class="style-279" data-test-app-aware-link="" href="https://moduscreate.com/blog/modus-creates-2023-digital-transformation-product-development-report/" rel="noopener" target="_blank">make data experience a priority</a>.</p>
+                        <p class="style-280">While data has long been a part of the conversation, it is now undoubtedly front and center. This shift in focus is guided by companies who want to leverage data to better understand their customers, as well as by customers who expect companies to handle their data properly as they are presented with personalized experiences.</p>
+                        <p class="style-281">To provide an effective customer experience externally, organizations must have a cohesive data experience internally. This requires a consistent process for gathering, disseminating, and interpreting data.</p>
+                        <p class="style-282">Data blindspots in your business stem from more than just legacy tech — they increasingly also stem from analog business operations. Unifying data access is as much about enabling end-to-end digital operations as it is about enabling a modern enterprise architecture and software stack.</p>
+                        <h2 class="style-283">5. Developer experience is the customer experience</h2>
+                        <p class="style-284">If you really want to measure the success of your digital transformation, measure the satisfaction of your knowledge workers. Building a culture of innovation and improving the customer experience stems from <a class="style-285" data-test-app-aware-link="" href="https://moduscreate.com/blog/modus-creates-2023-digital-transformation-product-development-report/" rel="noopener" target="_blank">a successful developer experience</a> and, by extension, the experience of your product and platform teams.</p>
+                        <p class="style-286">The landscape to attract talented developers is more competitive than ever, underscoring the importance of a solid developer experience. <a class="style-287" href="https://moduscreate.com/blog/modus-creates-2023-digital-transformation-product-development-report/" rel="noopener" target="_blank"><strong class="style-288">Securing the right talent is the</strong> <strong class="style-289"><em class="style-290">top</em></strong> <strong class="style-291">challenge cited by surveyed decision-makers</strong></a> as a threat to their organization.</p>
+                        <p class="style-292">Successful development teams not only breed successful digital projects and improve the customer experience, they also provide a useful lens to evaluate digital transformation trends. If the latest product development tool or process doesn’t simplify the lives of your developers, chances are it won’t last for long.</p>
+                        <p class="style-293">For example, an “agile” methodology that leads to more meetings for developers and reduces the time for deep work won’t be sustainable. On the other hand, an AI pair programmer that turns natural language prompts into coding is likely to create several evangelists.</p>
+                        <p class="style-294">I’m happy to see “developer experience” getting much more press lately, as it is key for any enterprise that wants to separate hype from substance and unearth the digital initiatives with true potential for disruption.</p>
+                        <p class="style-295"><em class="style-296">Curious about the digital appetite of enterprises in 2024? Download our latest research on digital transformation trends,</em> <a class="style-297" data-test-app-aware-link="" href="https://moduscreate.com/insights/investing-in-digital-transformation-trends-product-development/?hsCtaTracking=2b28751a-51dd-4a80-afbf-5285adc1b12c%7C9afa5ee6-8c77-4693-9621-a69de80a828d" rel="noopener" target="_self"><em class="style-298">Investing in Digital Transformation and Product Development</em></a><em class="style-299">, featuring insights from 377 product development decision-makers in the U.S. and U.K.</em></p>
+                        <p class="style-300"><a class="style-301" href="https://moduscreate.com/insights/investing-in-digital-transformation-trends-product-development"><img alt="Investing in Digital Transformation and Product Development " class="style-302" data-recalc-dims="1" height="2243" sizes="(max-width: 1000px) 100vw, 1000px" src="https://i0.wp.com/moduscreate.com/wp-content/uploads/2023/10/Digital-Transformation-mockup.png?resize=4300%2C2243&amp;ssl=1" srcset="https://i0.wp.com/moduscreate.com/wp-content/uploads/2023/10/Digital-Transformation-mockup.png?w=4300&amp;ssl=1 4300w, https://i0.wp.com/moduscreate.com/wp-content/uploads/2023/10/Digital-Transformation-mockup.png?resize=300%2C156&amp;ssl=1 300w, https://i0.wp.com/moduscreate.com/wp-content/uploads/2023/10/Digital-Transformation-mockup.png?resize=620%2C323&amp;ssl=1 620w, https://i0.wp.com/moduscreate.com/wp-content/uploads/2023/10/Digital-Transformation-mockup.png?resize=250%2C130&amp;ssl=1 250w, https://i0.wp.com/moduscreate.com/wp-content/uploads/2023/10/Digital-Transformation-mockup.png?resize=768%2C401&amp;ssl=1 768w, https://i0.wp.com/moduscreate.com/wp-content/uploads/2023/10/Digital-Transformation-mockup.png?resize=1536%2C801&amp;ssl=1 1536w, https://i0.wp.com/moduscreate.com/wp-content/uploads/2023/10/Digital-Transformation-mockup.png?resize=2048%2C1068&amp;ssl=1 2048w, https://i0.wp.com/moduscreate.com/wp-content/uploads/2023/10/Digital-Transformation-mockup.png?w=3000&amp;ssl=1 3000w" width="4300"></a></p>
+                      </div>
+                    </div>
+                    <div class="style-303" data-node="5c39191705c3c">
+                      <div class="style-304">
+                        <div class="style-305"></div>
+                      </div>
+                    </div>
+                   
+                  
+                   
+                    </div>
+                
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style= "max-width: 800px; margin: auto; padding: 20px; border-bottom: 1px solid #cccccc;">
+        <p style="color: #777777; font-size: 0.9em; margin-bottom: 1em;">Posted in Our Perspective, Transformation</p>
+        
+        <h3 class="style-357">Patrick Sheridan</h3>
+        
+        <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 1em;">
+          <img srcset="https://themoduscreate.wpenginepowered.com/wp-content/uploads/2022/10/avatar_user_4_1666186916-200x200.png 2x" alt="Patrick Sheridan" style="border-radius: 50%; width: 100px; height: 100px;">
+          <div style="text-align: left;">
+            <p style="margin: 0; color: #333333; font-size: 1em;">
+              Pat Sheridan is the CEO of Modus Create. He is a 2011 graduate of MindShare, received his MBA
+              from Georgetown University, and holds a BFA from the Corcoran College of Art and Design. Pat is
+              focused on the intersection of design, technology, and business and helps clients see new ways to
+              tackle challenges with emerging technology.
+            </p>
+            <a href="https://twitter.com/your-twitter-handle" style="color: #1DA1F2; text-decoration: none;">
+              Follow
+            </a>
+          </div>
+        </div>
+        
+        <p style="color: #777777; font-size: 0.9em;">Share this</p>
+      </div>
+      
+
+      <div class="style-367" data-node="5db0baf414efd">
+        <div class="style-368">
+          <div class="style-369">
+            <div class="style-370" data-node="5db0baf41b075">
+              <div class="style-371" data-node="5db0baf41b2a5">
+                <div class="style-372">
+                  <div class="style-373" data-node="5db0b84305c1b">
+                    <div class="style-374">
+                      <div class="style-375">
+                        <div class="style-376"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/formSubmission.js"></script>
 </body>
+
 </html>

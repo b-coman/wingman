@@ -42,10 +42,10 @@ exports.executeAssessmentFlow = async (assessmentRecordId, assessmentType) => {
                 logger.info(`promptsIDs: ${promptsIDs}`);
 
                 // finds the value of ApprovedPromptID
-                const approvedPromptId = await engagementPromptsService.findApprovedPromptRecord(promptsIDs);
-                logger.info(`approvedPromptId: ${approvedPromptId}`);
+                const approvedPromptRecordId = await engagementPromptsService.findApprovedPromptRecord(promptsIDs);
+                logger.info(`approvedPromptId: ${approvedPromptRecordId}`);
                 
-                await doAssessmentGeneral(engagementRecordId, engagementId, assessmentRecordId, assessmentId, approvedPromptId);
+                await doAssessmentGeneral(engagementRecordId, engagementId, assessmentRecordId, assessmentId, approvedPromptRecordId);
                 break;
             case 'Specific':
                 await doAssessmentSpecific(assessmentId);

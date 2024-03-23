@@ -14,7 +14,7 @@ const ajv = new Ajv();
 const marketingAgentResponseSchema = require('../../schemas/marketingAgentResponseSchema.json');
 const wingmanAgentsService = require('../services/wingmanAgentsService');
 const { insertEngagementPrompt } = require('../lib/airtableUtils');
-const agents = require('../../config');
+const { agents, emails } = require('../../config');
 const logFlowTracking = require('../services/flowTrackingService');
 const { delay } = require('../utils/utils'); // Adjust the path as necessary
 
@@ -60,9 +60,9 @@ exports.execute = async (formData) => {
         const engagementSourceDetails = sourceRecord.EngagementSourceDetails;
 
         // STEP 2 --> call the Marketing Agent to ask about research prompt candidates
-        crewName = "Marketing";
-        taskDescription = agents.marketingTaskDescription;
-        taskPrompt = agents.marketingTaskPrompt.replace('$(COMPANY)', company).replace('$(DOMAIN)', domain).replace('$(SOURCE_DETAILS)', engagementSourceDetails);
+        const crewName = "Marketing";
+        const taskDescription = agents.marketingTaskDescription;
+        const taskPrompt = agents.marketingTaskPrompt.replace('$(COMPANY)', company).replace('$(DOMAIN)', domain).replace('$(SOURCE_DETAILS)', engagementSourceDetails);
 
         // Prepare data for agent tracking
         const agentData = {
@@ -75,9 +75,11 @@ exports.execute = async (formData) => {
 
         // Start tracking the agent activity
         const runID = await airtableUtils.createAgentActivityRecord(companyId, crewName, taskDescription, taskPrompt);
+        logger.info(`Agent activity run ID: ${runID}, type: ${typeof runID}`);
 
         // Call the agent with the prompt
-        const agentResponse = await wingmanAgentsService.callWingmanAgentsApp(crewName, taskDescription, taskPrompt);
+        const agentResponse = await wingmanAgentsService.callWingmanAgentsApp(crewName, taskDescription, taskPrompt, agents.marketingAgentEndpoint);
+        logger.info('Agent response:', agentResponse);
 
         // Complete tracking the agent activity with the response
         await airtableUtils.updateAgentActivityRecord(runID, agentResponse);

@@ -8,7 +8,6 @@ const logger = require('../../logger');
  * Sends an email using nodemailer with customizable subject and body.
  * @param {string} toEmail - The recipient's email address.
  * @param {string} subject - The subject of the email.
- * @param {string} textBody - The plain text body of the email.
  * @param {string} htmlBody - The HTML body of the email.
  */
 exports.sendEmail = async (toEmail, subject, body) => {

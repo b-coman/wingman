@@ -9,7 +9,7 @@ document.getElementById('submissionForm').addEventListener('submit', function(ev
         company: document.getElementById('company').value,
         role: document.getElementById('role').value,
         workEmail: document.getElementById('workEmail').value,
-        sourceId: 'SRC-001',
+        sourceId: envDefaultSourceId,
         engagementInitialContext: '{}'
     };
 
