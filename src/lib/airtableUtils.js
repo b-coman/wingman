@@ -372,6 +372,66 @@ exports.createPainAssessmentDetails = async (agentResponseResult, assessmentDeta
 };
 
 
+// Function to get an entry from the 'AssessmentDetails:FinalReport' table by AssessmentDetailID
+exports.getFinalReportEntry = async (assessmentDetailsId) => {
+    const table = base('AssessmentDetails:FinalReport');
+    try {
+        const records = await table.select({
+            filterByFormula: `{AssessmentDetailID} = '${[assessmentDetailsId]}'`,
+            maxRecords: 1
+        }).firstPage();
+logger.info(`getFinalReportEntry: ${records.length}`);
+        return records.length > 0 ? records[0] : null;
+    } catch (error) {
+        console.error('Error in getFinalReportEntry:', error);
+        throw error;
+    }
+};
+
+// Function to update an entry in the 'AssessmentDetails:FinalReport' table
+exports.updateFinalReportEntry = async (assessmentDetailsId, markdownContent, htmlContent, pdfFileName, pdfFileURL) => {
+    const table = base('AssessmentDetails:FinalReport');
+    try {
+        const existingEntry = await exports.getFinalReportEntry(assessmentDetailsId);
+        if (existingEntry) {
+            const updatedRecord = await table.update(existingEntry.id, {
+                'ReportContentMarkdown': markdownContent,
+                'ReportContentHTML': htmlContent,
+                'ReportPDFfileName': pdfFileName,
+                'ReportPDFURL': pdfFileURL
+            });
+            return updatedRecord;
+        } else {
+            throw new Error(`FinalReportEntry not found for AssessmentDetailID: ${assessmentDetailsId}`);
+        }
+    } catch (error) {
+        console.error('Error in updateFinalReportEntry:', error);
+        throw error;
+    }
+};
+
+// Function to create a new entry in the 'AssessmentDetails:FinalReport' table
+exports.createFinalReportEntry = async (assessmentDetailsId, markdownContent, htmlContent, pdfFileName, pdfFileURL) => {
+    const table = base('AssessmentDetails:FinalReport');
+    try {
+        const createdRecord = await table.create({
+            'AssessmentDetailID': [assessmentDetailsId],
+            'ReportContentMarkdown': markdownContent,
+            'ReportContentHTML': htmlContent,
+            'ReportPDFfileName': pdfFileName,
+            'ReportPDFURL': pdfFileURL
+        });
+        return createdRecord;
+    } catch (error) {
+        console.error('Error in createFinalReportEntry:', error);
+        throw error;
+    }
+};
+
+
+
+//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
 //------------- FIND --> IMPORTANT (reuse everytime possible)!! Generic function to extract all fields and values for a record based on its primary key
 exports.getAllFieldsForRecord = async (tableName, primaryKeyField, primaryKeyValue) => {
     const table = base(tableName);

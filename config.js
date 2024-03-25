@@ -100,6 +100,92 @@ const emails = {
     adminRawReportGeneratedSubject: 'Raw Report ready for {{{COMPANY_NAME}}}',
     adminRawReportGeneratedContent: `A raw report for {{{COMPANY_NAME}}} under engagement {{{ENGAGEMENT_ID}}} / assessment {{{ASSESSMENT_ID}}} has been completed. 
     <br><br>Please review at your earliest convenience: [Link to Report]. Your approval is required to advance to the next steps.`
+};
+
+const htmlTemplates = {
+    // template for pdf report
+    pdfReport: `
+    <html>
+<head>
+    <title>PDF</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+    body {
+        font-family: 'Arial', sans-serif;
+        font-size: 1.1em; /* Adjust base font size if needed */
+        line-height: 1.6;
+        color: #4A4A4A;
+        background-color: #fff;
+        width: 80%; /* This will make the content width 80% of the page */
+        margin: 0 auto;
+        padding: 2.5em;
+    }
+    h1 {
+        font-size: 2em; /* Equivalent to 26px */
+        font-weight: normal;
+        color: #000;
+        padding-bottom: 0.25em; /* Equivalent to 4px */
+        margin-bottom: 1.25em; /* Equivalent to 20px */
+        border-bottom: 3px solid #4CAF50;
+    }
+    h2 {
+        font-size: 1.5em; /* Equivalent to 22px */
+        font-weight: bold;
+        color: #000;
+        margin-top: 2.5em; /* Equivalent to 40px */
+        margin-bottom: 0.625em; /* Equivalent to 10px */
+    }
+    h3 {
+        font-size: 1.2em; /* Equivalent to 18px */
+        font-weight: bold;
+        margin-top: 1.25em; /* Equivalent to 20px */
+        margin-bottom: 0.5em; /* Equivalent to 8px */
+    }
+    p, ul, li {
+        font-size: 1em; /* Equivalent to 14px */
+        margin-top: 0.625em; /* Equivalent to 10px */
+    }
+    a {
+        color: #1a0dab;
+        text-decoration: none;
+    }
+    a:hover {
+        text-decoration: underline;
+    }
+    ul {
+        list-style-type: none;
+        padding-left: 0;
+    }
+    li {
+        margin-bottom: 0.3125em; /* Equivalent to 5px */
+    }
+    li:before {
+        content: "• ";
+        color: #4CAF50; /* Bullet color */
+        font-weight: bold; /* If you want it to be bold */
+    }
+    .footer {
+        text-align: center;
+        margin-top: 2.5em; /* Equivalent to 40px */
+        padding-top: 1.25em; /* Equivalent to 20px */
+        border-top: 1px solid #EAEAEA;
+        color: #777;
+    }
+    @media print {
+        body {
+            width: 100%; /* Use full width when printing */
+        }
+        /* Adjust font-sizes and widths for printing if necessary */
+    }
+</style>
+</head>
+<body>
+    {{{REPORT}}}
+</body>
+</html>
+
+     ` 
 }
 
-module.exports = { agents, emails }; 
+module.exports = { agents, emails, htmlTemplates }; 

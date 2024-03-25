@@ -1,57 +1,78 @@
+// file name: /src/services/pdfReportService.js
+
+require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const marked = require('marked');
-const puppeteer = require('puppeteer');
-const logger = require('../../logger'); 
+const axios = require('axios');
+const logger = require('../../logger');
 const airtableUtils = require('../lib/airtableUtils');
 
-// Convert Markdown to HTML using 'marked'
-function convertMarkdownToHTML(markdownContent) {
-    return marked(markdownContent);
-}
-
-// Generate and save a PDF from HTML content
-async function generateAndSavePDF(htmlContent, pdfFileName) {
-    try {
-        const pdfFilePath = path.join(__dirname, '..', 'public', 'pdf', pdfFileName);
-        const browser = await puppeteer.launch();
-        const page = await browser.newPage();
-        await page.setContent(htmlContent);
-        await page.pdf({ path: pdfFilePath, format: 'A4' });
-        await browser.close();
-        return pdfFilePath;
-    } catch (error) {
-        logger.error(`Failed to generate or save PDF: ${error}`);
-        throw new Error(`Failed to generate or save PDF: ${error.message}`);
-    }
-}
-
 // Main service function to process agent output, generate a PDF, and update Airtable
-async function processAgentOutput(markdownContent, assessmentDetailId, companyShortName, assessmentSku) {
+async function processAgentOutput(htmlContent, assessmentDetailId, companyName) {
     try {
-        const htmlContent = convertMarkdownToHTML(markdownContent);
-        const pdfFileName = `${companyShortName}-${assessmentSku}-${assessmentDetailId}.pdf`;
-        const pdfFilePath = await generateAndSavePDF(htmlContent, pdfFileName);
+        const pdfFileName = `${companyName}-${assessmentDetailId}.pdf`;
+        const pdfFileURL = await generatePDFWithPDFShift(htmlContent, pdfFileName);
+
+        logger.info(assessmentDetailId);
 
         // Check if an entry exists and update or create accordingly
-        const existingEntry = await airtableUtils.getFinalReportEntry(assessmentDetailId);
-        if (existingEntry) {
-            await airtableUtils.updateFinalReportEntry(assessmentDetailId, markdownContent, htmlContent, pdfFileName);
-        } else {
-            await airtableUtils.createFinalReportEntry(assessmentDetailId, markdownContent, htmlContent, pdfFileName);
-        }
+        //const existingEntry = await airtableUtils.getFinalReportEntry(assessmentDetailId);
+        //logger.info(existingEntry);
 
-        logger.info(`PDF generated and saved at: ${pdfFilePath}`);
+        const xx = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailId, 'AssessmentDetails:FinalReport')
+        logger.info(xx); // --> asta meeergeee!!
+
+        // if (existingEntry) {
+        //     await airtableUtils.updateFinalReportEntry(assessmentDetailId, '', htmlContent, pdfFileName, pdfFileURL);
+        // } else {
+        //     await airtableUtils.createFinalReportEntry(assessmentDetailId, '', htmlContent, pdfFileName, pdfFileURL);
+        // }
+
+        logger.info(`PDF generated and saved at: ${pdfFileURL}`);
         // Optionally return the path or any other data you might need
-        return pdfFilePath;
+        return pdfFileURL;
+
     } catch (error) {
         logger.error(`Error in processAgentOutput: ${error}`);
-        // Depending on your error handling strategy, you might want to rethrow the error, return null, or handle it differently
         throw error; // or handle differently
     }
 }
-module.exports = { processAgentOutput };
 
-// Example usage
-// Replace placeholders with actual values
-// processAgentOutput('Your Markdown Content Here', 'assessmentDetailId', 'CompanyShortName', 'AssessmentSKU');
+
+// Generate and save a PDF from HTML content
+async function generatePDFWithPDFShift(htmlContent, pdfFileName) {
+    const apiURL = 'https://api.pdfshift.io/v3/convert/pdf';
+    const apiKey = process.env.PDFSHIFT_API_KEY; // Replace with your actual API key
+    const auth = Buffer.from(`api:${apiKey}`).toString('base64');
+
+    try {
+        const response = await axios.post(apiURL, {
+            source: htmlContent,
+            sandbox: true, // !!!! set to false to take out the watermark
+            filename: pdfFileName,
+            format: 'A4',
+            use_print: true,
+            margin: '50px',
+            zoom: 0.8,
+
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Basic ${auth}`
+            },
+            responseType: 'json' // Ensure that the response type is JSON to get the URL
+        });
+
+        // Write the PDF to a file
+        //fs.writeFileSync(outputFilePath, response.data);
+        // console.log(`PDF successfully created at ${outputFilePath}`);
+
+        return response.data.url;
+
+    } catch (error) {
+        console.error(`Error converting HTML to PDF: ${error}`);
+    }
+}
+
+module.exports = { processAgentOutput };

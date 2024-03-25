@@ -11,7 +11,7 @@ const wingmanAgentsService = require('../services/wingmanAgentsService');
 const airtableUtils = require('../lib/airtableUtils');
 const logger = require('../../logger');
 const logFlowTracking = require('../services/flowTrackingService');
-const { agents, emails } = require('../../config');
+const { agents, emails, htmlTemplates } = require('../../config');
 const { Type } = require('ajv/dist/compile/util');
 const { DataType } = require('ajv/dist/compile/validate/dataType');
 const { log } = require('handlebars');
@@ -24,6 +24,13 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
         const assessmentStatus = await airtableUtils.findFieldValueByRecordId('Assessments', assessmentRecordId, 'AssessmentStatus');
         const companyDetails = await companyService.fetchCompanyDetailsFromEngagement(engagementRecordId);
 
+        logger.info(`Starting general assessment flow for AssessmentRecordID=${assessmentRecordId}, AssessmentID ${assessmentId}`);
+        logger.info(`   EngagementRecordID: value = ${engagementRecordId}, type = ${typeof engagementRecordId}`);
+        logger.info(`   EngagementID: value = ${engagementId}, type = ${typeof engagementId}`);
+        logger.info(`   AssessmentRecordID: value = ${assessmentRecordId}, type = ${typeof assessmentRecordId}`);
+        logger.info(`   AssessmentID: value = ${assessmentId}, type = ${typeof assessmentId}`);
+        logger.info(`   ApprovedPromptID: value = ${approvedPromptRecordId}, type = ${typeof approvedPromptRecordId}`);
+
         switch (assessmentStatus) {
             case "requested": {
                 logger.yay(`entering the branch for a new assessment with assessmentStatus = ${assessmentStatus}`);
@@ -31,13 +38,6 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
 
                 // update the status for the current assessment to started
                 await airtableUtils.updateRecordField('Assessments', assessmentRecordId, 'AssessmentStatus', 'started');
-
-                logger.info(`Starting general assessment flow for AssessmentRecordID=${assessmentRecordId}, AssessmentID ${assessmentId}`);
-                logger.info(`   EngagementRecordID: value = ${engagementRecordId}, type = ${typeof engagementRecordId}`);
-                logger.info(`   EngagementID: value = ${engagementId}, type = ${typeof engagementId}`);
-                logger.info(`   AssessmentRecordID: value = ${assessmentRecordId}, type = ${typeof assessmentRecordId}`);
-                logger.info(`   AssessmentID: value = ${assessmentId}, type = ${typeof assessmentId}`);
-                logger.info(`   ApprovedPromptID: value = ${approvedPromptRecordId}, type = ${typeof approvedPromptRecordId}`);
 
 
                 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -332,14 +332,30 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                 //TO BE DONE: test if the final report is approved
 
                 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                
-                
+
+
                 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 // WORKING HERE
 
-                // Call processAgentOutput with necessary parameters
-                await processAgentOutput(markdownContent, assessmentDetailId, companyShortName, assessmentSku);
-                console.log('PDF report generated and processed successfully.');
+                var assessmentDetailsId = await airtableUtils.findAssessDetailsByAssessIDAndTemplate(assessmentId, process.env.envDefaultGenAssessFinalResultId);
+                assessmentDetailsId = assessmentDetailsId[0].id
+                logger.info(`assessmentDetailsId = ${assessmentDetailsId}`);
+
+                const genReport = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsId, 'Value');
+                const genReportStatus = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsId, 'Status');
+                logger.info(`genReport = ${genReport}`);
+                logger.info(`genReportStatus = ${genReportStatus}`);
+
+                const companyName = companyDetails.companyName;
+                const companyNameFile = companyName.replace(/\s/g, "-");
+
+                const genReportHTML = await replacePlaceholders.generateContent(isPath = false, htmlTemplates.pdfReport, { REPORT: marked.parse(genReport) });
+
+                // generate PDF and return its url
+                const pdfFilePath = await processAgentOutput(genReportHTML, assessmentDetailsId, companyNameFile, assessmentId);
+                logger.info(`pdfFilePath = ${pdfFilePath}`);
+
+                break;
 
                 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -350,14 +366,8 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
 
                 await logFlowTracking({ flowName: flowName, flowStatus: 'In Progress', flowStep: 'send final report', stepStatus: 'started', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
 
-                var assessmentDetailsId = await airtableUtils.findAssessDetailsByAssessIDAndTemplate(assessmentId, process.env.envDefaultGenAssessFinalResultId);
-                assessmentDetailsId = assessmentDetailsId[0].id
-                logger.info(`assessmentDetailsId = ${assessmentDetailsId}`);
 
-                const genReport = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsId, 'Value');
-                const genReportStatus = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsId, 'Status');
-                logger.info(`genReport = ${genReport}`);
-                logger.info(`genReportStatus = ${genReportStatus}`);
+
 
                 if (genReportStatus == 'approved') { // --> this means we can send the email to the client
 
