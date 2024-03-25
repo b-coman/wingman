@@ -11,10 +11,10 @@ const logger = require('../../logger'); // Adjust the path as needed
  * @param {String} agentResponseResult The response result from the agent to store in assessment details.
  * @param {String} envDefaultGenAssessRawResultId The environment variable indicating the template ID for finding assessment details.
  */
-exports.updateAssessmentDetailsAndStatus = async (assessmentId, assessmentRecordId, agentResponseResult, envDefaultGenAssessRawResultId) => {
+exports.updateAssessmentDetailsAndStatus = async (assessmentId, assessmentRecordId, agentResponseResult, envIDtemplate) => {
     try {
         // Identify the record that should be updated
-        var assessmentDetails = await airtableUtils.findAssessDetailsByAssessIDAndTemplate(assessmentId, envDefaultGenAssessRawResultId);
+        var assessmentDetails = await airtableUtils.findAssessDetailsByAssessIDAndTemplate(assessmentId, envIDtemplate);
         if (assessmentDetails.length === 0) {
             throw new Error("No assessment details found for the given criteria.");
         }
@@ -24,9 +24,6 @@ exports.updateAssessmentDetailsAndStatus = async (assessmentId, assessmentRecord
         await airtableUtils.updateRecordField('AssessmentDetails', assessmentDetailsId, 'Value', agentResponseResult);
         await airtableUtils.updateRecordField('AssessmentDetails', assessmentDetailsId, 'Status', 'pending');
         await airtableUtils.updateRecordField('AssessmentDetails', assessmentDetailsId, 'Date', new Date().toISOString());
-
-        // Update the status for the current assessment
-        await airtableUtils.updateRecordField('Assessments', assessmentRecordId, 'AssessmentStatus', 'web research');
 
         logger.info(`Assessment details and status updated successfully for assessment ID: ${assessmentId}`);
     } catch (error) {

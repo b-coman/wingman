@@ -19,7 +19,7 @@ const agents = {
     The confidence score should reflect the likelihood of the statement being true
     Format your response as a JSON array of objects. Each object should follow this structure: {"statement": "Your statement here", "description": "description here", "confidenceScore": 0.95}.
     Do not include any formatting elements or line breaks within the objects. Ensure to use proper JSON formatting with double quotes for keys and string values.`,
-    
+
     // general assess agent --> used in General Assessment Flow
     generalAssessAgentEndpoint: '/general_assess',
     generalAssessDescription: "Search information on internet",
@@ -29,18 +29,54 @@ const agents = {
     The key area that should be investigated is revelead by the following statement: 
     $(APPROVED_PROMPT).`,
 
+    // identify pains agent
+    generalPainsIdentifierEndpoint: '/identify_pains',
+    generalPainsIdentifierDescription: "Analyze data and provide a list of pains",
+    generalPainsIdentifierTaskPrompt: `You will get two datasets: an initial research about a company named $(COMPANY) and a set of pains structured as JSON.
+     You will get thsese inputs at the end of this prompt.
+     Your task is to look on the initial research and the pains list and extract a list of pains that are very likely to be felt by the company, together with a reasoning why you consider this pain point should be included, considering the company's context revelead by the initial research.
+     You will return the list of selected pains as a JSON array of objects. 
+     Each object should follow this structure: {"recordID": "recordID here, according to the list provided", "painSKU": "the pain identifier here, according to the list provided", "reasoning": "the reason why was chosen", "confidenceScore": ""}.
+     Confidence score should have a value from 0 to 1, where 1 indicates very high confidence.
+     You will provide only the pains you are very confident on, with a score bigger than 0.7.
+     Here are the inputs for you analysis: 
+     // Initial research starts here 
+     {{{INITIAL_RESEARCH}}}
+     // Initial research ends here 
+     // Pains list starts here 
+     {{{PAINS_LIST}}}
+     // Pains list ends here`,
+
     // generate initial report
     generalReportAgentEndpoint: '/create_report',
-    generalReportDescription: "Create a comprehensive report based on an initial reserach",
-    generalReportTaskPrompt: `An initial research about a company named $(COMPANY) was conducted by one of our coleagues. I will provide it at the end of this prompt.
-    Based on this initial research you have to create a profesional business report to be sent and presented to our contact to thei company. 
-    So you need to use a way to address that acomplish this situation. 
-    The idea is something like "we, Modus Create, we created this, and we present the findings to you, $(COMPANY)" - Modus Create is the company you work for.
-    The report should be well structured, according to the best practices you are aware of.
-    You'll start with an introductory part, presenting the context. 
-    Feel free to order the following sections as you wish, but an important aspect is to include at the end a section about how Modus Create can help $(COMPANY) on next step, and improving their capabilities
-    This being said, I wish you a great success and please see here the initial research I mentioned above: 
-    $(INITIAL_RESEARCH).`,
+    generalReportDescription: "Create a comprehensive report based on an initial input data",
+    generalReportTaskPrompt: `You work for a consultancy firm named Modus Create. Modus Create is a technological and management consultancy firm that helps companies to transform their businesses for the new era. Our mantra at Modus is "butique style, enterprise scale".
+    An initial research about a potential new client, {{{COMPANY}}}, was conducted by one of our coleagues. 
+    I will provide it at the end of this prompt, together with a list of possible pains. This list of pains is formated as JSON, and has the following fields:
+    - painSKU - it is an internal identifier, you can ignore it in your analysis
+    - painStatement - a short statement about the pain
+    - painDescription - a longer description about the pain, highlighting what the subject feels when the pain is present
+    - painImpact - possible business impact when pain arises
+    Based on this initial data (research and list of pains) you have to create a profesional business report. General rules you should consider when you formulate your response:
+    - start with an introductory part, explaining the general market/industry context;
+    - next sections will include the following topics: particular challanges that {{{COMPANY}}} is facing, what they feel when a certain challange is present or a pain arises, solutions that might be considered to address the challanges, and how the solutions might impact the business;
+    - at the end include a section about how Modus Create can help the company to address the challanges and the pains - be positive and forward thinking here;
+    - create a flow for the report that is easy to follow and easy to read; I will penalize you if you use bullet points in more than one paragraph;
+    - when appropriate, or when it makes sense to sustain your point of view (especially negative facts), please insert examples and data extracted from the initial reserach - this is super important, don't make negative claims that are not explained, and sustained by data and facts;
+    - you have to formulate the whole report at the second person, in a professional business language - don't use 'they' too often; instead of 'they', use 'your organization' or the name of the company;
+    - you should abstain yourself from making decisive claims; formulate the statements in a potential grammatical mood - please favor an indecisive language, using constructs like 'might be', 'seems', 'very likely';
+    - do not include in the report direct quotes from pain points (or mentioning them directly, leaving the impression you had this data on hand) - instead of that provide a reasoning and your own interpretation;
+    - the report should be formated as markdown, being ready to transformed in a pdf document.
+    
+    This being said, I wish you a great success and please see here the initial research and pain points I mentioned above: 
+
+    // Initial research starts here 
+    {{{INITIAL_RESEARCH}}}
+    // Initial research ends here 
+
+    // potential pain points list starts here 
+    {{{PAINS}}}
+    // potential pain points list ends here`,
 
 };
 
@@ -66,4 +102,4 @@ const emails = {
     <br><br>Please review at your earliest convenience: [Link to Report]. Your approval is required to advance to the next steps.`
 }
 
-module.exports = {agents, emails}; 
+module.exports = { agents, emails }; 

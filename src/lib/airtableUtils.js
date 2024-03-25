@@ -288,6 +288,90 @@ exports.findAssessDetailsByAssessIDAndTemplate = async (assessmentId, templateVa
 
 
 
+/**
+ * Fetches data from the "Pains" table and returns it in a JSON format with specific fields.
+ * @returns {Promise<Array>} An array of objects each containing id, PainSKU, and PainStatement.
+ */
+exports.fetchPainsData = async () => {
+    const table = base('Pains');
+    const painsData = [];
+    await table.select({
+        // Specify any filters if needed, such as fields to retrieve or sorting
+    }).eachPage((records, fetchNextPage) => {
+        records.forEach(record => {
+            painsData.push({
+                recordID: record.id,
+                PainSKU: record.get('PainSKU'),
+                PainStatement: record.get('PainStatement')
+            });
+        });
+        fetchNextPage();
+    });
+
+    return painsData;
+};
+
+
+exports.findPainRecordIdBySKU = async (painSKU) => {
+    const table = base('Pains');
+    try {
+        const records = await table.select({
+            filterByFormula: `{PainSKU} = '${painSKU}'`,
+            maxRecords: 1
+        }).firstPage();
+
+        if (records.length > 0) {
+            return records[0].id; // Return the first record's ID
+        } else {
+            throw new Error(`No record found with PainSKU: ${painSKU}`);
+        }
+    } catch (error) {
+        logger.error(`Error finding record by PainSKU: ${painSKU}: ${error}`);
+        throw error;
+    }
+};
+
+
+/**
+ * Creates entries in the AssessmentDetails:Pains table for each item in the agent's response.
+ * @param {Array} agentResponseResult - The response from the agent as an array of objects.
+ * @param {String} assessmentDetailsId - The ID for the AssessmentDetail linked to these entries.
+ * @returns {Promise<void>}
+ */
+exports.createPainAssessmentDetails = async (agentResponseResult, assessmentDetailsId, runID) => {
+    const assessmentDetailsPainsTable = base('AssessmentDetails:Pains');
+
+    // Define a regex for painSKU format validation
+    const painSKURegex = /^P-\d{2}$/;
+
+    // Iterate through each result item
+    for (const item of agentResponseResult) {
+        try {
+            // Validate painSKU format
+            if (!painSKURegex.test(item.painSKU)) {
+                throw new Error(`Invalid painSKU format: ${item.painSKU}`);
+            }
+
+            const painRecordID = await exports.findPainRecordIdBySKU(item.painSKU); // Lookup the PainID using the painSKU
+            const confidenceScore = parseFloat(item.confidenceScore); // Convert to number
+
+            await assessmentDetailsPainsTable.create({
+                'AssessmentDetailID': [assessmentDetailsId],
+                'PainID': [painRecordID],
+                'ConfidenceScore': confidenceScore,
+                'Reason': item.reasoning,
+                'AgentRunID' : [runID]
+            });
+
+            //logger.info(`Entry created with PainSKU: ${item.painSKU}`);
+        } catch (error) {
+            logger.error(`Error creating entry with PainSKU: ${item.painSKU}: ${error}`);
+            console.error(error);
+        }
+    }
+};
+
+
 //------------- FIND --> IMPORTANT (reuse everytime possible)!! Generic function to extract all fields and values for a record based on its primary key
 exports.getAllFieldsForRecord = async (tableName, primaryKeyField, primaryKeyValue) => {
     const table = base(tableName);
