@@ -2,6 +2,7 @@ body {
   background-color: #f4f4f4;
 }
 
+
 .navbar-brand {
   font-weight: bold;
   color: #fff !important;
@@ -52,9 +53,15 @@ tr:nth-child(even) {
 }
 
 .btn-primary:hover {
-  background-color: #0069d9;
+  background-color: #0052ab;
   border-color: #0062cc;
 }
+
+.btn-primary:active {
+  background-color: #00356d; /* Darker blue on click */
+  border-color: #004085;
+}
+
 
 .btn-secondary {
   background-color: #6c757d;

@@ -2,15 +2,16 @@
 
 require('dotenv').config();
 const nodemailer = require('nodemailer');
-const logger = require('../../logger'); 
+const logger = require('../../logger');
 
 /**
- * Sends an email using nodemailer with customizable subject and body.
+ * Sends an email using nodemailer with customizable subject, body, and attachments.
  * @param {string} toEmail - The recipient's email address.
  * @param {string} subject - The subject of the email.
- * @param {string} htmlBody - The HTML body of the email.
+ * @param {string} body - The HTML body of the email.
+ * @param {Array} [attachments=[]] - Array of attachment objects.
  */
-exports.sendEmail = async (toEmail, subject, body) => {
+exports.sendEmail = async (toEmail, subject, body, attachments = []) => {
     const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -24,6 +25,7 @@ exports.sendEmail = async (toEmail, subject, body) => {
         to: toEmail, // Recipient's email address
         subject: subject, // Subject line
         html: body, // HTML body
+        attachments, // Attachments array
     };
 
     try {

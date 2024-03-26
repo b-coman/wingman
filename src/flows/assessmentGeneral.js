@@ -15,6 +15,8 @@ const { agents, emails, htmlTemplates } = require('../../config');
 const { Type } = require('ajv/dist/compile/util');
 const { DataType } = require('ajv/dist/compile/validate/dataType');
 const { log } = require('handlebars');
+const axios = require('axios');
+
 
 
 const flowName = 'AssessmentGeneralFlow';
@@ -25,11 +27,12 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
         const companyDetails = await companyService.fetchCompanyDetailsFromEngagement(engagementRecordId);
 
         logger.info(`Starting general assessment flow for AssessmentRecordID=${assessmentRecordId}, AssessmentID ${assessmentId}`);
-        logger.info(`   EngagementRecordID: value = ${engagementRecordId}, type = ${typeof engagementRecordId}`);
-        logger.info(`   EngagementID: value = ${engagementId}, type = ${typeof engagementId}`);
-        logger.info(`   AssessmentRecordID: value = ${assessmentRecordId}, type = ${typeof assessmentRecordId}`);
-        logger.info(`   AssessmentID: value = ${assessmentId}, type = ${typeof assessmentId}`);
-        logger.info(`   ApprovedPromptID: value = ${approvedPromptRecordId}, type = ${typeof approvedPromptRecordId}`);
+        logger.info(`   EngagementRecordID:     value = ${engagementRecordId}, type = ${typeof engagementRecordId}`);
+        logger.info(`   EngagementID:           value = ${engagementId}, type = ${typeof engagementId}`);
+        logger.info(`   AssessmentRecordID:     value = ${assessmentRecordId}, type = ${typeof assessmentRecordId}`);
+        logger.info(`   AssessmentID:           value = ${assessmentId}, type = ${typeof assessmentId}`);
+        logger.info(`   AssessmentStatus:       value = ${assessmentStatus}, type = ${typeof assessmentStatus}`);
+        logger.info(`   ApprovedPromptID:       value = ${approvedPromptRecordId}, type = ${typeof approvedPromptRecordId}`);
 
         switch (assessmentStatus) {
             case "requested": {
@@ -136,7 +139,9 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
 
                 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-            } case "web research done": {
+            } 
+            
+            case "web research done": {
                 //this means we can move on the pain identification step
 
                 logger.yay(`entering the branch for a new assessment with assessmentStatus = ${assessmentStatus}`);
@@ -277,12 +282,6 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                     var taskPrompt = await replacePlaceholders.generateContent(isFilePath = false, agents.generalReportTaskPrompt, { INITIAL_RESEARCH: rawReport, PAINS: painDetailsJson, COMPANY: companyDetails.companyName, DOMAIN: companyDetails.companyDomain });
                     logger.info(`taskPrompt = ${taskPrompt}`);
 
-                    // // replaces the placeholders in the prompt
-                    // const taskPrompt = agents.generalReportTaskPrompt
-                    //     .replace(/\$\(COMPANY\)/g, companyDetails.companyName)
-                    //     .replace(/\$\(DOMAIN\)/g, companyDetails.companyDomain)
-                    //     .replace(/\$\(INITIAL_RESEARCH\)/g, rawReport);
-
                     // create the agent data object --> this is the data that will be sent to the agent army
                     const agentData = {
                         CompanyID: companyDetails.companyRecordId,
@@ -323,82 +322,86 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
 
 
             }
+
             case "general report done": {
 
                 logger.yay(`entering the branch for a new assessment with assessmentStatus = ${assessmentStatus}`);
                 await logFlowTracking({ flowName: flowName, flowStatus: 'In Progress', flowStep: 'case = general report', stepStatus: 'started', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
 
-                //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                //TO BE DONE: test if the final report is approved
-
-                //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-
-                //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                // WORKING HERE
-
                 var assessmentDetailsId = await airtableUtils.findAssessDetailsByAssessIDAndTemplate(assessmentId, process.env.envDefaultGenAssessFinalResultId);
                 assessmentDetailsId = assessmentDetailsId[0].id
-                logger.info(`assessmentDetailsId = ${assessmentDetailsId}`);
+                //logger.info(`assessmentDetailsId = ${assessmentDetailsId}`);
 
                 const genReport = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsId, 'Value');
                 const genReportStatus = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsId, 'Status');
-                logger.info(`genReport = ${genReport}`);
-                logger.info(`genReportStatus = ${genReportStatus}`);
+            //    logger.info(`genReport = ${genReport}`);
+              //  logger.info(`genReportStatus = ${genReportStatus}`);
 
-                const companyName = companyDetails.companyName;
-                const companyNameFile = companyName.replace(/\s/g, "-");
+                if (genReportStatus == 'approved') { // --> this means we can proceed generating and sending the final report
 
-                const genReportHTML = await replacePlaceholders.generateContent(isPath = false, htmlTemplates.pdfReport, { REPORT: marked.parse(genReport) });
+                   // PDF FILE STEP
+                    const companyName = companyDetails.companyName;
+                    const companyNameFile = companyName.replace(/\s/g, "-");
 
-                // generate PDF and return its url
-                const pdfFilePath = await processAgentOutput(genReportHTML, assessmentDetailsId, companyNameFile, assessmentId);
-                logger.info(`pdfFilePath = ${pdfFilePath}`);
+                    // replace placeholders and convert to html
+                    const genReportHTML = await replacePlaceholders.generateContent(isPath = false, htmlTemplates.pdfReport, { REPORT: marked.parse(genReport) });
 
-                break;
+                    // generate PDF and return its url
+                    const pdfReturn = await processAgentOutput(genReportHTML, assessmentDetailsId, companyNameFile, assessmentId);
+                    const pdfFileURL = pdfReturn[1];
+                    const pdfFileName = pdfReturn[0];
 
-                //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-
-
-                //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                //- STEP 6 --> send email to the client contact with the report
-
-                await logFlowTracking({ flowName: flowName, flowStatus: 'In Progress', flowStep: 'send final report', stepStatus: 'started', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
+                    await logFlowTracking({ flowName: flowName, flowStatus: 'In Progress', flowStep: 'create PDF report', stepStatus: 'completed', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
 
 
+                    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                    //- STEP 6 --> send email to the client contact with the report as attachement
+
+                    await logFlowTracking({ flowName: flowName, flowStatus: 'In Progress', flowStep: 'send final report', stepStatus: 'started', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
 
 
-                if (genReportStatus == 'approved') { // --> this means we can send the email to the client
+                    // Download PDF from PDFShift storage as a buffer
+                    const response = await axios.get(pdfFileURL, {responseType: 'arraybuffer'});
+                    const pdfBuffer = response.data;
 
-                    //THIS NEEDS MORE WORK AT THE END...
+                    // Send email with PDF attachment using the buffer
+                    const emailAttachement = [{
+                        filename: pdfFileName, // The filename to appear in the email
+                        content: pdfBuffer, // Use the buffer directly as the content of the attachment
+                        contentType: 'application/pdf',
+                    }];
 
-                    logger.info(`companyName = ${companyDetails.companyName}`);
+                   // logger.info(`companyName = ${companyDetails.companyName}`);
 
                     const contactFirstName = await airtableUtils.findFieldValueByRecordId('Engagements', engagementRecordId, '*PrimaryContactFirstName (from CompanyID)');
                     const contactLastName = await airtableUtils.findFieldValueByRecordId('Engagements', engagementRecordId, '*PrimaryContactLastName (from CompanyID)');
                     const contactEmail = await airtableUtils.findFieldValueByRecordId('Engagements', engagementRecordId, '*PrimaryContactEmail (from CompanyID)');
 
-                    var emailSubject = emails.genReportEmailSubject;
-                    var emailContent = emails.genReportEmailContent;
+                    //const emailSubject = emails.genReportEmailSubject;
+                   // const emailContent = emails.genReportEmailContent;
 
                     // Generate the email body using the emailBodyMaker service
-                    var emailBody = await replacePlaceholders.generateContent(isFilePath = true, 'email_client', { MESSAGE_BODY: emailContent, COMPANY_NAME: companyDetails.companyName, CONTACT_FIRSTNAME: contactFirstName, CONTACT_LASTNAME: contactLastName });
+                    const emailSubject = await replacePlaceholders.generateContent(isFilePath = false, emails.genReportEmailSubject, { COMPANY_NAME: companyName });
+                    const emailContent = await replacePlaceholders.generateContent(isFilePath = false, emails.genReportEmailContent, { COMPANY_NAME: companyDetails.companyName, REPORT_FILENAME: pdfFileName, REPORT_URL: pdfFileURL });
+                    const emailBody = await replacePlaceholders.generateContent(isFilePath = true, 'email_client', { CONTACT_FIRSTNAME: contactFirstName, MESSAGE_BODY: emailContent});
+
+//logger.info(`emailBody = ${emailBody}`);
 
                     // Send the email 
-                    await sendEmail(contactEmail, emailSubject, emailBody);
+                    await sendEmail(contactEmail, emailSubject, emailBody, emailAttachement);
 
                     // log the step
                     await logFlowTracking({ flowName: flowName, flowStatus: 'In Progress', flowStep: 'Email sent to the client', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: { contactFirstName, contactLastName, contactEmail } });
 
 
-                    logger.yay(`entering the branch for a new assessment with assessmentStatus = ${assessmentStatus}`);
+                    logger.yay(`case for assessmentStatus = ${assessmentStatus} is completed`);
                     await logFlowTracking({ flowName: flowName, flowStatus: 'In Progress', flowStep: '3rd branch', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
                     break;
 
-                } else {
-                    logger.yay(`entering the branch for a new assessment with assessmentStatus = ${assessmentStatus}`);
-                    await logFlowTracking({ flowName: flowName, flowStatus: 'In Progress', flowStep: '3rd branch', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
+                }
+                else {
+                    //something went wrong with the raw report, so we need to ask the user to provide more information
+                    logger.warn(`The raw research was not approved, so we need to ask the source owner to approve the raw research before we can continue with the general assessment`);
                 }
             }
             default: {

@@ -94,7 +94,7 @@ exports.createEngagement = async (companyId, sourceIdentifier, engagementInitial
         // Find the Airtable record ID for the Engagement Type "WET-002"
         // !! envDeafultEngagementType is set in .env file
         const engagementTypeId = await exports.findRecordIdByIdentifier('WingmanEngagementTypes', 'EngagementTypeID', process.env.envDeafultEngagementType);
-        
+
         // Create a new engagement record with the resolved sourceId and engagementTypeId
         const createdRecords = await engagementsTable.create([{
             fields: {
@@ -102,6 +102,7 @@ exports.createEngagement = async (companyId, sourceIdentifier, engagementInitial
                 'SourceID': [sourceId],
                 'EngagementTypeID': [engagementTypeId], // Set the EngagementTypeID field
                 'EngagementInitialContext': engagementInitialContext,
+                "Timestamp": new Date().toISOString(),
                 // Add other necessary fields here
             }
         }]);
@@ -155,7 +156,7 @@ exports.insertEngagementPrompt = async (engagementId, statement, description, co
     try {
         await engagementPromptsTable.create([{
             fields: {
-                'EngagementID': [engagementId], 
+                'EngagementID': [engagementId],
                 'EngagementPromptStatement': statement,
                 'EngagementPromptDescription': description,
                 'EngagementPromptConfidence': confidenceScore,
@@ -193,7 +194,7 @@ exports.updateAgentActivityRecord = async (runID, output) => {
     const stringOutput = JSON.stringify(output);
 
     try {
-        await table.update(runID, {"runOutput": stringOutput});
+        await table.update(runID, { "runOutput": stringOutput });
     } catch (error) {
         console.error('Error updating agent activity record:', error);
         throw error;
@@ -243,23 +244,23 @@ exports.getAssessmentTypeById = async (assessmentId) => {
         assessmentRecord = await base('Assessments').find(assessmentId);
         assessmentTypeId = assessmentRecord.fields.AssessmentTypeID;
 
-    if (!assessmentTypeId || assessmentTypeId.length === 0) {
-        logger.error(`AssessmentTypeID not found for AssessmentID: ${assessmentId}`);
-        throw new Error(`AssessmentTypeID not found for AssessmentID: ${assessmentId}`);
+        if (!assessmentTypeId || assessmentTypeId.length === 0) {
+            logger.error(`AssessmentTypeID not found for AssessmentID: ${assessmentId}`);
+            throw new Error(`AssessmentTypeID not found for AssessmentID: ${assessmentId}`);
+        }
+
+        // Fetch the AssessmentTypeName from WingmanAssessmentTypes using the AssessmentTypeID
+        // Note: Assuming the linked field returns an array of IDs, we take the first one
+        const typeId = assessmentTypeId[0]; // Adjust if your setup might include multiple IDs
+        const typeRecord = await base('WingmanAssessmentTypes').find(typeId);
+        const assessmentTypeName = typeRecord.fields.AssessmentTypeName;
+
+        logger.info(`Fetched AssessmentTypeName: ${assessmentTypeName} for AssessmentID: ${assessmentId} with TypeID: ${typeId}`);
+        return assessmentTypeName;
+    } catch (error) {
+        logger.error(`Error fetching AssessmentTypeName for AssessmentID ${assessmentId}: ${error}`);
+        throw error;
     }
-
-    // Fetch the AssessmentTypeName from WingmanAssessmentTypes using the AssessmentTypeID
-    // Note: Assuming the linked field returns an array of IDs, we take the first one
-    const typeId = assessmentTypeId[0]; // Adjust if your setup might include multiple IDs
-    const typeRecord = await base('WingmanAssessmentTypes').find(typeId);
-    const assessmentTypeName = typeRecord.fields.AssessmentTypeName;
-
-    logger.info(`Fetched AssessmentTypeName: ${assessmentTypeName} for AssessmentID: ${assessmentId} with TypeID: ${typeId}`);
-    return assessmentTypeName;
-} catch (error) {
-    logger.error(`Error fetching AssessmentTypeName for AssessmentID ${assessmentId}: ${error}`);
-    throw error;
-}
 }
 
 // identify the place where the raw result returned by general assess agent will be placed
@@ -360,7 +361,7 @@ exports.createPainAssessmentDetails = async (agentResponseResult, assessmentDeta
                 'PainID': [painRecordID],
                 'ConfidenceScore': confidenceScore,
                 'Reason': item.reasoning,
-                'AgentRunID' : [runID]
+                'AgentRunID': [runID]
             });
 
             //logger.info(`Entry created with PainSKU: ${item.painSKU}`);
@@ -380,7 +381,7 @@ exports.getFinalReportEntry = async (assessmentDetailsId) => {
             filterByFormula: `{AssessmentDetailID} = '${[assessmentDetailsId]}'`,
             maxRecords: 1
         }).firstPage();
-logger.info(`getFinalReportEntry: ${records.length}`);
+        logger.info(`getFinalReportEntry: ${records.length}`);
         return records.length > 0 ? records[0] : null;
     } catch (error) {
         console.error('Error in getFinalReportEntry:', error);
@@ -389,21 +390,17 @@ logger.info(`getFinalReportEntry: ${records.length}`);
 };
 
 // Function to update an entry in the 'AssessmentDetails:FinalReport' table
-exports.updateFinalReportEntry = async (assessmentDetailsId, markdownContent, htmlContent, pdfFileName, pdfFileURL) => {
+exports.updateFinalReportEntry = async (recordToUpdate, assessmentDetailsId, markdownContent, htmlContent, pdfFileName, pdfFileURL) => {
     const table = base('AssessmentDetails:FinalReport');
     try {
-        const existingEntry = await exports.getFinalReportEntry(assessmentDetailsId);
-        if (existingEntry) {
-            const updatedRecord = await table.update(existingEntry.id, {
-                'ReportContentMarkdown': markdownContent,
-                'ReportContentHTML': htmlContent,
-                'ReportPDFfileName': pdfFileName,
-                'ReportPDFURL': pdfFileURL
-            });
-            return updatedRecord;
-        } else {
-            throw new Error(`FinalReportEntry not found for AssessmentDetailID: ${assessmentDetailsId}`);
-        }
+        const updatedRecord = await table.update(recordToUpdate, {
+            'AssessmentDetailID': [assessmentDetailsId],
+            'ReportContentMarkdown': markdownContent,
+            'ReportContentHTML': htmlContent,
+            'ReportPDFfileName': pdfFileName,
+            'ReportPDFURL': pdfFileURL
+        });
+        return updatedRecord;
     } catch (error) {
         console.error('Error in updateFinalReportEntry:', error);
         throw error;
@@ -486,7 +483,8 @@ exports.findFieldValueByRecordId = async (tableName, recordId, fieldName) => {
         if (record && record.fields[fieldName]) {
             return record.fields[fieldName]; // Return the value of the specified field
         } else {
-            throw new Error(`Field ${fieldName} not found for Record ID: ${recordId} in ${tableName}.`);
+            return null; // Return null if the record or field does not exist
+            //throw new Error(`Field ${fieldName} not found for Record ID: ${recordId} in ${tableName}.`);
         }
     } catch (error) {
         console.error(`Error finding field value by Record ID in ${tableName}:`, error);

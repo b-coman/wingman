@@ -3,7 +3,6 @@
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
-const marked = require('marked');
 const axios = require('axios');
 const logger = require('../../logger');
 const airtableUtils = require('../lib/airtableUtils');
@@ -14,24 +13,19 @@ async function processAgentOutput(htmlContent, assessmentDetailId, companyName) 
         const pdfFileName = `${companyName}-${assessmentDetailId}.pdf`;
         const pdfFileURL = await generatePDFWithPDFShift(htmlContent, pdfFileName);
 
-        logger.info(assessmentDetailId);
-
         // Check if an entry exists and update or create accordingly
-        //const existingEntry = await airtableUtils.getFinalReportEntry(assessmentDetailId);
-        //logger.info(existingEntry);
+        var recordPresent = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailId, 'AssessmentDetails:FinalReport');
+        if (recordPresent === null) {
+            await airtableUtils.createFinalReportEntry(assessmentDetailId, '', htmlContent, pdfFileName, pdfFileURL);
+        } else {
+            recordPresent = recordPresent[0];
+            await airtableUtils.updateFinalReportEntry(recordPresent, assessmentDetailId, '', htmlContent, pdfFileName, pdfFileURL);
 
-        const xx = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailId, 'AssessmentDetails:FinalReport')
-        logger.info(xx); // --> asta meeergeee!!
-
-        // if (existingEntry) {
-        //     await airtableUtils.updateFinalReportEntry(assessmentDetailId, '', htmlContent, pdfFileName, pdfFileURL);
-        // } else {
-        //     await airtableUtils.createFinalReportEntry(assessmentDetailId, '', htmlContent, pdfFileName, pdfFileURL);
-        // }
+        }
 
         logger.info(`PDF generated and saved at: ${pdfFileURL}`);
         // Optionally return the path or any other data you might need
-        return pdfFileURL;
+        return [pdfFileName, pdfFileURL];
 
     } catch (error) {
         logger.error(`Error in processAgentOutput: ${error}`);

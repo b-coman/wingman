@@ -89,13 +89,19 @@ const emails = {
     <br><br>
     Welcome aboard,`,
 
-    genReportEmailSubject: 'Welcome to a new journey',
-    genReportEmailContent: `TRALALA SI LALA --> We're glad you found our article on the Modus Create blog engaging. As a welcome gesture, we're preparing a personalized market analysis for you. This complimentary analysis will dive into the opportunities and challenges within your sector, providing you with targeted insights.
+    genReportEmailSubject: 'Preliminary assessment report for {{{COMPANY_NAME}}}',
+    genReportEmailContent: `I hope this message finds you well.
     <br><br>
-    Expect this detailed overview in your inbox soon. It's crafted to support your strategic decisions with actionable data. Should you have any inquiries or wish for an in-depth discussion, don't hesitate to contact us.
+    We are pleased to inform you that your preliminary assessment is now complete. 
+    Attached, you will find a detailed report of our findings and recommendations tailored specifically to your organization's needs and objectives.
+    You also can access it at the following link: <a href={{{REPORT_URL}}}>{{{REPORT_FILENAME}}}</a>.
     <br><br>
-    Welcome aboard,`,
-
+    We believe this report will provide valuable insights into the areas of improvement and potential growth opportunities for your business. 
+    Our team is committed to supporting you in navigating the next steps and is ready to discuss any aspects of the report in further detail.
+    <br><br>
+    Please do not hesitate to contact us should you have any questions or require further clarification on the report findings. 
+    We look forward to the opportunity of discussing the next steps with you.`,
+    
     // admin emails
     adminRawReportGeneratedSubject: 'Raw Report ready for {{{COMPANY_NAME}}}',
     adminRawReportGeneratedContent: `A raw report for {{{COMPANY_NAME}}} under engagement {{{ENGAGEMENT_ID}}} / assessment {{{ASSESSMENT_ID}}} has been completed. 
