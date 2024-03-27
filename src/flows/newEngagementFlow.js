@@ -12,6 +12,8 @@ const logger = require('../../logger');
 const Ajv = require('ajv');
 const ajv = new Ajv();
 const marketingAgentResponseSchema = require('../../schemas/marketingAgentResponseSchema.json');
+const replacePlaceholders = require('../services/replacePlaceholders');
+const companyService = require('../services/companyService');
 const wingmanAgentsService = require('../services/wingmanAgentsService');
 const { insertEngagementPrompt } = require('../lib/airtableUtils');
 const { agents, emails } = require('../../config');
@@ -19,27 +21,15 @@ const logFlowTracking = require('../services/flowTrackingService');
 const { delay } = require('../utils/utils'); // Adjust the path as necessary
 
 
-
-// Validate function setup
-//const validate = ajv.compile(marketingAgentResponseSchema);
-
 // Orchestrates the flow to create a new engagement
 exports.execute = async (formData) => {
     try {
-        const timestampStart = new Date().toISOString();
-        logger.info('Starting new engagement flow with formData:', formData);
-
-        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        //test here if form data <> null --> s-a facut submit la form
-
-
-        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        logger.yay('Starting new engagement flow with formData:', formData);
 
         // log the flow staus
         await logFlowTracking({ flowName: 'EngagementFlow', flowStatus: 'Started', flowStep: 'initialization', stepStatus: 'OK', timestamp: new Date().toISOString(), additionalInfo: { formData } });
 
         // STEP 1 --> creating/identifying initial assets 
-
         // Extract and prepare data received from the form
         const { name, company, role, workEmail, sourceId, engagementInitialContext } = formData;
         const domain = workEmail.substring(workEmail.lastIndexOf("@") + 1);
@@ -61,73 +51,36 @@ exports.execute = async (formData) => {
         await logFlowTracking({ flowName: 'EngagementFlow', flowStatus: 'In Progress', flowStep: 'EngagementCreated', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementId, additionalInfo: { companyId, contactId } });
 
         //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        // stop here for this stage
-
-
-        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        // starts the prompt creation // only if the engagement status = started
-
-        // identify the sentence that describe what is inside of the article, the EngagementSourceDetails
-        const sourceRecord = await airtableUtils.getAllFieldsForRecord('WingmanSources', 'SourceID', formData.sourceId);
-        const engagementSourceDetails = sourceRecord.EngagementSourceDetails;
-
-        // STEP 2 --> call the Marketing Agent to ask about research prompt candidates
-        const crewName = "Marketing";
-        const taskDescription = agents.marketingTaskDescription;
-        const taskPrompt = agents.marketingTaskPrompt.replace('$(COMPANY)', company).replace('$(DOMAIN)', domain).replace('$(SOURCE_DETAILS)', engagementSourceDetails);
-
-        // Prepare data for agent tracking
-        const agentData = {
-            CompanyID: companyId,
-            CrewName: crewName,
-            TaskDescription: taskDescription,
-            TaskPrompt: taskPrompt,
-            Timestamp: new Date().toISOString()
-        };
-
-        // Start tracking the agent activity
-        const runID = await airtableUtils.createAgentActivityRecord(companyId, crewName, taskDescription, taskPrompt);
-        logger.info(`Agent activity run ID: ${runID}, type: ${typeof runID}`);
-
-        // Call the agent with the prompt
-        const agentResponse = await wingmanAgentsService.callWingmanAgentsApp(crewName, taskDescription, taskPrompt, agents.marketingAgentEndpoint);
-        logger.info('Agent response:', agentResponse);
-
-        // Complete tracking the agent activity with the response
-        await airtableUtils.updateAgentActivityRecord(runID, agentResponse);
-
-        // process the agent response and update the Airtable record with the prompts received
-        const prompts = JSON.parse(agentResponse.result);
-        for (const prompt of prompts) {
-            await insertEngagementPrompt(engagementId, prompt.statement, prompt.description, prompt.confidenceScore);
-        }
-
-        // log the flow staus
-        await logFlowTracking({ flowName: 'EngagementFlow', flowStatus: 'In Progress', flowStep: 'AgentResponseProcessed', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementId, additionalInfo: { promptsLength: prompts.length } });
-
         // STEP 3 --> inform the source owner of the new engagement
-        // Retrieve the EngagementSourceOwnerUserId
+        // Retrieve the source details
         const engagementSourceOwnerUserId = await airtableUtils.findEngagementSourceOwnerUserId(sourceId);
+        const sourceRecordId = await airtableUtils.findRecordIdByIdentifier('WingmanSources', 'SourceID', sourceId);
+        const sourceName = await airtableUtils.findFieldValueByRecordId('WingmanSources', sourceRecordId, 'EngagementSourceName');
         logger.info(`Engagement Source Owner User ID: ${engagementSourceOwnerUserId}`);
 
         // Retrieve the email address of the EngagementSourceOwner
-        const sourceOwnerEmail = await airtableUtils.findUserEmailByUserId(engagementSourceOwnerUserId);
-        logger.info(`Source Owner Email: ${sourceOwnerEmail}`);
+        const userDetails = await airtableUtils.getFieldsForRecordById('Users', engagementSourceOwnerUserId);
+        logger.info(`Source Owner Email: ${userDetails.UserEmail}`);
+
+        // Retrieve the company details
+        const companyDetails = await companyService.fetchCompanyDetailsFromEngagement(engagementId);
 
         // send the email to the source owner
-        await sendEmail(sourceOwnerEmail, "New Engagement Created", `Hi, a new engagement has been created with company: ${company} and contact: ${firstName} ${lastName}.`);
-        logger.info(`Email sent successfully to: ${sourceOwnerEmail}`);
+        const emailSubject = emails.adminNewEngagementSubject;
+        const emailContent = await replacePlaceholders.generateContent(isFilePath = false, emails.adminNewEngagementContent, { COMPANY_NAME: companyDetails.companyName, CONTACT_NAME: companyDetails.contactFullName, SOURCE_NAME: sourceName });
+        const emailBody = await replacePlaceholders.generateContent(isFilePath = true, 'email_admin', { USER_FIRSTNAME: userDetails.UserFirstName, MESSAGE_BODY: emailContent });
+
+        await sendEmail(userDetails.UserEmail, emailSubject, emailBody);
+        logger.info(`Email sent successfully to: ${userDetails.UserEmail}`);
 
         // log the flow staus --> email sent
-        await logFlowTracking({ flowName: 'EngagementFlow', flowStatus: 'In Progress', flowStep: 'email sent to source owner', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementId, additionalInfo: { sourceOwnerEmail: sourceOwnerEmail } });
+        await logFlowTracking({ flowName: 'EngagementFlow', flowStatus: 'In Progress', flowStep: 'email sent to source owner', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementId, additionalInfo: { sourceOwnerEmail: userDetails.UserEmail } });
 
         // log the flow staus --> flow ends
         await logFlowTracking({ flowName: 'EngagementFlow', flowStatus: 'Completed', flowStep: 'flow end', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementId, additionalInfo: {} });
 
         // Return success status and any relevant IDs or details
         return { success: true, companyId, contactId, engagementId };
-
-        // -------------- Flow ends here --------------------
 
     } catch (error) {
         logger.error('Error executing new engagement flow: %o', error);

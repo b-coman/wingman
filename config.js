@@ -4,21 +4,35 @@ const express = require('express');
 const app = express();
 const isDevelopment = process.env.NODE_ENV === 'development';
 
+const systemRules ={
+    rule1: `The first most important context is the one provided in the context of a company, if it's any.
+    The second most important context is the one provided in the context of the engagement, if it's any.
+    The third most important context is the one provided in the context of the campaign: the source of the lead, the article the client read.`,
+};
+
 const agents = {
     // marketing agent --> used in New Engagement Flow
     agentsBaseURL: isDevelopment ? 'http://127.0.0.1:5000' : 'https://wingman-agents.azurewebsites.net',
+    
     marketingAgentEndpoint: '/mkt_crew',
     marketingTaskDescription: "Analyze market for a given company",
-    marketingTaskPrompt: `You are helping the Modus Create sales team to qualify a prospective lead. The lead's company name is $(COMPANY) and their website is https://$(DOMAIN) .
+    marketingTaskPrompt: `You are helping the Modus Create sales team to qualify a prospective lead. The lead's company name is $(COMPANY) and their website is https://{{{DOMAIN}}} .
     Someone from their side filled in a form in one of Modus Create blog articles, expressing their interest in our services.
-    The title of the article is "Digital transformation is not possible without cybersecurity".
-    The link to the article is $(SOURCE_DETAILS). 
-    Your task is to make an Internet research regarding the lead, their general threads especially in the context of the article mentioned above. As you are a market expert, a key point is to have a deep look on any signals present online, news, market data, social posts, or other sources that might reveal areas that Modus can investigate further with their representatives. The end goal is to find that point that resonates most with their business context. Please include references when is possible.
+    {{{SOURCE_DETAILS}}}. 
+    Your task is to conduct an Internet research regarding this company, their general threads especially in the context of the article mentioned above. 
+    As you are a market expert, the key point is to have a deep look on any signals present online, news, market data, social posts, or any other sources that might reveal areas that Modus can investigate further with their representatives. 
+    The end goal is to find that point that resonates most with their business context. Please include references everywhere is possible.
     After the research, please conclude with a list of 3 main areas Modus might pursue to win this client.
     Each area should include a statement (short), a description (longer form), and a confidence score between 0 and 1, where 1 indicates very high confidence.
-    The confidence score should reflect the likelihood of the statement being true
+    The confidence score should reflect the likelihood of the statement being true.
     Format your response as a JSON array of objects. Each object should follow this structure: {"statement": "Your statement here", "description": "description here", "confidenceScore": 0.95}.
-    Do not include any formatting elements or line breaks within the objects. Ensure to use proper JSON formatting with double quotes for keys and string values.`,
+    Do not include any formatting elements or line breaks within the objects. Ensure to use proper JSON formatting with double quotes for keys and string values.
+    You will get here some additional context, that might help you to better shape your response:
+    Company Context: {{{COMPANY_CONTEXT}}}
+    Engagement Context: {{{ENGAGEMENT_CONTEXT}}}
+    Campaign Context: {{{CAMPAIGN_CONTEXT}}}
+    Also, when evaluating those contexts you should be aware by some prioritization rules.
+    The prioritization rules are: {{{SYSTEM_RULES}}}`,
 
     // general assess agent --> used in General Assessment Flow
     generalAssessAgentEndpoint: '/general_assess',
@@ -103,6 +117,20 @@ const emails = {
     We look forward to the opportunity of discussing the next steps with you.`,
     
     // admin emails
+    adminNewEngagementSubject: 'YAY, new lead landed',
+    adminNewEngagementContent: `Good news: a new lead came in. Here are the the details:
+    <br><br>
+    Company: <a href={{{COMPANY_DOMAIN}}}>{{{COMPANY_NAME}}}</a> 
+    <br>Contact: {{{CONTACT_NAME}}}
+    <br>Source: {{{SOURCE_NAME}}}
+    <br><br>As you are the Growth representative for this source, please take a look at the new lead, and review at your earliest convenience.
+    <br>
+    Your approval is required to advance to the next steps.`,
+
+    adminStrategicDirectionsSubject: 'Strategic directions for {{{COMPANY_NAME}}}',
+    adminStrategicDirectionsContent: `Strategic directions were identified for {{{COMPANY_NAME}}} under engagement {{{ENGAGEMENT_ID}}}.
+    <br><br>Please review at your earliest convenience. Your approval is required to advance to the next steps.`,
+
     adminRawReportGeneratedSubject: 'Raw Report ready for {{{COMPANY_NAME}}}',
     adminRawReportGeneratedContent: `A raw report for {{{COMPANY_NAME}}} under engagement {{{ENGAGEMENT_ID}}} / assessment {{{ASSESSMENT_ID}}} has been completed. 
     <br><br>Please review at your earliest convenience: [Link to Report]. Your approval is required to advance to the next steps.`

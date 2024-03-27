@@ -430,26 +430,47 @@ exports.createFinalReportEntry = async (assessmentDetailsId, markdownContent, ht
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 //------------- FIND --> IMPORTANT (reuse everytime possible)!! Generic function to extract all fields and values for a record based on its primary key
-exports.getAllFieldsForRecord = async (tableName, primaryKeyField, primaryKeyValue) => {
+// exports.getAllFieldsForRecord = async (tableName, primaryKeyField, primaryKeyValue) => {
+//     const table = base(tableName);
+//     try {
+//         const records = await table.select({
+//             filterByFormula: `{${primaryKeyField}} = '${primaryKeyValue}'`
+//         }).firstPage();
+
+//         if (records.length > 0) {
+//             // Return the fields of the first matching record
+//             return records[0].fields;
+//         } else {
+//             // No record found
+//             console.log(`No record found with ${primaryKeyField} = ${primaryKeyValue} in ${tableName}`);
+//             return null;
+//         }
+//     } catch (error) {
+//         console.error('Error retrieving record from Airtable:', error);
+//         throw error;
+//     }
+// };
+
+exports.getFieldsForRecordById = async (tableName, recordId) => {
     const table = base(tableName);
     try {
-        const records = await table.select({
-            filterByFormula: `{${primaryKeyField}} = '${primaryKeyValue}'`
-        }).firstPage();
+        // Directly find the record by its ID
+        const record = await table.find(recordId);
 
-        if (records.length > 0) {
-            // Return the fields of the first matching record
-            return records[0].fields;
+        if (record) {
+            // Return the fields of the found record
+            return record.fields;
         } else {
             // No record found
-            console.log(`No record found with ${primaryKeyField} = ${primaryKeyValue} in ${tableName}`);
+            console.log(`No record found with ID ${recordId} in ${tableName}`);
             return null;
         }
     } catch (error) {
-        console.error('Error retrieving record from Airtable:', error);
+        console.error('Error retrieving record from Airtable by ID:', error);
         throw error;
     }
 };
+
 
 
 //------------- FIND --> two IMPORTANT functions below (reuse everytime possible)

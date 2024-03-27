@@ -4,6 +4,7 @@ const express = require('express');
 const router = express.Router();
 const airtableUtils = require('../lib/airtableUtils');
 const newEngagementFlow = require('../flows/newEngagementFlow');
+const doEngagementFlow = require('../flows/engagementFlow');
 const { executeAssessmentFlow } = require('../services/assessmentTypeService');
 const logger = require('../../logger'); 
 
@@ -28,6 +29,36 @@ router.post('/submit-form', async (req, res) => {
     }
 });
 
+
+
+router.post('/start-engagement', async (req, res) => {
+    try {
+        const { engagementRecordId } = req.body;
+        logger.info(`Starting engagement flow for EngagementID: ${engagementRecordId}`);
+
+        // Fetch the EngagementStatus and engagementId based on the provided engagement record ID
+        const engagementStatus = await airtableUtils.findFieldValueByRecordId('Engagements', engagementRecordId, 'EngagementStatus');
+        const engagementId = await airtableUtils.findFieldValueByRecordId('Engagements', engagementRecordId, 'EngagementID');
+
+        logger.info(`Engagement status: ${engagementStatus}`);
+        logger.info(`Engagement ID: ${engagementId}`);
+        logger.info(`Engagement record ID: ${engagementRecordId}`);
+
+        if (!engagementStatus) {
+            logger.warn(`Engagement status not found for EngagementID: ${engagementId}`);
+            return res.status(404).send('Engagement status not found');
+        }
+
+        // Execute engagement flow
+        await doEngagementFlow(engagementRecordId, engagementId, engagementStatus);
+        logger.info(`Successfully completed Engagement flow for EngagementID: ${engagementId}`);
+
+        res.json({ message: 'Engagement flow started successfully' });
+    } catch (error) {
+        logger.error(`Failed to start engagement flow: ${error.message}`, error);
+        res.status(500).send('Error starting engagement flow');
+    }
+});
 
 router.post('/start-assessment', async (req, res) => {
     try {

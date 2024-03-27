@@ -23,11 +23,10 @@ exports.fetchCompanyDetailsFromEngagement = async (engagementRecordId) => {
         // Fetch company name and domain using the CompanyID
         const companyName = await airtableUtils.findFieldValueByRecordId('Companies', companyRecordId, 'CompanyName');
         const companyDomain = await airtableUtils.findFieldValueByRecordId('Companies', companyRecordId, 'CompanyDomain');
-        //logger.info(`CompanyName: ${companyName}`);
-        //logger.info(`CompanyDomain: ${companyDomain}`);
+        const contactFullName = await airtableUtils.findFieldValueByRecordId('Companies', companyRecordId, '*ContactFullName (from *Contacts)');
 
         // Return the company details as an object
-        return { companyRecordId, companyName, companyDomain };
+        return { companyRecordId, companyName, companyDomain, contactFullName };
     } catch (error) {
         logger.error(`Error fetching company details from engagement: ${error}`);
         throw error; // Rethrow the error for handling by the caller
