@@ -4,10 +4,11 @@
   "description": "more to come",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon app.js",
+    "start": "NODE_ENV=production node app.js",
+    "dev": "NODE_ENV=development nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -22,6 +23,7 @@
     "handlebars": "^4.7.8",
     "marked": "^12.0.1",
     "mssql": "^10.0.2",
+    "node-fetch": "^3.3.2",
     "nodemailer": "^6.9.12",
     "puppeteer": "^22.6.0",
     "winston": "^3.12.0"

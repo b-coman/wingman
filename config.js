@@ -4,7 +4,7 @@ const express = require('express');
 const app = express();
 const isDevelopment = process.env.NODE_ENV === 'development';
 
-const systemRules ={
+const systemRules = {
     rule1: `The first most important context is the one provided in the context of a company, if it's any.
     The second most important context is the one provided in the context of the engagement, if it's any.
     The third most important context is the one provided in the context of the campaign: the source of the lead, the article the client read.`,
@@ -13,10 +13,10 @@ const systemRules ={
 const agents = {
     // marketing agent --> used in New Engagement Flow
     agentsBaseURL: isDevelopment ? 'http://127.0.0.1:5000' : 'https://wingman-agents.azurewebsites.net',
-    
+
     marketingAgentEndpoint: '/mkt_crew',
     marketingTaskDescription: "Analyze market for a given company",
-    marketingTaskPrompt: `You are helping the Modus Create sales team to qualify a prospective lead. The lead's company name is $(COMPANY) and their website is https://{{{DOMAIN}}} .
+    marketingTaskPrompt: `You are helping the Modus Create sales team to qualify a prospective lead. The lead's company name is {{{COMPANY}}} and their website is https://{{{DOMAIN}}} .
     Someone from their side filled in a form in one of Modus Create blog articles, expressing their interest in our services.
     {{{SOURCE_DETAILS}}}. 
     Your task is to conduct an Internet research regarding this company, their general threads especially in the context of the article mentioned above. 
@@ -92,6 +92,21 @@ const agents = {
     {{{PAINS}}}
     // potential pain points list ends here`,
 
+    // prompt to reformulate the initial set of questions
+    // _COMPANYASSESSMENT_ is a placeholder for companyAssessment
+    // _QUESTIONSETBODY_ is a placeholder for questionSetBody
+    validateQuestionsPrompt: `You are my assistant on creating a list of signals we should follow and monitor in future for a company we are investigating in a role of business consultants. Here it is a Company Assessment Report we have as a starting point, formated as JSON:\n\n
+    {{{COMPANY_ASSESSMENT}}} \n\n
+    I also have a list of question as a first proposal to be included in an initial survey. 
+    Please check again these questions, and compare them against the meaning of the Assessment Report provided before. 
+    If some questions are redundant, overlap, or they ask the same thing in another way comparing other questions in the list, please take them out and keep only what is relevant (try to reduce as much as possible; our aim is not having more then 10-12 questions in this survey). 
+    Also, I'd like to reformulate the questions to be more adapted to the company's specifics, and the general idea emerged from Assessment Report provided above. 
+    Please provide me this revised list as a JSON, including the corresponsent ID from the list above (very important: please don't alter the IDs in any way!) and its reformulated version. 
+    Your response should be the JSON only, without any other additional details.\n
+    Here is an example on how the JSON structure should look like: {'GEN-Q-02': 'How does it translate... ?',} \n
+    My original list of question list is: \n\n
+    {{{QUESTIONSET_BODY}}}`,
+
 };
 
 const emails = {
@@ -115,7 +130,7 @@ const emails = {
     <br><br>
     Please do not hesitate to contact us should you have any questions or require further clarification on the report findings. 
     We look forward to the opportunity of discussing the next steps with you.`,
-    
+
     // admin emails
     adminNewEngagementSubject: 'YAY, new lead landed',
     adminNewEngagementContent: `Good news: a new lead came in. Here are the the details:
@@ -128,11 +143,11 @@ const emails = {
     Your approval is required to advance to the next steps.`,
 
     adminStrategicDirectionsSubject: 'Strategic directions for {{{COMPANY_NAME}}}',
-    adminStrategicDirectionsContent: `Strategic directions were identified for {{{COMPANY_NAME}}} under engagement {{{ENGAGEMENT_ID}}}.
+    adminStrategicDirectionsContent: `Strategic directions were identified for {{{COMPANY_NAME}}} under engagement ID={{{ENGAGEMENT_ID}}}.
     <br><br>Please review at your earliest convenience. Your approval is required to advance to the next steps.`,
 
     adminRawReportGeneratedSubject: 'Raw Report ready for {{{COMPANY_NAME}}}',
-    adminRawReportGeneratedContent: `A raw report for {{{COMPANY_NAME}}} under engagement {{{ENGAGEMENT_ID}}} / assessment {{{ASSESSMENT_ID}}} has been completed. 
+    adminRawReportGeneratedContent: `A raw report for {{{COMPANY_NAME}}} under engagement ID={{{ENGAGEMENT_ID}}} / assessment {{{ASSESSMENT_ID}}} has been completed. 
     <br><br>Please review at your earliest convenience: [Link to Report]. Your approval is required to advance to the next steps.`
 };
 
@@ -219,7 +234,7 @@ const htmlTemplates = {
 </body>
 </html>
 
-     ` 
+     `
 }
 
-module.exports = { agents, emails, htmlTemplates }; 
+module.exports = { systemRules, agents, emails, htmlTemplates }; 

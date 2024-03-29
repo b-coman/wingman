@@ -12,6 +12,8 @@ const logFlowTracking = require('../services/flowTrackingService');
 const { systemRules, agents, emails, htmlTemplates } = require('../../config');
 const { log } = require('handlebars');
 const axios = require('axios');
+const { stringify } = require('ajv');
+
 
 
 
@@ -25,37 +27,42 @@ const doEngagementFlow = async (engagementRecordId, engagementId, engagementStat
                 // log status, flow started
                 await logFlowTracking({ flowName: flowName, flowStatus: 'Started', flowStep: 'initialization', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, additionalInfo: { engagementStatus } });
 
+
                 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 //- STEP 1 - identify source details
                 var sourceId = await airtableUtils.findFieldValueByRecordId('Engagements', engagementRecordId, 'SourceID');
                 sourceId = sourceId[0];
-        
+
                 // identify the decription about the article, the EngagementSourceDetails
                 const engagementSourceDetails = await airtableUtils.findFieldValueByRecordId('WingmanSources', sourceId, 'EngagementSourceDetails');
 
                 // log status, end of step
-                await logFlowTracking({ flowName: flowName, flowStatus: 'In Progress', flowStep: 'identify source details', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, additionalInfo: { engagementStatus, sourceId, sourceRecord, engagementSourceDetails } });
+                await logFlowTracking({ flowName: flowName, flowStatus: 'In Progress', flowStep: 'identify source details', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, additionalInfo: { engagementStatus, sourceId, engagementSourceDetails } });
+
 
                 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 //- STEP 2 --> call the Marketing Agent to ask about research prompt candidates
                 const crewName = "Marketing";
                 const taskDescription = agents.marketingTaskDescription;
-                //const taskPrompt = agents.marketingTaskPrompt.replace('$(COMPANY)', company).replace('$(DOMAIN)', domain).replace('$(SOURCE_DETAILS)', engagementSourceDetails);
+
+                const engagementDetails = await airtableUtils.getFieldsForRecordById('Engagements', engagementRecordId);
+                const companyRecordId = engagementDetails.CompanyID[0];
+                const companyDetails = await airtableUtils.getFieldsForRecordById('Companies', companyRecordId);
 
                 //replace placeholders in the prompt
-                const taskPrompt = await replacePlaceholders.generateContent(isFilePath = false, marketingTaskPrompt, { 
-                    COMPANY: companyName, 
-                    DOMAIN: companyDomain, 
+                const taskPrompt = await replacePlaceholders.generateContent(isFilePath = false, agents.marketingTaskPrompt, {
+                    COMPANY: companyDetails.CompanyName,
+                    DOMAIN: companyDetails.CompanyDomain,
                     SOURCE_DETAILS: engagementSourceDetails,
-                    COMPANY_CONTEXT: companyContext,
-                    ENGAGEMENT_CONTEXT: engagementContext,
-                    CAMPAIGN_CONTEXT: campaignContext,
+                    COMPANY_CONTEXT: companyDetails.CompanyNotes,
+                    ENGAGEMENT_CONTEXT: engagementDetails.EngagementSalesContext,
+                    CAMPAIGN_CONTEXT: engagementDetails.EngagementInitialContext,
+                    SYSTEM_RULES: systemRules.rule1
                 });
-
 
                 // Prepare data for agent tracking
                 const agentData = {
-                    CompanyID: companyId,
+                    CompanyID: companyRecordId,
                     CrewName: crewName,
                     TaskDescription: taskDescription,
                     TaskPrompt: taskPrompt,
@@ -63,7 +70,7 @@ const doEngagementFlow = async (engagementRecordId, engagementId, engagementStat
                 };
 
                 // Start tracking the agent activity
-                const runID = await airtableUtils.createAgentActivityRecord(companyId, crewName, taskDescription, taskPrompt);
+                const runID = await airtableUtils.createAgentActivityRecord(companyRecordId, crewName, taskDescription, taskPrompt);
                 logger.info(`Agent activity run ID: ${runID}, type: ${typeof runID}`);
 
                 // Call the agent with the prompt
@@ -76,32 +83,37 @@ const doEngagementFlow = async (engagementRecordId, engagementId, engagementStat
                 // process the agent response and update the Airtable record with the prompts received
                 const prompts = JSON.parse(agentResponse.result);
                 for (const prompt of prompts) {
-                    await insertEngagementPrompt(engagementId, prompt.statement, prompt.description, prompt.confidenceScore);
+                    await airtableUtils.insertEngagementPrompt(engagementRecordId, prompt.statement, prompt.description, prompt.confidenceScore);
                 }
 
                 // log status, agent response done
-                await logFlowTracking({ flowName: 'EngagementFlow', flowStatus: 'In Progress', flowStep: 'AgentResponseProcessed', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementId, additionalInfo: { promptsLength: prompts.length } });
+                await logFlowTracking({ flowName: 'EngagementFlow', flowStatus: 'In Progress', flowStep: 'AgentResponseProcessed', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, additionalInfo: { promptsLength: prompts.length } });
 
+
+                //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 // STEP 3 --> inform the source owner about the creation of strategic directions
-                // Retrieve the EngagementSourceOwnerUserId
-                const engagementSourceOwnerUserId = await airtableUtils.findEngagementSourceOwnerUserId(sourceId);
+
+                // identify the source owner
+                const engagementSourceOwnerUserId = engagementDetails['EngagementSourceOwner (from SourceID)'];
                 logger.info(`Engagement Source Owner User ID: ${engagementSourceOwnerUserId}`);
 
-                // Retrieve EngagementSourceOwner details
-                const sourceOwnerEmail = await airtableUtils.findUserEmailByUserId(engagementSourceOwnerUserId);
-                logger.info(`Source Owner Email: ${sourceOwnerEmail}`);
+                // Retrieve details about EngagementSourceOwner
+                const userDetails = await airtableUtils.getFieldsForRecordById('Users', engagementSourceOwnerUserId);
+
+                // replace placeholders for subject and body
+                const emailSubject = await replacePlaceholders.generateContent(isFilePath = false, emails.adminStrategicDirectionsSubject, { COMPANY_NAME: companyDetails.CompanyName });
+                const emailContent = await replacePlaceholders.generateContent(isFilePath = false, emails.adminStrategicDirectionsContent, { COMPANY_NAME: companyDetails.CompanyName, ENGAGEMENT_ID: engagementId });
+                const emailBody = await replacePlaceholders.generateContent(isFilePath = true, 'email_admin', { USER_FIRSTNAME: userDetails.UserFirstName, MESSAGE_BODY: emailContent });
 
                 // send the email to the source owner
-                await sendEmail(sourceOwnerEmail, "New Engagement Created", `Hi, a new engagement has been created with company: ${company} and contact: ${firstName} ${lastName}.`);
-                logger.info(`Email sent successfully to: ${sourceOwnerEmail}`);
+                await sendEmail(userDetails.UserEmail, emailSubject, emailBody);
+                logger.info(`Email sent successfully to: ${userDetails.UserEmail}`);
 
                 // log status --> email sent
-                await logFlowTracking({ flowName: 'EngagementFlow', flowStatus: 'In Progress', flowStep: 'email sent to source owner', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementId, additionalInfo: { sourceOwnerEmail: sourceOwnerEmail } });
+                await logFlowTracking({ flowName: 'EngagementFlow', flowStatus: 'In Progress', flowStep: 'email sent to source owner', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, additionalInfo: { sourceOwnerEmail: userDetails.UserEmail } });
 
                 // log status --> flow ends
-                await logFlowTracking({ flowName: 'EngagementFlow', flowStatus: 'Completed', flowStep: 'flow end', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementId, additionalInfo: {} });
-
-
+                await logFlowTracking({ flowName: 'EngagementFlow', flowStatus: 'Completed', flowStep: 'flow end', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, additionalInfo: {} });
             }
         };
 

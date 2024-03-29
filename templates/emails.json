@@ -1,0 +1,26 @@
+{
+    "client": {
+        "welcomeEmail": {
+            "subject": "Welcome to a new journey",
+            "content": "We're glad you found our article on the Modus Create blog engaging..."
+        },
+        "generalReport": {
+            "subject": "Preliminary assessment report for {{{COMPANY_NAME}}}",
+            "content": "I hope this message finds you well..."
+        }
+    },
+    "admin": {
+        "newEngagement": {
+            "subject": "YAY, new lead landed",
+            "content": "Good news: a new lead came in. Here are the details..."
+        },
+        "strategicDirections": {
+            "subject": "Strategic directions for {{{COMPANY_NAME}}}",
+            "content": "Strategic directions were identified for {{{COMPANY_NAME}}} under engagement ID={{ENGAGEMENT_ID}}."
+        },
+        "rawReportGenerated": {
+            "subject": "Raw Report ready for {{{COMPANY_NAME}}}",
+            "content": "A raw report for {{{COMPANY_NAME}}} under engagement ID={{ENGAGEMENT_ID}} / assessment {{{ASSESSMENT_ID}}} has been completed."
+        }
+    }
+}

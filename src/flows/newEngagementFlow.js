@@ -15,7 +15,6 @@ const marketingAgentResponseSchema = require('../../schemas/marketingAgentRespon
 const replacePlaceholders = require('../services/replacePlaceholders');
 const companyService = require('../services/companyService');
 const wingmanAgentsService = require('../services/wingmanAgentsService');
-const { insertEngagementPrompt } = require('../lib/airtableUtils');
 const { agents, emails } = require('../../config');
 const logFlowTracking = require('../services/flowTrackingService');
 const { delay } = require('../utils/utils'); // Adjust the path as necessary
@@ -58,7 +57,7 @@ exports.execute = async (formData) => {
         const sourceName = await airtableUtils.findFieldValueByRecordId('WingmanSources', sourceRecordId, 'EngagementSourceName');
         logger.info(`Engagement Source Owner User ID: ${engagementSourceOwnerUserId}`);
 
-        // Retrieve the email address of the EngagementSourceOwner
+        // Retrieve details of the EngagementSourceOwner
         const userDetails = await airtableUtils.getFieldsForRecordById('Users', engagementSourceOwnerUserId);
         logger.info(`Source Owner Email: ${userDetails.UserEmail}`);
 

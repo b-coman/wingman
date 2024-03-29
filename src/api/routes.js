@@ -53,7 +53,7 @@ router.post('/start-engagement', async (req, res) => {
         await doEngagementFlow(engagementRecordId, engagementId, engagementStatus);
         logger.info(`Successfully completed Engagement flow for EngagementID: ${engagementId}`);
 
-        res.json({ message: 'Engagement flow started successfully' });
+        res.json({ message: 'route /start-engagement ended successfully' });
     } catch (error) {
         logger.error(`Failed to start engagement flow: ${error.message}`, error);
         res.status(500).send('Error starting engagement flow');
@@ -80,5 +80,35 @@ router.post('/start-assessment', async (req, res) => {
         res.status(500).send('Error starting assessment flow');
     }
 });
+
+router.post('/typeform', async (req, res) => {
+    try {
+        const payload = req.body;
+        logger.info('Received Typeform webhook:', payload);
+
+        // Example: Extracting and logging a simple piece of data
+        const formId = payload.form_response.form_id;
+        const answers = payload.form_response.answers.map(answer => {
+            return {
+                question: answer.field.ref,
+                type: answer.type,
+                answer: answer[answer.type] // Assumes that answer type (e.g., 'text', 'choice') matches key in answer object
+            };
+        });
+
+        // Example: Process and map answers to Airtable (pseudo-code)
+        for (const answer of answers) {
+            // Your logic to map and process answers here
+            console.log(answer);
+            // e.g., await saveAnswerToAirtable(answer);
+        }
+
+        res.status(200).send('Webhook received');
+    } catch (error) {
+        logger.error("Typeform webhook handling error:", { error: error.message });
+        res.status(500).send("An error occurred while handling Typeform webhook.");
+    }
+});
+
 
 module.exports = router;

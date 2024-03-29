@@ -141,8 +141,7 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
 
             } 
             
-            case "web research done": {
-                //this means we can move on the pain identification step
+            case "web research done": { //this means we can move on the pain identification step
 
                 logger.yay(`entering the branch for a new assessment with assessmentStatus = ${assessmentStatus}`);
                 await logFlowTracking({ flowName: flowName, flowStatus: 'In Progress', flowStep: 'case = potential pains', stepStatus: 'started', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
@@ -211,8 +210,7 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                 break
             }
 
-            case "potential pains done": {
-                // this means we can proceed with creating the final report
+            case "potential pains done": {  // this means we can proceed with creating the final report
 
                 logger.yay(`entering the branch for a new assessment with assessmentStatus = ${assessmentStatus}`);
                 await logFlowTracking({ flowName: flowName, flowStatus: 'In Progress', flowStep: 'case = web reserach', stepStatus: 'started', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
@@ -323,7 +321,7 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
 
             }
 
-            case "general report done": {
+            case "general report done": {   // this means we can send the report
 
                 logger.yay(`entering the branch for a new assessment with assessmentStatus = ${assessmentStatus}`);
                 await logFlowTracking({ flowName: flowName, flowStatus: 'In Progress', flowStep: 'case = general report', stepStatus: 'started', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });

@@ -5,7 +5,7 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const generalRouter = require('./src/api/routes');
-const logger = require('./logger'); // Import the Winston logger
+const logger = require('./logger'); 
 
 app.use(cors()); // This will allow all origins. For production, configure allowed origins appropriately.
 

@@ -271,7 +271,6 @@ exports.findAssessDetailsByAssessIDAndTemplate = async (assessmentId, templateVa
         const records = await table.select({
             filterByFormula: `AND({AssessmentID} = '${assessmentId}', FIND('${templateValue}', {WingmanAssessmentItemsTemplate (from AssessmentItemID)}))`
         }).firstPage();
-
         // Map the records to extract the Airtable record ID and fields
         const mappedRecords = records.map(record => {
             return {
