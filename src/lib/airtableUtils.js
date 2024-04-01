@@ -372,6 +372,41 @@ exports.createPainAssessmentDetails = async (agentResponseResult, assessmentDeta
 };
 
 
+
+/**
+ * Creates entries in the AssessmentDetails:Signals table for each item in the agent's response.
+ * @param {Array} agentResponseResult - The response from the agent as an array of objects.
+ * @param {String} assessmentDetailsId - The ID for the AssessmentDetail linked to these entries.
+ * @returns {Promise<void>}
+ */
+exports.createSignalAssessmentDetails = async (agentResponseResult, assessmentDetailsId, runID) => {
+    const assessmentDetailsSignalsTable = base('AssessmentDetails:Signals');
+
+    // Iterate through each result item
+    for (const item of agentResponseResult) {
+        try {
+            const signalRecordID = item.SignalRecordId; 
+            const reasoning = item.reasoning;
+            const confidenceScore = parseFloat(item.confidenceScore); // Convert to number
+
+            await assessmentDetailsSignalsTable.create({
+                'AssessmentDetailID': [assessmentDetailsId],
+                'SignalID': [signalRecordID],
+                'ConfidenceScore': confidenceScore,
+                'Reason': reasoning,
+                'AgentRunID': [runID]
+            });
+           // logger.info(`Entry created with Signal ID: ${signalRecordID}`);
+           
+        } catch (error) {
+            logger.error(`Error creating entry with Signal ID: ${assessmentDetailsId}: ${error}`);
+            console.error(error);
+        }
+    }
+};
+
+
+
 // Function to get an entry from the 'AssessmentDetails:FinalReport' table by AssessmentDetailID
 exports.getFinalReportEntry = async (assessmentDetailsId) => {
     const table = base('AssessmentDetails:FinalReport');
@@ -424,6 +459,36 @@ exports.createFinalReportEntry = async (assessmentDetailsId, markdownContent, ht
     }
 };
 
+
+/**
+ * Fetches signals from 'painsXsignals' table that are linked to a specific pain ID.
+ * @param {string} painId - The ID of the pain record to find related signals for.
+ * @returns {Promise<Array>} A promise that resolves to an array of records from 'painsXsignals' linked to the painId.
+ */
+exports.fetchRelatedSignalsForPain = async (painRecordId) => {
+
+// indentify the pain ID in the Pains table for the painRecordId
+const painId = await this.findFieldValueByRecordId('Pains', painRecordId, 'PainID');
+
+    let signalIDs = [];
+    try {
+      const records = await base('painsXsignals').select({
+        filterByFormula: `{PainID} = '${painId}'`
+      }).all(); // Fetch all records that match the painID
+  
+      records.forEach(record => {
+        if (record.fields.SignalID) {
+          // Assuming SignalID is an array of linked record IDs
+          signalIDs = signalIDs.concat(record.fields.SignalID);
+        }
+      });
+  
+    } catch (error) {
+      logger.error(`Error fetching signals for Pain ID ${painId}:`, error);
+    }
+  
+    return signalIDs; // Array of Signal IDs linked to the given Pain ID
+  }
 
 
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>

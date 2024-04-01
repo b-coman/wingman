@@ -4,6 +4,13 @@ const express = require('express');
 const app = express();
 const isDevelopment = process.env.NODE_ENV === 'development';
 
+const appConfig = {
+    rawreportRequireApproval: true, // Whether to require approval for raw report
+    painRequireApproval: true, // Whether to require approval for pains
+    generalreportRequireApproval: true, // Whether to require approval for general report
+    signalRequireApproval: false, // Whether to require approval for signals
+};
+
 const systemRules = {
     rule1: `The first most important context is the one provided in the context of a company, if it's any.
     The second most important context is the one provided in the context of the engagement, if it's any.
@@ -44,7 +51,7 @@ const agents = {
     $(APPROVED_PROMPT).`,
 
     // identify pains agent
-    generalPainsIdentifierEndpoint: '/identify_pains',
+    generalPainsIdentifierEndpoint: '/analyse_data',
     generalPainsIdentifierDescription: "Analyze data and provide a list of pains",
     generalPainsIdentifierTaskPrompt: `You will get two datasets: an initial research about a company named $(COMPANY) and a set of pains structured as JSON.
      You will get thsese inputs at the end of this prompt.
@@ -237,4 +244,4 @@ const htmlTemplates = {
      `
 }
 
-module.exports = { systemRules, agents, emails, htmlTemplates }; 
+module.exports = { appConfig, systemRules, agents, emails, htmlTemplates }; 

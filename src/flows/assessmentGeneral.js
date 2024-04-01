@@ -5,13 +5,14 @@ const marked = require('marked');
 const replacePlaceholders = require('../services/replacePlaceholders');
 const { sendEmail } = require('../services/emailService');
 const { processAgentOutput } = require('../services/pdfReportService');
+const { processSignalsFromPains } = require('../services/getSignalsForGeneralAssessmentService');
 const updateAssessmentDetailsService = require('../services/updateAssessmentDetailsService');
 const companyService = require('../services/companyService');
 const wingmanAgentsService = require('../services/wingmanAgentsService');
 const airtableUtils = require('../lib/airtableUtils');
 const logger = require('../../logger');
 const logFlowTracking = require('../services/flowTrackingService');
-const { agents, emails, htmlTemplates } = require('../../config');
+const { appConfig, agents, emails, htmlTemplates } = require('../../config');
 const { Type } = require('ajv/dist/compile/util');
 const { DataType } = require('ajv/dist/compile/validate/dataType');
 const { log } = require('handlebars');
@@ -22,6 +23,9 @@ const axios = require('axios');
 const flowName = 'AssessmentGeneralFlow';
 const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentRecordId, assessmentId, approvedPromptRecordId) => {
     try {
+        logger.yay(`entering the flow Assessment General flow for EngagementID=${engagementId}, AssessmentID ${assessmentId}`);
+        await logFlowTracking({ flowName: flowName, flowStatus: 'Started', flowStep: 'initialization', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
+
         //get the staus for the assessment and test it
         const assessmentStatus = await airtableUtils.findFieldValueByRecordId('Assessments', assessmentRecordId, 'AssessmentStatus');
         const companyDetails = await companyService.fetchCompanyDetailsFromEngagement(engagementRecordId);
@@ -35,9 +39,9 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
         logger.info(`   ApprovedPromptID:       value = ${approvedPromptRecordId}, type = ${typeof approvedPromptRecordId}`);
 
         switch (assessmentStatus) {
-            case "requested": {
+            case "requested": { // this is a new assessment, proceed with raw report
                 logger.yay(`entering the branch for a new assessment with assessmentStatus = ${assessmentStatus}`);
-                await logFlowTracking({ flowName: flowName, flowStatus: 'Started', flowStep: 'initialization', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: { approvedPromptRecordId } });
+                await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'initialization', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: { approvedPromptRecordId } });
 
                 // update the status for the current assessment to started
                 await airtableUtils.updateRecordField('Assessments', assessmentRecordId, 'AssessmentStatus', 'started');
@@ -49,7 +53,7 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                 const contactLastName = await airtableUtils.findFieldValueByRecordId('Engagements', engagementRecordId, '*PrimaryContactLastName (from CompanyID)');
                 const contactEmail = await airtableUtils.findFieldValueByRecordId('Engagements', engagementRecordId, '*PrimaryContactEmail (from CompanyID)');
 
-                await logFlowTracking({ flowName: flowName, flowStatus: 'In Progress', flowStep: 'identify contact details', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: { contactFirstName, contactLastName, contactEmail } });
+                await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'identify contact details', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: { contactFirstName, contactLastName, contactEmail } });
                 logger.info(`Contact details for EngagementID ${engagementId}: ${contactFirstName}, ${contactLastName}, ${contactEmail}`);
 
 
@@ -65,7 +69,7 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                 await sendEmail(contactEmail, emailSubject, emailBody);
 
                 // log the step
-                await logFlowTracking({ flowName: flowName, flowStatus: 'In Progress', flowStep: 'Email sent to the client', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: { contactFirstName, contactLastName, contactEmail } });
+                await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'Email sent to the client', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: { contactFirstName, contactLastName, contactEmail } });
 
 
                 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -102,7 +106,8 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 //-STEP 4 --> update Airtable records
                 // update with the agent result in Airtable
-                await updateAssessmentDetailsService.updateAssessmentDetailsAndStatus(assessmentId, assessmentRecordId, agentResponseResult, process.env.envDefaultGenAssessRawResultId);
+                const assessmentDetailsStatus = appConfig.rawreportRequireApproval ? 'pending' : 'approved';   // check if this step requires approaval or not --> so set the staus as 'approved' if doesn't require approaval
+                await updateAssessmentDetailsService.updateAssessmentDetailsAndStatus(assessmentId, assessmentRecordId, agentResponseResult, process.env.envDefaultGenAssessRawResultId, assessmentDetailsStatus);
 
                 // update the status for the current assessment
                 await airtableUtils.updateRecordField('Assessments', assessmentRecordId, 'AssessmentStatus', 'web research');
@@ -130,21 +135,21 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                 logger.info(`Email sent successfully to: ${sourceOwnerEmail}`);
 
                 // log the flow staus --> email sent
-                await logFlowTracking({ flowName: flowName, flowStatus: 'In Progress', flowStep: 'email sent to source owner', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: { sourceOwnerEmail: sourceOwnerEmail } });
+                await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'email sent to source owner', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: { sourceOwnerEmail: sourceOwnerEmail } });
 
                 // log the flow status --> end of branch
-                await logFlowTracking({ flowName: flowName, flowStatus: 'In Progress', flowStep: 'end of branch', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
+                await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'end of branch', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
                 logger.yay(`The first major branch in the general assessment is DONE --> AssessmentID=${assessmentId}`);
                 break;
 
                 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-            } 
-            
+            }
+
             case "web research done": { //this means we can move on the pain identification step
 
                 logger.yay(`entering the branch for a new assessment with assessmentStatus = ${assessmentStatus}`);
-                await logFlowTracking({ flowName: flowName, flowStatus: 'In Progress', flowStep: 'case = potential pains', stepStatus: 'started', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
+                await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'case = potential pains', stepStatus: 'started', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
 
                 // find the ID of the record in AssessmentDetails table where to place the record for pains identified by the agent
                 var assessmentDetailsForPainsId = await airtableUtils.findAssessDetailsByAssessIDAndTemplate(assessmentId, process.env.envDefaultGenAssessPainPointsId);
@@ -191,7 +196,8 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
 
                     // update with the agent result in Airtable
                     agentResponseResult = JSON.stringify(agentResponseResult)
-                    await updateAssessmentDetailsService.updateAssessmentDetailsAndStatus(assessmentId, assessmentRecordId, agentResponseResult, process.env.envDefaultGenAssessPainPointsId);
+                    const assessmentDetailsStatus = appConfig.painRequireApproval ? 'pending' : 'approved';  // check if this step requires approaval or not --> so set the staus as 'approved' if doesn't require approaval
+                    await updateAssessmentDetailsService.updateAssessmentDetailsAndStatus(assessmentId, assessmentRecordId, agentResponseResult, process.env.envDefaultGenAssessPainPointsId, assessmentDetailsStatus);
 
                     // update the status for the current assessment
                     await airtableUtils.updateRecordField('Assessments', assessmentRecordId, 'AssessmentStatus', 'potential pains done');
@@ -199,7 +205,7 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                     //INFORM SOURCE OWNER!!
 
-                    await logFlowTracking({ flowName: flowName, flowStatus: 'in progress', flowStep: 'identify potential pains', stepStatus: 'done', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
+                    await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'identify potential pains', stepStatus: 'done', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
                     logger.yay(`General assessment flow completed successfully for AssessmentID=${assessmentId}`);
 
                 }
@@ -213,7 +219,7 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
             case "potential pains done": {  // this means we can proceed with creating the final report
 
                 logger.yay(`entering the branch for a new assessment with assessmentStatus = ${assessmentStatus}`);
-                await logFlowTracking({ flowName: flowName, flowStatus: 'In Progress', flowStep: 'case = web reserach', stepStatus: 'started', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
+                await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'case = web reserach', stepStatus: 'started', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
 
                 // find the ID of the record in AssessmentDetails where the record for potential pains is located
                 var assessmentDetailsForPainsId = await airtableUtils.findAssessDetailsByAssessIDAndTemplate(assessmentId, process.env.envDefaultGenAssessPainPointsId);
@@ -284,7 +290,7 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                     const agentData = {
                         CompanyID: companyDetails.companyRecordId,
                         CrewName: 'copywriting',
-                        TaskDescription: 'Create a comprehensive report based on data provided',
+                        TaskDescription: agents.generalReportDescription,
                         TaskPrompt: taskPrompt,
                         Timestamp: new Date().toISOString()
                     };
@@ -303,12 +309,13 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                     await airtableUtils.updateAgentActivityRecord(runID, agentResponse);
 
                     // update with the agent result in Airtable
-                    await updateAssessmentDetailsService.updateAssessmentDetailsAndStatus(assessmentId, assessmentRecordId, agentResponseResult, process.env.envDefaultGenAssessFinalResultId);
+                    const assessmentDetailsStatus = appConfig.generalreportRequireApproval ? 'pending' : 'approved';  // check if this step requires approaval or not --> so set the staus as 'approved' if doesn't require approaval
+                    await updateAssessmentDetailsService.updateAssessmentDetailsAndStatus(assessmentId, assessmentRecordId, agentResponseResult, process.env.envDefaultGenAssessFinalResultId, assessmentDetailsStatus);
 
                     // update the status for the current assessment
                     await airtableUtils.updateRecordField('Assessments', assessmentRecordId, 'AssessmentStatus', 'general report done');
 
-                    await logFlowTracking({ flowName: flowName, flowStatus: 'in progress', flowStep: 'case = web research', stepStatus: 'done', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
+                    await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'case = web research', stepStatus: 'done', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
                     logger.yay(`General assessment flow completed successfully for AssessmentID=${assessmentId}`);
 
                 }
@@ -321,10 +328,36 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
 
             }
 
-            case "general report done": {   // this means we can send the report
+            case "general report done": {   // this means the we can indentify and validate the signals (based on the report content and the pains)
 
                 logger.yay(`entering the branch for a new assessment with assessmentStatus = ${assessmentStatus}`);
-                await logFlowTracking({ flowName: flowName, flowStatus: 'In Progress', flowStep: 'case = general report', stepStatus: 'started', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
+                await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'case = general report', stepStatus: 'started', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
+
+                var assessmentDetailsId = await airtableUtils.findAssessDetailsByAssessIDAndTemplate(assessmentId, process.env.envDefaultGenAssessFinalResultId);
+                assessmentDetailsId = assessmentDetailsId[0].id
+                //logger.info(`assessmentDetailsId = ${assessmentDetailsId}`);
+
+
+                // Example usage
+                await processSignalsFromPains(engagementRecordId, assessmentRecordId, assessmentId, flowName).then(() => {
+                    console.log('Signals processing completed successfully.');
+                }).catch(error => {
+                    console.error('An error occurred:', error);
+                });
+
+
+                logger.yay(`case for assessmentStatus = ${assessmentStatus} is completed`);
+                await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: '3rd branch', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
+                break;
+
+
+
+            }
+
+            case "flow concluded": {   // this means we can send the report
+
+                logger.yay(`entering the branch for a new assessment with assessmentStatus = ${assessmentStatus}`);
+                await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'case = general report', stepStatus: 'started', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
 
                 var assessmentDetailsId = await airtableUtils.findAssessDetailsByAssessIDAndTemplate(assessmentId, process.env.envDefaultGenAssessFinalResultId);
                 assessmentDetailsId = assessmentDetailsId[0].id
@@ -332,12 +365,12 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
 
                 const genReport = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsId, 'Value');
                 const genReportStatus = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsId, 'Status');
-            //    logger.info(`genReport = ${genReport}`);
-              //  logger.info(`genReportStatus = ${genReportStatus}`);
+                //    logger.info(`genReport = ${genReport}`);
+                //  logger.info(`genReportStatus = ${genReportStatus}`);
 
                 if (genReportStatus == 'approved') { // --> this means we can proceed generating and sending the final report
 
-                   // PDF FILE STEP
+                    // PDF FILE STEP
                     const companyName = companyDetails.companyName;
                     const companyNameFile = companyName.replace(/\s/g, "-");
 
@@ -349,17 +382,17 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                     const pdfFileURL = pdfReturn[1];
                     const pdfFileName = pdfReturn[0];
 
-                    await logFlowTracking({ flowName: flowName, flowStatus: 'In Progress', flowStep: 'create PDF report', stepStatus: 'completed', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
+                    await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'create PDF report', stepStatus: 'completed', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
 
 
                     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                     //- STEP 6 --> send email to the client contact with the report as attachement
 
-                    await logFlowTracking({ flowName: flowName, flowStatus: 'In Progress', flowStep: 'send final report', stepStatus: 'started', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
+                    await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'send final report', stepStatus: 'started', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
 
 
                     // Download PDF from PDFShift storage as a buffer
-                    const response = await axios.get(pdfFileURL, {responseType: 'arraybuffer'});
+                    const response = await axios.get(pdfFileURL, { responseType: 'arraybuffer' });
                     const pdfBuffer = response.data;
 
                     // Send email with PDF attachment using the buffer
@@ -369,31 +402,31 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                         contentType: 'application/pdf',
                     }];
 
-                   // logger.info(`companyName = ${companyDetails.companyName}`);
+                    // logger.info(`companyName = ${companyDetails.companyName}`);
 
                     const contactFirstName = await airtableUtils.findFieldValueByRecordId('Engagements', engagementRecordId, '*PrimaryContactFirstName (from CompanyID)');
                     const contactLastName = await airtableUtils.findFieldValueByRecordId('Engagements', engagementRecordId, '*PrimaryContactLastName (from CompanyID)');
                     const contactEmail = await airtableUtils.findFieldValueByRecordId('Engagements', engagementRecordId, '*PrimaryContactEmail (from CompanyID)');
 
                     //const emailSubject = emails.genReportEmailSubject;
-                   // const emailContent = emails.genReportEmailContent;
+                    // const emailContent = emails.genReportEmailContent;
 
                     // Generate the email body using the emailBodyMaker service
                     const emailSubject = await replacePlaceholders.generateContent(isFilePath = false, emails.genReportEmailSubject, { COMPANY_NAME: companyName });
                     const emailContent = await replacePlaceholders.generateContent(isFilePath = false, emails.genReportEmailContent, { COMPANY_NAME: companyDetails.companyName, REPORT_FILENAME: pdfFileName, REPORT_URL: pdfFileURL });
-                    const emailBody = await replacePlaceholders.generateContent(isFilePath = true, 'email_client', { CONTACT_FIRSTNAME: contactFirstName, MESSAGE_BODY: emailContent});
+                    const emailBody = await replacePlaceholders.generateContent(isFilePath = true, 'email_client', { CONTACT_FIRSTNAME: contactFirstName, MESSAGE_BODY: emailContent });
 
-//logger.info(`emailBody = ${emailBody}`);
+                    //logger.info(`emailBody = ${emailBody}`);
 
                     // Send the email 
                     await sendEmail(contactEmail, emailSubject, emailBody, emailAttachement);
 
                     // log the step
-                    await logFlowTracking({ flowName: flowName, flowStatus: 'In Progress', flowStep: 'Email sent to the client', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: { contactFirstName, contactLastName, contactEmail } });
+                    await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'Email sent to the client', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: { contactFirstName, contactLastName, contactEmail } });
 
 
                     logger.yay(`case for assessmentStatus = ${assessmentStatus} is completed`);
-                    await logFlowTracking({ flowName: flowName, flowStatus: 'In Progress', flowStep: '3rd branch', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
+                    await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: '3rd branch', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
                     break;
 
                 }
@@ -402,6 +435,7 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                     logger.warn(`The raw research was not approved, so we need to ask the source owner to approve the raw research before we can continue with the general assessment`);
                 }
             }
+
             default: {
                 logger.error(`The assessmentStatus is not valid: ${assessmentStatus}`);
                 //logFlowEvent(assessmentId, 'doAssessmentGeneral', 'error', `The assessmentStatus is not valid: ${assessmentStatus}`); // Flow tracking: Error

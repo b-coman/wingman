@@ -2,6 +2,7 @@
 
 const airtableUtils = require('../lib/airtableUtils'); // Adjust the path as needed
 const logger = require('../../logger'); // Adjust the path as needed
+const { config } = require('dotenv');
 
 /**
  * Updates assessment details and status based on the given assessment ID.
@@ -11,7 +12,7 @@ const logger = require('../../logger'); // Adjust the path as needed
  * @param {String} agentResponseResult The response result from the agent to store in assessment details.
  * @param {String} envDefaultGenAssessRawResultId The environment variable indicating the template ID for finding assessment details.
  */
-exports.updateAssessmentDetailsAndStatus = async (assessmentId, assessmentRecordId, agentResponseResult, envIDtemplate) => {
+exports.updateAssessmentDetailsAndStatus = async (assessmentId, assessmentRecordId, agentResponseResult, envIDtemplate, assessmentDetailsStatus) => {
     try {
         // Identify the record that should be updated
         var assessmentDetails = await airtableUtils.findAssessDetailsByAssessIDAndTemplate(assessmentId, envIDtemplate);
@@ -22,7 +23,7 @@ exports.updateAssessmentDetailsAndStatus = async (assessmentId, assessmentRecord
 
         // Update the assessment details with the agent response
         await airtableUtils.updateRecordField('AssessmentDetails', assessmentDetailsId, 'Value', agentResponseResult);
-        await airtableUtils.updateRecordField('AssessmentDetails', assessmentDetailsId, 'Status', 'pending');
+        await airtableUtils.updateRecordField('AssessmentDetails', assessmentDetailsId, 'Status', assessmentDetailsStatus);
         await airtableUtils.updateRecordField('AssessmentDetails', assessmentDetailsId, 'Date', new Date().toISOString());
 
         logger.info(`Assessment details and status updated successfully for assessment ID: ${assessmentId}`);
