@@ -62,17 +62,17 @@ router.post('/start-engagement', async (req, res) => {
 
 router.post('/start-assessment', async (req, res) => {
     try {
-        const { assessmentId } = req.body;
-        logger.info(`Starting assessment flow for AssessmentID: ${assessmentId}`);
+        const { assessmentRecordId } = req.body;
+        logger.info(`Starting assessment flow for AssessmentID: ${assessmentRecordId}`);
         // Fetch the AssessmentType based on the provided AssessmentID
-        const assessmentType = await airtableUtils.getAssessmentTypeById(assessmentId);
+        const assessmentType = await airtableUtils.getAssessmentTypeById(assessmentRecordId);
         if (!assessmentType) {
-            logger.warn(`Assessment type not found for AssessmentID: ${assessmentId}`);
+            logger.warn(`Assessment type not found for AssessmentID: ${assessmentRecordId}`);
             return res.status(404).send('Assessment type not found');
         }
         // Execute the appropriate assessment flow
-        await executeAssessmentFlow(assessmentId, assessmentType);
-        logger.info(`Successfully completed assessment flow for AssessmentID: ${assessmentId}`);
+        await executeAssessmentFlow(assessmentRecordId, assessmentType);
+        logger.yay(`Successfully completed /start-assessment route for Assessment: ${assessmentRecordId}`);
 
         res.send('Assessment flow started successfully');
     } catch (error) {

@@ -1,7 +1,7 @@
 // filename: logger.js
 
 const winston = require('winston');
-require('winston').addColors({ yay: 'magenta' }); // Directly add the custom color for 'yay'
+require('winston').addColors({ yay: 'magenta', debug: 'yellow'}); // Directly add the custom color for 'yay'
 
 // Define custom logging levels and colors
 const customLevels = {
@@ -10,17 +10,19 @@ const customLevels = {
     warn: 1,
     info: 2,
     yay: 3, // Adding the 'yay' level
+    debug: 4,
   },
   colors: {
     error: 'red',
     warn: 'yellow',
     info: 'green',
     yay: 'magenta', // Color for the 'yay' level
+    debug: 'yellow'
   },
 };
 
 const logger = winston.createLogger({
-  level: 'yay', // Set 'yay' as the lowest level to ensure it logs
+  level: 'debug', // Set 'yay' as the lowest level to ensure it logs
   levels: customLevels.levels,
   format: winston.format.combine(
     winston.format.timestamp({
@@ -29,15 +31,13 @@ const logger = winston.createLogger({
     winston.format.errors({ stack: true }),
     winston.format.splat(),
     winston.format.printf(info => {
-      const logObject = {
-        timestamp: `[${info.timestamp}]`,
-        level: info.level,
-        message: info.message,
-        ...info.metadata,
-        ...(info.stack && { stack: info.stack })
-      };
-      return JSON.stringify(logObject);
+      let formattedMessage = info.message;
+      if (typeof info.message === 'object') {
+        formattedMessage = JSON.stringify(info.message, null, 2);
+      }
+      return `[${info.timestamp}] ${info.level}: ${formattedMessage}`;
     })
+    
   ),
   transports: [
     new winston.transports.File({ filename: 'error.log', level: 'error' }),

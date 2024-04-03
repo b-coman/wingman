@@ -6,9 +6,11 @@ const replacePlaceholders = require('../services/replacePlaceholders');
 const { sendEmail } = require('../services/emailService');
 const { processAgentOutput } = require('../services/pdfReportService');
 const { processSignalsFromPains } = require('../services/getSignalsForGeneralAssessmentService');
+const { processQuestionsFromSignals } = require('../services/getQuestionsForGeneralAssessmentService');
 const updateAssessmentDetailsService = require('../services/updateAssessmentDetailsService');
 const companyService = require('../services/companyService');
 const wingmanAgentsService = require('../services/wingmanAgentsService');
+const peopleUtils = require('../lib/peopleUtils');
 const airtableUtils = require('../lib/airtableUtils');
 const logger = require('../../logger');
 const logFlowTracking = require('../services/flowTrackingService');
@@ -333,26 +335,48 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                 logger.yay(`entering the branch for a new assessment with assessmentStatus = ${assessmentStatus}`);
                 await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'case = general report', stepStatus: 'started', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
 
-                var assessmentDetailsId = await airtableUtils.findAssessDetailsByAssessIDAndTemplate(assessmentId, process.env.envDefaultGenAssessFinalResultId);
-                assessmentDetailsId = assessmentDetailsId[0].id
-                //logger.info(`assessmentDetailsId = ${assessmentDetailsId}`);
+                // call the service to process signals from pains
+                await processSignalsFromPains(engagementRecordId, assessmentRecordId, assessmentId, flowName, assessmentStatus);
 
+                logger.yay(`case for assessmentStatus = ${assessmentStatus} is completed`);
+                await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'closing the branch', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
+                break;
 
-                // Example usage
-                await processSignalsFromPains(engagementRecordId, assessmentRecordId, assessmentId, flowName).then(() => {
-                    console.log('Signals processing completed successfully.');
-                }).catch(error => {
-                    console.error('An error occurred:', error);
-                });
+            }
+
+            case "signals done": {   // this means the we can indentify the questions and create the typeform
+
+                logger.yay(`entering the branch for a new assessment with assessmentStatus = ${assessmentStatus}`);
+                await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'initiatilization', stepStatus: 'started', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
+
+                // call the service to process questions from signals
+          //      const jsonQuestionsData = await processQuestionsFromSignals(engagementRecordId, assessmentRecordId, assessmentId, flowName, assessmentStatus);
+          //      logger.debug(`jsonQuestionsData = ${jsonQuestionsData}`);
+
+                // find the record ID in table AssessmentDetails where report is stored
+                var assessmentDetailsForReportId = await airtableUtils.findAssessDetailsByAssessIDAndTemplate(assessmentId, process.env.envDefaultGenAssessFinalResultId);
+                assessmentDetailsForReportId = assessmentDetailsForReportId[0].id;
+
+                // get the report
+                var reportContent = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsForReportId, 'Value');
+
+                // get the contactID for this engagement
+                const contactRecordId = await peopleUtils.findPrimaryContactID(engagementRecordId);
+
+                // get role details for this contact
+                const contactDetails = await peopleUtils.fetchPeopleDetails(contactRecordId, 'contact');
+                const roleName = contactDetails.RoleName;
+                const roleDescription = contactDetails.RoleDescription;
+                logger.debug(`Role name: ${roleName}`);
+                logger.debug(`Role description: ${roleDescription}`);
 
 
                 logger.yay(`case for assessmentStatus = ${assessmentStatus} is completed`);
-                await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: '3rd branch', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
+                await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'close the branch', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
                 break;
 
-
-
             }
+
 
             case "flow concluded": {   // this means we can send the report
 

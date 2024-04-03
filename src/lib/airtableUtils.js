@@ -397,7 +397,7 @@ exports.createSignalAssessmentDetails = async (agentResponseResult, assessmentDe
                 'AgentRunID': [runID]
             });
            // logger.info(`Entry created with Signal ID: ${signalRecordID}`);
-           
+
         } catch (error) {
             logger.error(`Error creating entry with Signal ID: ${assessmentDetailsId}: ${error}`);
             console.error(error);
@@ -489,6 +489,40 @@ const painId = await this.findFieldValueByRecordId('Pains', painRecordId, 'PainI
   
     return signalIDs; // Array of Signal IDs linked to the given Pain ID
   }
+
+
+
+/** --> similaarly to the above functions, this fetches questions related to a signal
+ * Fetches questions from 'signalsXquestions' table that are linked to a specific signal ID.
+ * @param {string} signalRecordId - The ID of the signal record to find related questions for.
+ * @returns {Promise<Array>} A promise that resolves to an array of records from 'signalsXquestions' linked to the signalId.
+ */
+exports.fetchRelatedQuestionsForSignal = async (signalRecordId) => {
+
+    // indentify the pain ID in the Pains table for the painRecordId
+    const signalId = await this.findFieldValueByRecordId('Signals', signalRecordId, 'SignalID');
+    
+        let questionIDs = [];
+        try {
+          const records = await base('signalsXquestions').select({
+            filterByFormula: `{SignalID} = '${signalId}'`
+          }).all(); // Fetch all records that match the signalID
+      
+          records.forEach(record => {
+            if (record.fields.QuestionID) {
+              // Assuming QuestionID is an array of linked record IDs
+              questionIDs = questionIDs.concat(record.fields.QuestionID);
+            }
+          });
+      
+        } catch (error) {
+          logger.error(`Error fetching signals for Pain ID ${signalId}:`, error);
+        }
+      
+        return questionIDs; // Array of Signal IDs linked to the given Pain ID
+      }
+    
+
 
 
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>

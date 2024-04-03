@@ -8,16 +8,17 @@ const {
 const airtableUtils = require('../lib/airtableUtils');
 const { sendEmail } = require('../services/emailService');
 const logger = require('../../logger');
-
-const Ajv = require('ajv');
-const ajv = new Ajv();
-const marketingAgentResponseSchema = require('../../schemas/marketingAgentResponseSchema.json');
 const replacePlaceholders = require('../services/replacePlaceholders');
 const companyService = require('../services/companyService');
 const wingmanAgentsService = require('../services/wingmanAgentsService');
 const { agents, emails } = require('../../config');
 const logFlowTracking = require('../services/flowTrackingService');
 const { delay } = require('../utils/utils'); // Adjust the path as necessary
+
+// this part I think can be erased
+const Ajv = require('ajv');
+const ajv = new Ajv();
+const marketingAgentResponseSchema = require('../../schemas/marketingAgentResponseSchema.json');
 
 
 // Orchestrates the flow to create a new engagement
