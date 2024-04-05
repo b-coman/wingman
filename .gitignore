@@ -4,6 +4,7 @@ sourceCode.txt
 .DS_Store
 public/
 combined.log
+error.log
 
 # Logs
 logs
