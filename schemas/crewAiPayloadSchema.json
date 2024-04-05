@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CrewAI Configuration",
+  "type": "object",
+  "required": ["crewName", "agents", "tasks"],
+  "properties": {
+    "crewName": {
+      "type": "string"
+    },
+    "process": {
+      "type": "string",
+      "enum": ["sequential", "hierarchical"]
+    },
+    "verbose": {
+      "type": "integer"
+    },
+    "maxRPM": {
+      "type": "integer"
+    },
+    "fullOutput": {
+      "type": "boolean"
+    },
+    "agents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["role", "goal", "backstory", "llm", "tools"],
+        "properties": {
+          "role": { "type": "string" },
+          "goal": { "type": "string" },
+          "backstory": { "type": "string" },
+          "llm": {
+            "type": "object",
+            "required": ["model_name", "temperature"],
+            "properties": {
+              "model_name": { "type": "string" },
+              "temperature": { "type": "number" }
+            }
+          },
+          "tools": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "max_iter": { "type": "integer" },
+          "verbose": { "type": "boolean" },
+          "allow_delegation": { "type": "boolean" },
+          "memory": { "type": "boolean" }
+        }
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["description", "expected_output", "agent"],
+        "properties": {
+          "description": { "type": "string" },
+          "expected_output": { "type": "string" },
+          "agent": { "type": "string" },
+          "tools": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "async_execution": { "type": "boolean" },
+          "parameters": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  }
+}

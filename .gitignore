@@ -2,6 +2,7 @@
 sourceCode.js
 sourceCode.txt
 .DS_Store
+public/
 
 # Logs
 logs

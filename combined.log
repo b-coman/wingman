@@ -1264,3 +1264,282 @@ This report has been crafted to provide a professional and insightful analysis o
 [2024-04-03 12:45:10] info: Server is running on port 3000
 [2024-04-03 12:48:22] info: Server is running on port 3000
 [2024-04-03 14:42:28] info: Server is running on port 3000
+[2024-04-04 13:01:43] info: Server is running on port 3000
+[2024-04-04 18:55:08] info: Server is running on port 3000
+[2024-04-04 19:04:27] info: Server is running on port 3000
+[2024-04-04 19:04:36] info: Server is running on port 3000
+[2024-04-04 19:04:45] info: Server is running on port 3000
+[2024-04-04 19:04:48] info: Server is running on port 3000
+[2024-04-04 19:04:49] info: Server is running on port 3000
+[2024-04-04 19:05:11] info: Server is running on port 3000
+[2024-04-04 19:05:50] info: Server is running on port 3000
+[2024-04-04 19:05:54] info: Server is running on port 3000
+[2024-04-04 19:06:21] info: Server is running on port 3000
+[2024-04-04 19:06:23] info: Server is running on port 3000
+[2024-04-04 19:07:04] info: Server is running on port 3000
+[2024-04-04 19:07:11] info: Server is running on port 3000
+[2024-04-04 19:07:20] info: Server is running on port 3000
+[2024-04-04 19:07:38] info: Server is running on port 3000
+[2024-04-04 19:08:43] info: Server is running on port 3000
+[2024-04-04 19:08:55] info: Server is running on port 3000
+[2024-04-04 19:08:58] info: Server is running on port 3000
+[2024-04-04 19:09:12] info: Server is running on port 3000
+[2024-04-04 19:09:21] info: Server is running on port 3000
+[2024-04-04 19:09:30] info: Server is running on port 3000
+[2024-04-04 19:09:42] info: Server is running on port 3000
+[2024-04-04 19:09:48] info: Server is running on port 3000
+[2024-04-04 19:09:50] info: Server is running on port 3000
+[2024-04-04 19:10:00] info: Server is running on port 3000
+[2024-04-04 19:10:05] info: Server is running on port 3000
+[2024-04-04 19:10:07] info: Server is running on port 3000
+[2024-04-04 19:10:10] info: Server is running on port 3000
+[2024-04-04 19:10:13] info: Server is running on port 3000
+[2024-04-04 19:10:20] info: Server is running on port 3000
+[2024-04-04 19:18:37] info: Server is running on port 3000
+[2024-04-04 19:19:03] info: Server is running on port 3000
+[2024-04-04 19:22:55] info: Server is running on port 3000
+[2024-04-04 19:22:58] info: Server is running on port 3000
+[2024-04-04 19:24:34] info: Server is running on port 3000
+[2024-04-04 19:24:36] info: Server is running on port 3000
+[2024-04-04 19:26:35] error: The formula for filtering records is invalid: Unknown field names: tasksku
+[2024-04-04 19:30:33] info: Server is running on port 3000
+[2024-04-04 19:30:35] info: Server is running on port 3000
+[2024-04-04 19:30:40] info: Server is running on port 3000
+[2024-04-04 19:30:46] debug: Fetching tool name for ID: recHzfgepCUJYpMaJ
+[2024-04-04 19:30:46] error: The formula for filtering records is invalid: Unknown field names: tasksku
+[2024-04-04 19:31:16] info: Server is running on port 3000
+[2024-04-04 19:31:18] info: Server is running on port 3000
+[2024-04-04 19:31:21] info: Server is running on port 3000
+[2024-04-04 19:31:27] debug: Fetching tool name for ID: recHzfgepCUJYpMaJ
+[2024-04-04 19:31:28] debug: Fetched tool name: perplexity_response_tool
+[2024-04-04 19:31:28] error: The formula for filtering records is invalid: Unknown field names: tasksku
+[2024-04-04 19:37:28] info: Server is running on port 3000
+[2024-04-04 19:37:30] info: Server is running on port 3000
+[2024-04-04 19:37:42] debug: Fetched tool name: perplexity_response_tool
+[2024-04-04 19:37:42] error: The formula for filtering records is invalid: Unknown field names: tasksku
+[2024-04-04 19:38:54] debug: Fetched tool name: perplexity_response_tool
+[2024-04-04 19:38:54] debug: Fetched tool name: search the web
+[2024-04-04 19:38:55] error: The formula for filtering records is invalid: Unknown field names: tasksku
+[2024-04-04 19:42:15] info: Server is running on port 3000
+[2024-04-04 19:42:16] info: Server is running on port 3000
+[2024-04-04 19:42:42] info: Server is running on port 3000
+[2024-04-04 19:43:05] info: Server is running on port 3000
+[2024-04-04 19:43:16] info: Server is running on port 3000
+[2024-04-04 19:43:17] info: Server is running on port 3000
+[2024-04-04 19:43:20] info: Server is running on port 3000
+[2024-04-04 19:43:29] info: Server is running on port 3000
+[2024-04-04 19:43:33] info: Server is running on port 3000
+[2024-04-04 19:43:42] info: Server is running on port 3000
+[2024-04-04 19:43:47] info: Server is running on port 3000
+[2024-04-04 19:43:52] info: Server is running on port 3000
+[2024-04-04 19:44:00] debug: Fetched tool name: perplexity_response_tool
+[2024-04-04 19:44:00] debug: Fetched tool name: search the web
+[2024-04-04 19:44:00] error: The formula for filtering records is invalid: Unknown field names: tasksku
+[2024-04-04 19:44:37] info: Server is running on port 3000
+[2024-04-04 19:46:35] info: Server is running on port 3000
+[2024-04-04 19:47:12] info: Server is running on port 3000
+[2024-04-04 19:47:14] info: Server is running on port 3000
+[2024-04-04 19:47:22] info: Server is running on port 3000
+[2024-04-04 19:47:31] debug: Fetched tool name: perplexity_response_tool
+[2024-04-04 19:47:31] debug: Fetched tool name: search the web
+[2024-04-04 19:47:31] error: The formula for filtering records is invalid: Unknown field names: tasksku
+[2024-04-04 19:49:57] info: Server is running on port 3000
+[2024-04-04 19:50:00] debug: Fetched tool name: perplexity_response_tool
+[2024-04-04 19:50:01] debug: Fetched tool name: search the web
+[2024-04-04 19:50:32] debug: Fetched tool name: perplexity_response_tool
+[2024-04-04 19:50:32] debug: Fetched tool name: search the web
+[2024-04-04 19:50:33] debug: Fetched tool name: perplexity_response_tool
+[2024-04-04 19:50:33] debug: Fetched tool name: search the web
+[2024-04-04 19:51:34] info: Server is running on port 3000
+[2024-04-04 19:51:37] info: Server is running on port 3000
+[2024-04-04 19:51:51] info: Server is running on port 3000
+[2024-04-04 19:52:53] info: Server is running on port 3000
+[2024-04-04 19:52:54] info: Server is running on port 3000
+[2024-04-04 19:52:56] info: Server is running on port 3000
+[2024-04-04 19:53:04] info: Server is running on port 3000
+[2024-04-04 19:53:08] info: Server is running on port 3000
+[2024-04-04 19:53:20] info: Server is running on port 3000
+[2024-04-04 19:53:37] info: Server is running on port 3000
+[2024-04-04 21:58:52] info: Server is running on port 3000
+[2024-04-04 22:00:09] info: Starting assessment flow for AssessmentID: rec3LPYqcmK2hqwYq
+[2024-04-04 22:00:09] info: Fetching AssessmentType for AssessmentID: rec3LPYqcmK2hqwYq
+[2024-04-04 22:00:12] info: Fetched AssessmentTypeName: General for AssessmentID: rec3LPYqcmK2hqwYq with TypeID: recYyTiJLonkZ0jad
+[2024-04-04 22:00:14] yay: entering the flow Assessment General flow for EngagementID=137, AssessmentID 38
+[2024-04-04 22:00:14] info: Flow tracking log --> Flow: AssessmentGeneralFlow, Status: Started, Step: initialization, Step Status: OK
+[2024-04-04 22:00:16] info: Starting general assessment flow for AssessmentRecordID=rec3LPYqcmK2hqwYq, AssessmentID 38
+[2024-04-04 22:00:16] info:    EngagementRecordID:     value = reccF8v8sC01HbxQ5, type = string
+[2024-04-04 22:00:16] info:    EngagementID:           value = 137, type = number
+[2024-04-04 22:00:16] info:    AssessmentRecordID:     value = rec3LPYqcmK2hqwYq, type = string
+[2024-04-04 22:00:16] info:    AssessmentID:           value = 38, type = number
+[2024-04-04 22:00:16] info:    AssessmentStatus:       value = signals done, type = string
+[2024-04-04 22:00:16] info:    ApprovedPromptID:       value = recSqJ2uHJMrPEsBq, type = string
+[2024-04-04 22:00:16] yay: entering the branch for a new assessment with assessmentStatus = signals done
+[2024-04-04 22:00:16] info: Flow tracking log --> Flow: AssessmentGeneralFlow, Status: signals done, Step: initiatilization, Step Status: started
+[2024-04-04 22:00:18] debug: Role name: Head of Business Unit
+[2024-04-04 22:00:18] debug: Role description: The Head of Business Unit is responsible for overseeing all operations, strategy, and performance of a specific business unit. They are responsible for setting goals, creating and implementing strategies, and coordinating with other business units to ensure alignment.
+[2024-04-04 22:00:18] yay: case for assessmentStatus = signals done is completed
+[2024-04-04 22:00:18] info: Flow tracking log --> Flow: AssessmentGeneralFlow, Status: signals done, Step: close the branch, Step Status: OK
+[2024-04-04 22:00:19] yay: Successfully completed the General flow for rec3LPYqcmK2hqwYq (assessmentTypeService.js)
+[2024-04-04 22:00:19] yay: Successfully completed /start-assessment route for Assessment: rec3LPYqcmK2hqwYq
+[2024-04-04 22:37:01] info: Server is running on port 3000
+[2024-04-04 22:37:10] info: Server is running on port 3000
+[2024-04-04 22:37:12] info: Server is running on port 3000
+[2024-04-04 22:37:14] info: Server is running on port 3000
+[2024-04-04 22:37:18] info: Server is running on port 3000
+[2024-04-04 22:37:20] info: Server is running on port 3000
+[2024-04-04 22:37:21] info: Server is running on port 3000
+[2024-04-04 22:37:24] info: Server is running on port 3000
+[2024-04-04 22:37:29] info: Server is running on port 3000
+[2024-04-04 22:37:32] info: Server is running on port 3000
+[2024-04-04 22:37:46] info: Server is running on port 3000
+[2024-04-04 22:37:53] info: Server is running on port 3000
+[2024-04-04 22:37:55] info: Server is running on port 3000
+[2024-04-04 22:37:59] info: Server is running on port 3000
+[2024-04-04 22:38:02] info: Server is running on port 3000
+[2024-04-04 22:42:06] info: Server is running on port 3000
+[2024-04-04 22:42:08] info: Server is running on port 3000
+[2024-04-04 22:42:11] info: Server is running on port 3000
+[2024-04-04 22:42:18] info: Server is running on port 3000
+[2024-04-04 22:42:21] info: Server is running on port 3000
+[2024-04-04 22:42:52] info: Server is running on port 3000
+[2024-04-04 22:42:53] info: Server is running on port 3000
+[2024-04-04 22:43:07] info: Server is running on port 3000
+[2024-04-04 22:43:11] info: Server is running on port 3000
+[2024-04-04 22:43:13] info: Server is running on port 3000
+[2024-04-04 22:43:14] info: Server is running on port 3000
+[2024-04-04 22:43:17] info: Server is running on port 3000
+[2024-04-04 22:43:21] info: Server is running on port 3000
+[2024-04-04 22:43:23] info: Server is running on port 3000
+[2024-04-04 22:43:38] info: Server is running on port 3000
+[2024-04-04 22:43:39] info: Server is running on port 3000
+[2024-04-04 22:43:42] info: Server is running on port 3000
+[2024-04-04 22:44:30] info: Server is running on port 3000
+[2024-04-04 22:44:33] info: Server is running on port 3000
+[2024-04-04 22:44:36] info: Server is running on port 3000
+[2024-04-04 22:44:38] info: Server is running on port 3000
+[2024-04-04 22:44:40] info: Server is running on port 3000
+[2024-04-04 22:44:42] info: Server is running on port 3000
+[2024-04-04 22:45:02] info: Server is running on port 3000
+[2024-04-04 22:45:10] info: Server is running on port 3000
+[2024-04-04 22:45:12] info: Server is running on port 3000
+[2024-04-04 22:45:49] info: Server is running on port 3000
+[2024-04-04 22:46:34] info: Server is running on port 3000
+[2024-04-04 22:47:33] info: Server is running on port 3000
+[2024-04-04 22:47:34] info: Server is running on port 3000
+[2024-04-04 22:47:36] info: Server is running on port 3000
+[2024-04-04 22:47:44] info: Server is running on port 3000
+[2024-04-04 22:48:10] info: Server is running on port 3000
+[2024-04-04 22:48:11] info: Server is running on port 3000
+[2024-04-04 22:48:33] info: Server is running on port 3000
+[2024-04-04 22:48:44] info: Server is running on port 3000
+[2024-04-04 22:49:24] info: Server is running on port 3000
+[2024-04-04 22:49:28] info: Server is running on port 3000
+[2024-04-04 22:49:30] info: Server is running on port 3000
+[2024-04-04 22:50:10] info: Server is running on port 3000
+[2024-04-04 22:50:17] info: Server is running on port 3000
+[2024-04-04 22:50:18] info: Server is running on port 3000
+[2024-04-04 22:55:03] info: Server is running on port 3000
+[2024-04-04 22:55:06] info: Server is running on port 3000
+[2024-04-04 22:55:22] info: Server is running on port 3000
+[2024-04-04 22:55:24] info: Server is running on port 3000
+[2024-04-04 22:55:26] info: Server is running on port 3000
+[2024-04-04 22:55:32] info: Server is running on port 3000
+[2024-04-04 22:56:01] info: Server is running on port 3000
+[2024-04-04 22:56:03] info: Server is running on port 3000
+[2024-04-04 22:56:05] info: Server is running on port 3000
+[2024-04-04 22:56:08] info: Server is running on port 3000
+[2024-04-04 22:58:00] info: Server is running on port 3000
+[2024-04-04 22:59:31] info: Server is running on port 3000
+[2024-04-04 23:00:17] info: Server is running on port 3000
+[2024-04-04 23:00:22] info: Server is running on port 3000
+[2024-04-04 23:00:45] info: Server is running on port 3000
+[2024-04-04 23:02:00] info: Server is running on port 3000
+[2024-04-04 23:02:01] info: Server is running on port 3000
+[2024-04-04 23:02:20] info: Server is running on port 3000
+[2024-04-04 23:02:22] info: Server is running on port 3000
+[2024-04-05 07:57:43] info: Server is running on port 3000
+[2024-04-05 07:57:44] info: Server is running on port 3000
+[2024-04-05 07:57:49] error: Error fetching task data: Cannot read properties of undefined (reading '0')
+[2024-04-05 08:00:27] info: Server is running on port 3000
+[2024-04-05 08:00:32] info: Server is running on port 3000
+[2024-04-05 08:00:33] info: Server is running on port 3000
+[2024-04-05 08:00:37] error: Error fetching task data: Cannot read properties of undefined (reading '0')
+[2024-04-05 08:03:22] info: Server is running on port 3000
+[2024-04-05 08:03:25] info: Server is running on port 3000
+[2024-04-05 08:04:37] info: Server is running on port 3000
+[2024-04-05 08:04:42] info: Server is running on port 3000
+[2024-04-05 08:13:47] info: Server is running on port 3000
+[2024-04-05 08:13:48] info: Server is running on port 3000
+[2024-04-05 08:13:53] info: Server is running on port 3000
+[2024-04-05 08:14:00] error: Error fetching task data: The task with SKU 'initial_research' does not have an assigned agent. An assigned agent is required.
+[2024-04-05 08:21:33] info: Server is running on port 3000
+[2024-04-05 08:21:36] info: Server is running on port 3000
+[2024-04-05 08:21:40] info: Server is running on port 3000
+[2024-04-05 08:21:44] info: Server is running on port 3000
+[2024-04-05 08:23:21] info: Server is running on port 3000
+[2024-04-05 08:23:25] info: Server is running on port 3000
+[2024-04-05 08:27:56] info: Server is running on port 3000
+[2024-04-05 08:27:57] info: Server is running on port 3000
+[2024-04-05 08:28:07] info: Server is running on port 3000
+[2024-04-05 08:28:14] info: Server is running on port 3000
+[2024-04-05 08:28:16] info: Server is running on port 3000
+[2024-04-05 08:28:47] info: Server is running on port 3000
+[2024-04-05 08:29:57] info: Server is running on port 3000
+[2024-04-05 08:30:01] info: Server is running on port 3000
+[2024-04-05 08:31:41] info: Server is running on port 3000
+[2024-04-05 08:31:42] info: Server is running on port 3000
+[2024-04-05 08:31:45] info: Server is running on port 3000
+[2024-04-05 08:31:47] info: Server is running on port 3000
+[2024-04-05 08:31:50] info: Server is running on port 3000
+[2024-04-05 08:31:53] info: Server is running on port 3000
+[2024-04-05 08:32:07] info: Starting assessment flow for AssessmentID: rec3LPYqcmK2hqwYq
+[2024-04-05 08:32:07] info: Fetching AssessmentType for AssessmentID: rec3LPYqcmK2hqwYq
+[2024-04-05 08:32:08] info: Fetched AssessmentTypeName: General for AssessmentID: rec3LPYqcmK2hqwYq with TypeID: recYyTiJLonkZ0jad
+[2024-04-05 08:32:09] yay: entering the flow Assessment General flow for EngagementID=137, AssessmentID 38
+[2024-04-05 08:32:09] info: Flow tracking log --> Flow: AssessmentGeneralFlow, Status: Started, Step: initialization, Step Status: OK
+[2024-04-05 08:32:11] info: Starting general assessment flow for AssessmentRecordID=rec3LPYqcmK2hqwYq, AssessmentID 38
+[2024-04-05 08:32:11] info:    EngagementRecordID:     value = reccF8v8sC01HbxQ5, type = string
+[2024-04-05 08:32:11] info:    EngagementID:           value = 137, type = number
+[2024-04-05 08:32:11] info:    AssessmentRecordID:     value = rec3LPYqcmK2hqwYq, type = string
+[2024-04-05 08:32:11] info:    AssessmentID:           value = 38, type = number
+[2024-04-05 08:32:11] info:    AssessmentStatus:       value = signals done, type = string
+[2024-04-05 08:32:11] info:    ApprovedPromptID:       value = recSqJ2uHJMrPEsBq, type = string
+[2024-04-05 08:32:11] yay: entering the branch for a new assessment with assessmentStatus = signals done
+[2024-04-05 08:32:11] info: Flow tracking log --> Flow: AssessmentGeneralFlow, Status: signals done, Step: initiatilization, Step Status: started
+[2024-04-05 08:32:13] debug: Role name: Head of Business Unit
+[2024-04-05 08:32:13] debug: Role description: The Head of Business Unit is responsible for overseeing all operations, strategy, and performance of a specific business unit. They are responsible for setting goals, creating and implementing strategies, and coordinating with other business units to ensure alignment.
+[2024-04-05 08:32:13] info: Flow tracking log --> Flow: AssessmentGeneralFlow, Status: signals done, Step: identify signals, Step Status: OK
+[2024-04-05 08:32:14] debug: AssessmentDetails ID for signals: recbTsYXyGB9TyUjD
+[2024-04-05 08:32:14] debug: AssessmentDetails ID for questions: recEQ2ifLetbzFaIp
+[2024-04-05 08:32:23] debug: Questions data: 
+ [{"QuestionRecordId":"recxbQIczuQ4bWvp1","QuestionStatement":"Can you describe the competencies and adaptability of employees within your company?","QuestionDescription":""},{"QuestionRecordId":"receHSgygIj3FD1y2","QuestionStatement":"How are you ensuring that your employees have the necessary skills for the digital age?","QuestionDescription":""},{"QuestionRecordId":"recmGg67j0wD98rne","QuestionStatement":"How flexible is your company in responding to changes?","QuestionDescription":"1 (Not at all flexible) - 5 (Extremely flexible)"},{"QuestionRecordId":"recjjhz9x1EQi1l9E","QuestionStatement":"Please indicate your level of agreement with the following statement: \"Our team focuses on delivering value to the customer above all else.\"","QuestionDescription":"1: Strongly disagree  5: Strongly agree"},{"QuestionRecordId":"rec654kVXf3RZNZHd","QuestionStatement":"Please indicate your level of agreement with the following statement: \"Our team is quick to adapt when a change in strategy or product direction occurs.\"","QuestionDescription":"1: Strongly disagree  5: Strongly agree"},{"QuestionRecordId":"rec8MqORfJUSRAtC5","QuestionStatement":"How mature is the adoption of Agile methodology within your company?","QuestionDescription":"1 (Not at all mature) - 5 (Extremely mature)"},{"QuestionRecordId":"recvXg669TI2GCbE5","QuestionStatement":"What tools and platforms are used for work management across the organization?","QuestionDescription":""},{"QuestionRecordId":"reccHLJQF1njfJaZ3","QuestionStatement":"Can you describe your company's technology infrastructure?","QuestionDescription":""},{"QuestionRecordId":"rect6fFkihxMNT7Id","QuestionStatement":"What tools and technologies are used by your software development team?","QuestionDescription":""},{"QuestionRecordId":"recQ3ZYpa5cioPKsD","QuestionStatement":"Have you ever found a tool to be difficult to use or non-intuitive?","QuestionDescription":""},{"QuestionRecordId":"rec6OB1m8M0Pzk1VX","QuestionStatement":"If yes, which tool was it and what difficulties did you experience?","QuestionDescription":""},{"QuestionRecordId":"recrg3nRRQYXXtK2Q","QuestionStatement":"On a scale of 1-5, how well do you think the current toolset supports the overall productivity and effectiveness of your team?","QuestionDescription":"1: Poor support  5: Excellent support"},{"QuestionRecordId":"recK0PlhoIiCckqgz","QuestionStatement":"If yes, could you provide an example of such a situation?","QuestionDescription":""},{"QuestionRecordId":"recx0NFeRszbm86PD","QuestionStatement":"To what degree do you agree with the following statement: “I can perform similar tasks in different tools”","QuestionDescription":"1: Strongly disagree  5: Strongly agree"},{"QuestionRecordId":"recCPN2MYj6cJFrsv","QuestionStatement":"Can you give an example, where, in which tool(s)?","QuestionDescription":""},{"QuestionRecordId":"recxg84KyxtGgUzAz","QuestionStatement":"Have you noticed different teams using different tools for similar tasks?","QuestionDescription":""},{"QuestionRecordId":"recS11cDfjBZ7TsWf","QuestionStatement":"Could you describe a situation where you struggled to learn a new tool or find sufficient support?","QuestionDescription":""},{"QuestionRecordId":"recpWvythdJaDYejv","QuestionStatement":"How often do you struggle to learn new tools or find sufficient documentation and support for the tools you are using?","QuestionDescription":"1: Very often struggle  5: Very rarely struggle"},{"QuestionRecordId":"rec2caEDtDLVuOes2","QuestionStatement":"Could you describe a situation where a tool didn't fit well with your team's needs or way of work?","QuestionDescription":""},{"QuestionRecordId":"rec74eBqYbt36PWyv","QuestionStatement":"On a scale of 1-5, how well do the tools you use align with your team's needs and way of work?","QuestionDescription":"1: Poor alignment  5: Excellent alignment"}]
+[2024-04-05 08:32:23] debug: questionsJson = [{"QuestionRecordId":"recxbQIczuQ4bWvp1","QuestionStatement":"Can you describe the competencies and adaptability of employees within your company?","QuestionDescription":""},{"QuestionRecordId":"receHSgygIj3FD1y2","QuestionStatement":"How are you ensuring that your employees have the necessary skills for the digital age?","QuestionDescription":""},{"QuestionRecordId":"recmGg67j0wD98rne","QuestionStatement":"How flexible is your company in responding to changes?","QuestionDescription":"1 (Not at all flexible) - 5 (Extremely flexible)"},{"QuestionRecordId":"recjjhz9x1EQi1l9E","QuestionStatement":"Please indicate your level of agreement with the following statement: \"Our team focuses on delivering value to the customer above all else.\"","QuestionDescription":"1: Strongly disagree  5: Strongly agree"},{"QuestionRecordId":"rec654kVXf3RZNZHd","QuestionStatement":"Please indicate your level of agreement with the following statement: \"Our team is quick to adapt when a change in strategy or product direction occurs.\"","QuestionDescription":"1: Strongly disagree  5: Strongly agree"},{"QuestionRecordId":"rec8MqORfJUSRAtC5","QuestionStatement":"How mature is the adoption of Agile methodology within your company?","QuestionDescription":"1 (Not at all mature) - 5 (Extremely mature)"},{"QuestionRecordId":"recvXg669TI2GCbE5","QuestionStatement":"What tools and platforms are used for work management across the organization?","QuestionDescription":""},{"QuestionRecordId":"reccHLJQF1njfJaZ3","QuestionStatement":"Can you describe your company's technology infrastructure?","QuestionDescription":""},{"QuestionRecordId":"rect6fFkihxMNT7Id","QuestionStatement":"What tools and technologies are used by your software development team?","QuestionDescription":""},{"QuestionRecordId":"recQ3ZYpa5cioPKsD","QuestionStatement":"Have you ever found a tool to be difficult to use or non-intuitive?","QuestionDescription":""},{"QuestionRecordId":"rec6OB1m8M0Pzk1VX","QuestionStatement":"If yes, which tool was it and what difficulties did you experience?","QuestionDescription":""},{"QuestionRecordId":"recrg3nRRQYXXtK2Q","QuestionStatement":"On a scale of 1-5, how well do you think the current toolset supports the overall productivity and effectiveness of your team?","QuestionDescription":"1: Poor support  5: Excellent support"},{"QuestionRecordId":"recK0PlhoIiCckqgz","QuestionStatement":"If yes, could you provide an example of such a situation?","QuestionDescription":""},{"QuestionRecordId":"recx0NFeRszbm86PD","QuestionStatement":"To what degree do you agree with the following statement: “I can perform similar tasks in different tools”","QuestionDescription":"1: Strongly disagree  5: Strongly agree"},{"QuestionRecordId":"recCPN2MYj6cJFrsv","QuestionStatement":"Can you give an example, where, in which tool(s)?","QuestionDescription":""},{"QuestionRecordId":"recxg84KyxtGgUzAz","QuestionStatement":"Have you noticed different teams using different tools for similar tasks?","QuestionDescription":""},{"QuestionRecordId":"recS11cDfjBZ7TsWf","QuestionStatement":"Could you describe a situation where you struggled to learn a new tool or find sufficient support?","QuestionDescription":""},{"QuestionRecordId":"recpWvythdJaDYejv","QuestionStatement":"How often do you struggle to learn new tools or find sufficient documentation and support for the tools you are using?","QuestionDescription":"1: Very often struggle  5: Very rarely struggle"},{"QuestionRecordId":"rec2caEDtDLVuOes2","QuestionStatement":"Could you describe a situation where a tool didn't fit well with your team's needs or way of work?","QuestionDescription":""},{"QuestionRecordId":"rec74eBqYbt36PWyv","QuestionStatement":"On a scale of 1-5, how well do the tools you use align with your team's needs and way of work?","QuestionDescription":"1: Poor alignment  5: Excellent alignment"}]
+[2024-04-05 08:32:23] yay: case for assessmentStatus = signals done is completed
+[2024-04-05 08:32:23] info: Flow tracking log --> Flow: AssessmentGeneralFlow, Status: signals done, Step: close the branch, Step Status: OK
+[2024-04-05 08:32:24] yay: Successfully completed the General flow for rec3LPYqcmK2hqwYq (assessmentTypeService.js)
+[2024-04-05 08:32:24] yay: Successfully completed /start-assessment route for Assessment: rec3LPYqcmK2hqwYq
+[2024-04-05 08:34:37] info: Server is running on port 3000
+[2024-04-05 08:34:47] info: Server is running on port 3000
+[2024-04-05 08:35:00] info: Server is running on port 3000
+[2024-04-05 08:35:15] info: Server is running on port 3000
+[2024-04-05 08:35:17] info: Server is running on port 3000
+[2024-04-05 08:35:22] info: Server is running on port 3000
+[2024-04-05 08:35:31] info: Server is running on port 3000
+[2024-04-05 08:35:39] info: Server is running on port 3000
+[2024-04-05 08:39:53] info: Server is running on port 3000
+[2024-04-05 08:39:54] info: Server is running on port 3000
+[2024-04-05 08:39:58] info: Server is running on port 3000
+[2024-04-05 08:40:02] info: Server is running on port 3000
+[2024-04-05 08:40:30] info: Server is running on port 3000
+[2024-04-05 08:40:41] info: Server is running on port 3000
+[2024-04-05 08:40:50] info: Server is running on port 3000
+[2024-04-05 08:41:13] info: Server is running on port 3000
+[2024-04-05 08:41:37] info: Server is running on port 3000
+[2024-04-05 08:42:04] info: Server is running on port 3000
+[2024-04-05 08:42:08] info: Server is running on port 3000
+[2024-04-05 08:42:42] info: Server is running on port 3000
+[2024-04-05 08:42:53] info: Server is running on port 3000
+[2024-04-05 08:43:01] info: Server is running on port 3000
+[2024-04-05 08:43:23] info: Server is running on port 3000
+[2024-04-05 08:43:26] info: Server is running on port 3000
+[2024-04-05 08:43:49] info: Server is running on port 3000

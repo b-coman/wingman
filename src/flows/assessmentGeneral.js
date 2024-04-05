@@ -10,8 +10,9 @@ const { processQuestionsFromSignals } = require('../services/getQuestionsForGene
 const updateAssessmentDetailsService = require('../services/updateAssessmentDetailsService');
 const companyService = require('../services/companyService');
 const wingmanAgentsService = require('../services/wingmanAgentsService');
-const peopleUtils = require('../lib/peopleUtils');
 const airtableUtils = require('../lib/airtableUtils');
+const peopleUtils = require('../lib/peopleUtils');
+const aiValidationUtils = require('../lib/aiValidationUtils');
 const logger = require('../../logger');
 const logFlowTracking = require('../services/flowTrackingService');
 const { appConfig, agents, emails, htmlTemplates } = require('../../config');
@@ -370,6 +371,15 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                 logger.debug(`Role name: ${roleName}`);
                 logger.debug(`Role description: ${roleDescription}`);
 
+                // get all questions that fit with the signals for this assessment
+                const questionsJson = await processQuestionsFromSignals(engagementRecordId, assessmentRecordId, assessmentId, flowName, assessmentStatus);
+                logger.debug(`questionsJson = ${questionsJson}`);
+
+                // validate the questions with the agents and get back the questions that fit with the context
+                const validatedQuestions = await aiValidationUtils.analyzeQuestionsWithContext(questionsJson, context);
+
+
+                
 
                 logger.yay(`case for assessmentStatus = ${assessmentStatus} is completed`);
                 await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'close the branch', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });

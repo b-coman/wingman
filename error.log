@@ -2438,3 +2438,13 @@
 [2024-04-03 10:24:29] error: Error in general assessment flow for AssessmentID 38: ReferenceError: jsonQuestionsData is not defined
 [2024-04-03 10:24:29] error: Error executing General flow for rec3LPYqcmK2hqwYq: ReferenceError: jsonQuestionsData is not defined
 [2024-04-03 10:24:29] error: Failed to start assessment flow: jsonQuestionsData is not defined jsonQuestionsData is not defined
+[2024-04-04 19:26:35] error: The formula for filtering records is invalid: Unknown field names: tasksku
+[2024-04-04 19:30:46] error: The formula for filtering records is invalid: Unknown field names: tasksku
+[2024-04-04 19:31:28] error: The formula for filtering records is invalid: Unknown field names: tasksku
+[2024-04-04 19:37:42] error: The formula for filtering records is invalid: Unknown field names: tasksku
+[2024-04-04 19:38:55] error: The formula for filtering records is invalid: Unknown field names: tasksku
+[2024-04-04 19:44:00] error: The formula for filtering records is invalid: Unknown field names: tasksku
+[2024-04-04 19:47:31] error: The formula for filtering records is invalid: Unknown field names: tasksku
+[2024-04-05 07:57:49] error: Error fetching task data: Cannot read properties of undefined (reading '0')
+[2024-04-05 08:00:37] error: Error fetching task data: Cannot read properties of undefined (reading '0')
+[2024-04-05 08:14:00] error: Error fetching task data: The task with SKU 'initial_research' does not have an assigned agent. An assigned agent is required.
