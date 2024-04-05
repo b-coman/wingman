@@ -3,6 +3,7 @@ sourceCode.js
 sourceCode.txt
 .DS_Store
 public/
+combined.log
 
 # Logs
 logs
