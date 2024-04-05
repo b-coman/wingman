@@ -5,7 +5,7 @@ sourceCode.txt
 public/
 combined.log
 error.log
-crewai_app
+tests/
 
 # Logs
 logs
