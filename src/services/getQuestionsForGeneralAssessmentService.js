@@ -3,7 +3,7 @@
 require('dotenv').config();
 const agents = require('../../templates/agents.json');
 const airtableUtils = require('../lib/airtableUtils');
-const assetsUtils = require('../lib/assetsUtils');
+const assetsUtils = require('../lib/knowledgeModelUtils');
 const logger = require('../../logger');
 const logFlowTracking = require('./flowTrackingService');
 const wingmanAgentsService = require('./wingmanAgentsService');

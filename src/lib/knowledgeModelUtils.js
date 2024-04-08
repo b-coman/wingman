@@ -1,9 +1,9 @@
-// /src/lib/assetsUtils.js
+// /src/lib/knowledgeModelUtils.js
 // here we keep all functions for:
 // Pains, Signals, Questions
 
 require('dotenv').config();
-const airtableUtils = require('../lib/airtableUtils'); // Adjust the path as needed
+const airtableUtils = require('./airtableUtils'); // Adjust the path as needed
 const logger = require('../../logger'); // Adjust the path as needed
 
 
