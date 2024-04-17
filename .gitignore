@@ -6,6 +6,7 @@ public/
 combined.log
 error.log
 tests/
+node_modules/
 
 # Logs
 logs
