@@ -15,7 +15,7 @@ router.post('/submit-form', async (req, res) => {
         const flowResult = await newEngagementFlow.execute(req.body);
 
         // Log the successful submission
-        logger.info('Form submitted successfully', { flowResult });
+        logger.yay(`Form submitted successfully: ${JSON.stringify(flowResult)}`);
 
         // Respond with success message and relevant IDs from the flow result
         res.json({
@@ -23,12 +23,12 @@ router.post('/submit-form', async (req, res) => {
             ...flowResult
         });
     } catch (error) {
-        logger.error("Form submission error:", { error: error.message });
+        logger.error(`Form submission error: ${error.message}`);
+
 
         res.status(500).send("An error occurred while submitting the form.");
     }
 });
-
 
 
 router.post('/start-engagement', async (req, res) => {

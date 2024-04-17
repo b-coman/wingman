@@ -19,7 +19,7 @@ const { delay } = require('../utils/utils'); // Adjust the path as necessary
 // Orchestrates the flow to create a new engagement
 exports.execute = async (formData) => {
     try {
-        logger.yay('Starting new engagement flow with formData:', formData);
+        logger.yay('Starting new engagement flow...');
 
         // log the flow staus
         await logFlowTracking({ flowName: 'EngagementFlow', flowStatus: 'Started', flowStep: 'initialization', stepStatus: 'OK', timestamp: new Date().toISOString(), additionalInfo: { formData } });
@@ -73,6 +73,8 @@ exports.execute = async (formData) => {
 
         // log the flow staus --> flow ends
         await logFlowTracking({ flowName: 'EngagementFlow', flowStatus: 'Completed', flowStep: 'flow end', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementId, additionalInfo: {} });
+
+        logger.yay('New engagement flow completed successfully!');
 
         // Return success status and any relevant IDs or details
         return { success: true, companyId, contactId, engagementId };

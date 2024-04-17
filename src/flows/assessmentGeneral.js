@@ -349,21 +349,17 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
 
                 logger.yay(`entering the branch for a new assessment with assessmentStatus = ${assessmentStatus}`);
                 await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'initiatilization', stepStatus: 'started', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
-
-                // call the service to process questions from signals
-          //      const jsonQuestionsData = await processQuestionsFromSignals(engagementRecordId, assessmentRecordId, assessmentId, flowName, assessmentStatus);
-          //      logger.debug(`jsonQuestionsData = ${jsonQuestionsData}`);
                
-
                 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 // prepare the context data for the AI validation
                 
                 // get the report
-                var assessmentDetailsForReportId = await airtableUtils.findAssessDetailsByAssessIDAndTemplate(assessmentId, process.env.envDefaultGenAssessFinalResultId);
+                var assessmentDetailsForReportId = await airtableUtils.findAssessDetailsByAssessIDAndTemplate(assessmentId, process.env.envDefaultGenAssessRawResultId);
                 assessmentDetailsForReportId = assessmentDetailsForReportId[0].id;
                 var reportContent = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsForReportId, 'Value');
+                logger.debug(`Report content: ${reportContent}`);
 
-                // get the strategic directions
+                // get the strategic directions --> oare chair am nevoie??
 
 
                 // get the internal notes
@@ -379,17 +375,13 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
 
                 // get all questions that fit with the signals for this assessment and put in a JSON string
                 const questionsJson = await processQuestionsFromSignals(engagementRecordId, assessmentRecordId, assessmentId, flowName, assessmentStatus);
-                logger.debug(`questionsJson = ${questionsJson}`);
+                logger.debug(`questionsJson = \n${questionsJson}`);
 
-
-
-
-
-                // validate the questions with the agents and get back the questions that fit with the context
+                // ask agents to select the questions that fits with the whole context (assessment and role)
                 const validatedQuestions = await aiValidationUtils.analyzeQuestionsWithContext(questionsJson, context);
 
 
-
+break;
 
                 logger.yay(`case for assessmentStatus = ${assessmentStatus} is completed`);
                 await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'close the branch', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });

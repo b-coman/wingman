@@ -10,8 +10,8 @@ const base = Airtable.base(process.env.AIRTABLE_BASE_ID);
 
 // Importing the assessment flow functions from the /flows directory
 const doAssessmentGeneral = require('../flows/assessmentGeneral');
-const doAssessmentSpecific = require('../flows/assessmentSpecific');
-const doAssessmentComprehensive = require('../flows/assessmentComprehensive');
+//const doAssessmentSpecific = require('../flows/assessmentSpecific');
+//const doAssessmentComprehensive = require('../flows/assessmentComprehensive');
 
 // Function to execute the appropriate assessment flow based on the assessment type
 exports.executeAssessmentFlow = async (assessmentRecordId, assessmentType) => {
@@ -46,10 +46,10 @@ exports.executeAssessmentFlow = async (assessmentRecordId, assessmentType) => {
                 await doAssessmentGeneral(engagementRecordId, engagementId, assessmentRecordId, assessmentId, approvedPromptRecordId);
                 break;
             case 'Specific':
-                await doAssessmentSpecific(assessmentRecordId);
+                //await doAssessmentSpecific(assessmentRecordId);
                 break;
             case 'Comprehensive':
-                await doAssessmentComprehensive(assessmentRecordId);
+                //await doAssessmentComprehensive(assessmentRecordId);
                 break;
             default:
                 logger.error(`Unknown assessment type: ${assessmentType} for AssessmentID ${assessmentRecordId}`);

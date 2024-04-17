@@ -58,26 +58,27 @@ async function processQuestionsFromSignals(engagementRecordId, assessmentRecordI
             }
         }
 
-        var jsonQuestionsData = JSON.stringify(questionsData);
+      //  const jsonQuestionsData = JSON.stringify(questionsData);
 
-       // console.log('Questions data:', jsonQuestionsData);
-        logger.debug(`Questions data: \n ${jsonQuestionsData}`);
+      //  logger.debug(`Questions data: \n${JSON.stringify(questionsData, null, 4)}`);
 
 
-        return jsonQuestionsData;
-
+     return JSON.stringify(questionsData, null, 2);
 
         // Prepare data for the agent
-        const jsonQuestionData = JSON.stringify(questionData);
+        const jsonQuestionData = JSON.stringify(questionsData);
         const taskPrompt = await replacePlaceholders.generateContent(
             isFilePath = false,
             agents.validateQuestions.prompt,
             {
                 COMPANY: 'The company name', // Fetch the actual company name as needed
-                INITIAL_RESEARCH: 'Initial research data', // Fetch or define the initial research data as needed
-                QUESTIONS_LIST: jsonQuestionData
+                QUESTIONSET_BODY: 'Initial research data', // Fetch or define the initial research data as needed
+                QUESTIONSET_BODY: jsonQuestionData
             }
         );
+
+        logger.debug(`taskPrompt \n${taskPrompt}`);
+
 
         // Agent call
         const agentData = {

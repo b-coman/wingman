@@ -13,8 +13,10 @@ exports.createCompany = async (companyDetails) => {
 // Creates or finds a contact associated with a company
 exports.createContact = async (contactDetails) => {
     const { firstName, lastName, email, role, companyId } = contactDetails;
-    // Logic to check or create the contact in Airtable
-    const contactId = await airtableUtils.checkOrCreateContact(companyId, firstName, lastName, email, role);
+    
+    // find the roleRecordId for the role passed by the form
+    const roleRecordId = await airtableUtils.findRecordIdByIdentifier('BusinessRoles', 'RoleName', role);
+    const contactId = await airtableUtils.checkOrCreateContact(companyId, firstName, lastName, email, roleRecordId);
     return contactId;
 };
 

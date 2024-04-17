@@ -51,7 +51,7 @@ exports.checkOrCreateCompany = async (companyName, companyDomain) => {
 
 // -------------- CONTACT check/create 
 
-exports.checkOrCreateContact = async (CompanyID, ContactFirstName, ContactLastName, ContactEmail, ContactType) => {
+exports.checkOrCreateContact = async (CompanyID, ContactFirstName, ContactLastName, ContactEmail, roleRecordId) => {
     const contactsTable = base('Contacts'); // Adjust 'Contacts' if your table name is different
     try {
         // Search for existing contact by email
@@ -71,7 +71,8 @@ exports.checkOrCreateContact = async (CompanyID, ContactFirstName, ContactLastNa
                     'ContactLastName': ContactLastName,
                     'ContactEmail': ContactEmail,
                     'ContactType': 'primary',
-                    'CompanyID': [CompanyID] // Assumes 'Company' is a linked record field to 'Companies' table
+                    'CompanyID': [CompanyID], // 'Company' is a linked record field to 'Companies' table
+                    'ContactRoleID': [roleRecordId] // 'ContactRole' is a linked record field
                 }
             }]);
             // Return new contact's ID
