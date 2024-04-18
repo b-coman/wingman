@@ -19,7 +19,7 @@ const systemRules = {
 
 const agents = {
     // marketing agent --> used in New Engagement Flow
-    agentsBaseURL: isDevelopment ? 'http://127.0.0.1:5000' : 'https://wingman-agents.azurewebsites.net',
+    agentsBaseURL: isDevelopment ? 'http://127.0.0.1:5000/do_crew' : 'https://wingman-agents.azurewebsites.net/do_crew',
 
     marketingAgentEndpoint: '/mkt_crew',
     marketingTaskDescription: "Analyze market for a given company",
