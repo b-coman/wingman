@@ -41,24 +41,22 @@ const doEngagementFlow = async (engagementRecordId, engagementId, engagementStat
 
 
                 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                //- STEP 2 --> call the Marketing Agent to ask about research prompt candidates
-                //const crewName = "Marketing";
-                //const taskDescription = agents.marketingTaskDescription;
-
+                //- STEP 2 --> call the agents to ask about research areas 
 
                 const engagementDetails = await airtableUtils.getFieldsForRecordById('Engagements', engagementRecordId);
                 const companyRecordId = engagementDetails.CompanyID[0];
                 const companyDetails = await airtableUtils.getFieldsForRecordById('Companies', companyRecordId);
 
                 // extract the crew JSON from Airtable, table WingmanAIsquads
-                const crewRecordId = await airtableUtils.findRecordIdByIdentifier('WingmanAIsquads', 'SquadSKU', 'initial_research');
+                // !!!--> HERE the hardcoded parameter "first_research" SHOULD BE CHANGED TO A CONFIG VARIABLE !!!!!!!!!!!!!
+                const crewRecordId = await airtableUtils.findRecordIdByIdentifier('WingmanAIsquads', 'SquadSKU', 'first_research');
                 const crewDetails = await airtableUtils.getFieldsForRecordById('WingmanAIsquads', crewRecordId);
                 const crewName = crewDetails.SquadName;
                 const crewJson = crewDetails.SquadJSON;
 
                 logger.info(crewJson);
 
-                //replace placeholders in the prompt
+                //replace placeholders in the payload
                 var crewPayload = await replacePlaceholders.generateContent(isFilePath = false, crewJson, {
                     COMPANY: companyDetails.CompanyName,
                     DOMAIN: companyDetails.CompanyDomain,
@@ -72,35 +70,19 @@ const doEngagementFlow = async (engagementRecordId, engagementId, engagementStat
                 logger.info(`Agent payload: \n${crewPayload}`);
                 logger.warn("Now calling agent...");
 
-
                 // Start tracking the agent activity
-                // const runID = await airtableUtils.createAgentActivityRecord(companyRecordId, crewName, taskDescription, taskPrompt);
-                // logger.info(`Agent activity run ID: ${runID}, type: ${typeof runID}`);
+                const runID = await airtableUtils.createAgentActivityRecord(companyRecordId, crewName, crewPayload);
+                logger.info(`Agent activity run ID: ${runID}, type: ${typeof runID}`);
 
-                // Call the agent with the prompt
+                // Call the agent army with the payload // schema path is used to validate the response
                 const schemaPath = '../../schema/crewAiResponseSchema.json'; 
                 const agentResponse = await wingmanAgentsService.callWingmanAgents(crewPayload, schemaPath);
-
-                // Complete tracking the agent activity with the response
-                //   await airtableUtils.updateAgentActivityRecord(runID, agentResponse);
-
                 logger.info(`Here is the response: \n ${JSON.stringify(agentResponse, null, 4)}`);
 
+                // Complete tracking the agent activity with the response
+                await airtableUtils.updateAgentActivityRecord(runID, JSON.stringify(agentResponse, null, 4));
 
-
-                // const schemaPath = '../../schema/crewAiResponseSchema.json';
-                // const validationResult = await validateJson(agentResponse, schemaPath);
-
-                // if (validationResult.valid) {
-                //     logger.info('Agent response is valid.');
-                //     // Process the valid response here
-                // } else {
-                //     logger.error(`Agent response validation failed: ${JSON.stringify(validationResult.errors)}`);
-                //     // Handle the validation failure (e.g., retry, log, alert)
-                // }
-
-
-                // process the agent response and update the Airtable record with the prompts received
+                // process the agent response and update the Airtable records with agent's proposals
                 const areas = agentResponse.result.areas;
                 for (const area of areas) {
                     await airtableUtils.insertEngagementPrompt(engagementRecordId, area.statement, area.description, area.confidenceScore);
@@ -109,20 +91,15 @@ const doEngagementFlow = async (engagementRecordId, engagementId, engagementStat
                 // log status, agent response done
                 await logFlowTracking({ flowName: 'EngagementFlow', flowStatus: 'In Progress', flowStep: 'AgentResponseProcessed', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId });
 
-
-                //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                // STEP 2.5 --> Update status for engagement to "strategic directions defined"
-
-                //WORK HERE!!
-
+                // update engagement status in Airtable
                 await airtableUtils.updateRecordField('Engagements', engagementRecordId, 'EngagementStatus', 'strategic directions defined');
+
 
                 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 // STEP 3 --> inform the source owner about the creation of strategic directions
 
                 // identify the source owner
                 const engagementSourceOwnerUserId = engagementDetails['EngagementSourceOwner (from SourceID)'];
-                logger.info(`Engagement Source Owner User ID: ${engagementSourceOwnerUserId}`);
 
                 // Retrieve details about EngagementSourceOwner
                 const userDetails = await airtableUtils.getFieldsForRecordById('Users', engagementSourceOwnerUserId);

@@ -24,6 +24,7 @@ exports.generateContent = async (isFilePath = false, templateInput, replacements
             const templatesDir = path.join(__dirname, '..', '..', 'templates');
             const templatePath = path.join(templatesDir, `${templateInput}.html`);
             templateString = fs.readFileSync(templatePath, 'utf-8');
+            logger.info(`Template loaded from file: ${templatePath}`);
         } else {
             // Use the template string as is
             templateString = templateInput;

@@ -51,7 +51,7 @@ router.post('/start-engagement', async (req, res) => {
 
         // Execute engagement flow
         await doEngagementFlow(engagementRecordId, engagementId, engagementStatus);
-        logger.info(`Successfully completed Engagement flow for EngagementID: ${engagementId}`);
+        logger.yay(`Successfully completed Engagement flow for EngagementID: ${engagementId}`);
 
         res.json({ message: 'route /start-engagement ended successfully' });
     } catch (error) {

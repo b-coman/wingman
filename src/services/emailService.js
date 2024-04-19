@@ -30,7 +30,7 @@ exports.sendEmail = async (toEmail, subject, body, attachments = []) => {
 
     try {
         const info = await transporter.sendMail(mailOptions);
-        logger.info(`Email sent successfully: ${info.messageId}`);
+       // logger.info(`Email sent successfully: ${info.messageId}`);
     } catch (error) {
         logger.error(`Error sending email to ${toEmail}:`, error);
     }

@@ -171,13 +171,12 @@ exports.insertEngagementPrompt = async (engagementId, statement, description, co
     }
 };
 
-exports.createAgentActivityRecord = async (companyID, crewName, taskDescription, taskPrompt) => {
+exports.createAgentActivityRecord = async (companyID, crewName, taskPrompt) => {
     const table = base('_agentRuns');
     try {
         const createResponse = await table.create({
             "CompanyID": [companyID], // Notice that companyID is now inside an array
             "CrewName": crewName,
-            "TaskDescription": taskDescription,
             "TaskPrompt": taskPrompt,
             "Timestamp": new Date().toISOString() // Or format it according to your needs
         });
