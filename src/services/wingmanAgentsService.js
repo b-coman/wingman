@@ -45,6 +45,7 @@ async function callWingmanAgents(crewPayload, schemaPath = null, maxRetries = 3)
                     try {
                         response.result = JSON.parse(response.result);
                         logger.info('Result parsed successfully into an object.');
+logger.info(response.result);
                     } catch (error) {
                         logger.error(`Failed to parse 'result' from JSON string: ${error.message}`);
                         throw error;  // Optional: re-throw the error if you want to handle it further up the chain

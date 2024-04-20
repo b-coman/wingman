@@ -75,7 +75,7 @@ const doEngagementFlow = async (engagementRecordId, engagementId, engagementStat
                 logger.info(`Agent activity run ID: ${runID}, type: ${typeof runID}`);
 
                 // Call the agent army with the payload // schema path is used to validate the response
-                const schemaPath = '../../schema/crewAiResponseSchema.json'; 
+                const schemaPath = '../../schema/crewAiResponseSchema_areas.json'; 
                 const agentResponse = await wingmanAgentsService.callWingmanAgents(crewPayload, schemaPath);
                 logger.info(`Here is the response: \n ${JSON.stringify(agentResponse, null, 4)}`);
 

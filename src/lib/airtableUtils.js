@@ -300,9 +300,10 @@ exports.fetchPainsData = async () => {
     }).eachPage((records, fetchNextPage) => {
         records.forEach(record => {
             painsData.push({
-                recordID: record.id,
-                PainSKU: record.get('PainSKU'),
-                PainStatement: record.get('PainStatement')
+              //  recordID: record.id,
+                painSKU: record.get('PainSKU'),
+                painStatement: record.get('PainStatement'),
+                painBusinessImpact: record.get('Business impact')
             });
         });
         fetchNextPage();
@@ -338,13 +339,17 @@ exports.findPainRecordIdBySKU = async (painSKU) => {
  * @param {String} assessmentDetailsId - The ID for the AssessmentDetail linked to these entries.
  * @returns {Promise<void>}
  */
-exports.createPainAssessmentDetails = async (agentResponseResult, assessmentDetailsId, runID) => {
+exports.createPainAssessmentDetails = async (jsonData, assessmentDetailsId, runID) => {
     const assessmentDetailsPainsTable = base('AssessmentDetails:Pains');
+
+    // Check if the passed data is the whole object and extract the pains array
+    const agentResponseResult = jsonData.pains || jsonData;
 
     // Define a regex for painSKU format validation
     const painSKURegex = /^P-\d{2}$/;
+    console.log(agentResponseResult);
 
-    // Iterate through each result item
+    // Iterate through each pain item
     for (const item of agentResponseResult) {
         try {
             // Validate painSKU format
@@ -359,7 +364,7 @@ exports.createPainAssessmentDetails = async (agentResponseResult, assessmentDeta
                 'AssessmentDetailID': [assessmentDetailsId],
                 'PainID': [painRecordID],
                 'ConfidenceScore': confidenceScore,
-                'Reason': item.reasoning,
+                'Reason': item.reason,
                 'AgentRunID': [runID]
             });
 
@@ -370,6 +375,7 @@ exports.createPainAssessmentDetails = async (agentResponseResult, assessmentDeta
         }
     }
 };
+
 
 
 

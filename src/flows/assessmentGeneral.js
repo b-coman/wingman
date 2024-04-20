@@ -80,7 +80,6 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
 
                 const approvedPromptDescription = await airtableUtils.findFieldValueByRecordId('EngagementPrompts', approvedPromptRecordId, 'EngagementPromptDescription');
 
-
                 // extract the crew JSON from Airtable, table WingmanAIsquads
                 // !!!--> HERE the hardcoded parameter "first_research" SHOULD BE CHANGED TO A CONFIG VARIABLE !!!!!!!!!!!!!
                 const crewRecordId = await airtableUtils.findRecordIdByIdentifier('WingmanAIsquads', 'SquadSKU', 'second_reserach');
@@ -97,48 +96,21 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                     APPROVED_PROMPT: approvedPromptDescription
                 });
 
-
                 logger.info(`Agent payload: \n${crewPayload}`);
                 logger.warn("Now calling agent...");
 
                 // Start tracking the agent activity
-                //const runID = await airtableUtils.createAgentActivityRecord(companyRecordId, crewName, crewPayload);
-                //logger.info(`Agent activity run ID: ${runID}, type: ${typeof runID}`);
+                const runID = await airtableUtils.createAgentActivityRecord(companyDetails.companyRecordId, crewName, crewPayload);
+                logger.info(`Agent activity run ID: ${runID}, type: ${typeof runID}`);
 
                 // Call the agent army with the payload // schema path is used to validate the response
-               // const schemaPath = '../../schema/crewAiResponseSchema.json'; 
+                // const schemaPath = '../../schema/crewAiResponseSchema.json'; 
                 const agentResponse = await wingmanAgentsService.callWingmanAgents(crewPayload);
+                const agentResponseResult = agentResponse.result;
                 logger.info(`Here is the response: \n ${JSON.stringify(agentResponse, null, 4)}`);
 
                 // Complete tracking the agent activity with the response
-               // await airtableUtils.updateAgentActivityRecord(runID, JSON.stringify(agentResponse, null, 4));
-
-
-
-                // const crewName = "generalAssess";
-                // const taskDescription = agents.generalAssessDescription;
-                // const taskPrompt = agents.generalAssessTaskPrompt.replace('$(COMPANY)', companyDetails.companyName).replace('$(DOMAIN)', companyDetails.companyDomain).replace('$(APPROVED_PROMPT)', approvedPromptDescription);
-                // logger.info(`TaskPrompt: ${taskPrompt}`);
-
-                // // Prepare data for agent tracking
-                // const agentData = {
-                //     CompanyID: companyDetails.companyRecordId,
-                //     CrewName: crewName,
-                //     TaskDescription: taskDescription,
-                //     TaskPrompt: taskPrompt,
-                //     Timestamp: new Date().toISOString()
-                // };
-
-                // // Start tracking the agent activity
-                // const runID = await airtableUtils.createAgentActivityRecord(agentData.CompanyID, agentData.CrewName, agentData.TaskDescription, agentData.TaskPrompt);
-
-                // // Call the agent with the prompt
-                // const agentResponse = await wingmanAgentsService.callWingmanAgentsApp(agentData.CrewName, agentData.TaskDescription, agentData.TaskPrompt, agents.generalAssessAgentEndpoint);
-                 const agentResponseResult = agentResponse.result;
-                // logger.info(agentResponseResult);
-
-                // // Complete tracking the agent activity with the response
-                // await airtableUtils.updateAgentActivityRecord(runID, agentResponse);
+                await airtableUtils.updateAgentActivityRecord(runID, JSON.stringify(agentResponse, null, 4));
 
 
                 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -166,10 +138,9 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                 emailSubject = await replacePlaceholders.generateContent(isPath = false, emails.adminRawReportGeneratedSubject, { COMPANY_NAME: companyDetails.companyName });
                 emailContent = await replacePlaceholders.generateContent(isPath = false, emails.adminRawReportGeneratedContent, { COMPANY_NAME: companyDetails.companyName, ENGAGEMENT_ID: engagementId, ASSESSMENT_ID: assessmentId });
                 emailBody = await replacePlaceholders.generateContent(isPath = true, 'email_admin', { MESSAGE_BODY: emailContent, USER_FIRSTNAME: sourceOwnerFirstName, AGENT_RESPONSE: agentResponseResultHTML });
-                
+
                 // Send the email 
                 await sendEmail(contactEmail, emailSubject, emailBody);
-
                 logger.info(`Email sent successfully to: ${sourceOwnerEmail}`);
 
                 // log the flow status --> email sent
@@ -204,27 +175,70 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                 if (rawReportStatus == 'approved') { // --> this means we can proceed with identifying the pains
 
                     // create the list with all pains (will be passed to the agent inside of the prompt as JSON)
-                    const allPains = await airtableUtils.fetchPainsData();
+                    var allPains = await airtableUtils.fetchPainsData();
+                    allPains = '\"' + JSON.stringify(allPains) + '\"';
+
+                logger.info(`Fetched pains data from Airtable: ${JSON.stringify(allPains)}`);
 
                     // create the task prompt
-                    var taskPrompt = await replacePlaceholders.generateContent(isFilePath = false, agents.generalPainsIdentifierTaskPrompt, { INITIAL_RESEARCH: rawReport, PAINS_LIST: JSON.stringify(allPains) });
+                  //  var taskPrompt = await replacePlaceholders.generateContent(isFilePath = false, agents.generalPainsIdentifierTaskPrompt, { INITIAL_RESEARCH: rawReport, PAINS_LIST: JSON.stringify(allPains) });
 
-                    // Prepare agent
-                    const agentData = {
-                        CompanyID: companyDetails.companyRecordId,
-                        CrewName: "dataAnalytics",
-                        TaskDescription: agents.generalPainsIdentifierDescription,
-                        TaskPrompt: taskPrompt,
-                        Timestamp: new Date().toISOString()
-                    };
+
+//--------------------------
+
+                // extract the crew JSON from Airtable, table WingmanAIsquads
+                // !!!--> HERE the hardcoded parameter "identify_pains" SHOULD BE CHANGED TO A CONFIG VARIABLE !!!!!!!!!!!!!
+                const crewRecordId = await airtableUtils.findRecordIdByIdentifier('WingmanAIsquads', 'SquadSKU', 'identify_pains');
+                const crewDetails = await airtableUtils.getFieldsForRecordById('WingmanAIsquads', crewRecordId);
+                const crewName = crewDetails.SquadName;
+                const crewJson = crewDetails.SquadJSON;
+
+                logger.info(crewJson);
+
+                //replace placeholders in the payload
+                var crewPayload = await replacePlaceholders.generateContent(isFilePath = false, crewJson, {
+                    COMPANY: companyDetails.CompanyName,
+                    INITIAL_RESEARCH: rawReport,
+                    PAINS_LIST: JSON.stringify(allPains)
+                });
+
+                logger.info(`Agent payload: \n${crewPayload}`);
+                logger.warn("Now calling agent...");
+
+                // Start tracking the agent activity
+                const runID = await airtableUtils.createAgentActivityRecord(companyDetails.companyRecordId, crewName, crewPayload);
+                logger.info(`Agent activity run ID: ${runID}, type: ${typeof runID}`);
+
+                // Call the agent army with the payload // schema path is used to validate the response
+                 const schemaPath = '../../schema/crewAiResponseSchema_pains.json'; 
+                const agentResponse = await wingmanAgentsService.callWingmanAgents(crewPayload, schemaPath);
+                var agentResponseResult = agentResponse.result;
+                logger.info(`Here is the response: \n ${JSON.stringify(agentResponse, null, 4)}`);
+
+                // Complete tracking the agent activity with the response
+                await airtableUtils.updateAgentActivityRecord(runID, JSON.stringify(agentResponse, null, 4));
+
+//------------------------------
+
+
+                    // // Prepare agent
+                    // const agentData = {
+                    //     CompanyID: companyDetails.companyRecordId,
+                    //     CrewName: "dataAnalytics",
+                    //     TaskDescription: agents.generalPainsIdentifierDescription,
+                    //     TaskPrompt: taskPrompt,
+                    //     Timestamp: new Date().toISOString()
+                    // };
 
                     // Start tracking the agent activity
-                    const runID = await airtableUtils.createAgentActivityRecord(agentData.CompanyID, agentData.CrewName, agentData.TaskDescription, agentData.TaskPrompt);
+                    //const runID = await airtableUtils.createAgentActivityRecord(agentData.CompanyID, agentData.CrewName, agentData.TaskDescription, agentData.TaskPrompt);
 
                     // Call the agent with the prompt
-                    const agentResponse = await wingmanAgentsService.callWingmanAgentsApp(agentData.CrewName, agentData.TaskDescription, agentData.TaskPrompt, agents.generalPainsIdentifierEndpoint);
-                    var agentResponseResult = agentResponse.result;
-                    agentResponseResult = JSON.parse(agentResponseResult);
+                   // const agentResponse = await wingmanAgentsService.callWingmanAgentsApp(agentData.CrewName, agentData.TaskDescription, agentData.TaskPrompt, agents.generalPainsIdentifierEndpoint);
+                   // var agentResponseResult = agentResponse.result;
+                   // agentResponseResult = JSON.parse(agentResponseResult);
+
+
 
                     // insert the pains identified by the agent into the AssessmentDetails:Pains table
                     await airtableUtils.createPainAssessmentDetails(agentResponseResult, assessmentDetailsForPainsId, runID);
@@ -384,10 +398,10 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
 
                 logger.yay(`entering the branch for a new assessment with assessmentStatus = ${assessmentStatus}`);
                 await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'initiatilization', stepStatus: 'started', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
-               
+
                 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 // prepare the context data for the AI validation
-                
+
                 // get the report
                 var assessmentDetailsForReportId = await airtableUtils.findAssessDetailsByAssessIDAndTemplate(assessmentId, process.env.envDefaultGenAssessRawResultId);
                 assessmentDetailsForReportId = assessmentDetailsForReportId[0].id;
@@ -416,7 +430,7 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                 const validatedQuestions = await aiValidationUtils.analyzeQuestionsWithContext(questionsJson, context);
 
 
-break;
+                break;
 
                 logger.yay(`case for assessmentStatus = ${assessmentStatus} is completed`);
                 await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'close the branch', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
