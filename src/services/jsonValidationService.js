@@ -35,7 +35,7 @@ async function validateJson(jsonData, schemaRelativePath) {
             logger.error(`Validation errors: ${JSON.stringify(validate.errors)}`);
             return { valid: false, errors: validate.errors };
         }
-        logger.yay('JSON is valid.');
+        logger.yay('JSON is valid. >> Schema check passed');
         return { valid: true, errors: null };
     } catch (error) {
         logger.error(`Error during JSON validation: ${error.message}`);

@@ -7,6 +7,7 @@ const { sendEmail } = require('../services/emailService');
 const { processAgentOutput } = require('../services/pdfReportService');
 const { processSignalsFromPains } = require('../services/getSignalsForGeneralAssessmentService');
 const { processQuestionsFromSignals } = require('../services/getQuestionsForGeneralAssessmentService');
+const { processQuestionsToSurvey } = require('../services/createSurveyAndFormService');
 const updateAssessmentDetailsService = require('../services/updateAssessmentDetailsService');
 const companyService = require('../services/companyService');
 const wingmanAgentsService = require('../services/wingmanAgentsService');
@@ -42,7 +43,7 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
         logger.info(`   ApprovedPromptID:       value = ${approvedPromptRecordId}, type = ${typeof approvedPromptRecordId}`);
 
         switch (assessmentStatus) {
-            case "requested": { // this is a new assessment, proceed with raw report
+            case "requested": { // new assessment --> do the initial reserach, create raw report
                 logger.yay(`entering the branch for a new assessment with assessmentStatus = ${assessmentStatus}`);
                 await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'initialization', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: { approvedPromptRecordId } });
 
@@ -155,7 +156,7 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
 
             }
 
-            case "web research done": { //this means we can move on the pain identification step
+            case "research done": { // research done --> proceed with pain identification
 
                 logger.yay(`entering the branch for a new assessment with assessmentStatus = ${assessmentStatus}`);
                 await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'case = potential pains', stepStatus: 'started', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
@@ -171,74 +172,45 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                 // extract the values for the raw report
                 const rawReport = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsForRawReportId, 'Value');
                 const rawReportStatus = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsForRawReportId, 'Status');
+                // seriailze raw report
+                const jsonRawReport = JSON.stringify(rawReport);
 
                 if (rawReportStatus == 'approved') { // --> this means we can proceed with identifying the pains
 
                     // create the list with all pains (will be passed to the agent inside of the prompt as JSON)
-                    var allPains = await airtableUtils.fetchPainsData();
-                    allPains = '\"' + JSON.stringify(allPains) + '\"';
+                    var painData = await airtableUtils.fetchPainsData();
+                    // serialiize signals data
+                    var jsonPainsData = JSON.stringify(painData);
 
-                logger.info(`Fetched pains data from Airtable: ${JSON.stringify(allPains)}`);
+                    // extract the crew JSON from Airtable, table WingmanAIsquads
+                    // !!!--> HERE the hardcoded parameter "identify_pains" SHOULD BE CHANGED TO A CONFIG VARIABLE !!!!!!!!!!!!!
+                    const crewRecordId = await airtableUtils.findRecordIdByIdentifier('WingmanAIsquads', 'SquadSKU', 'identify_pains');
+                    const crewDetails = await airtableUtils.getFieldsForRecordById('WingmanAIsquads', crewRecordId);
+                    const crewName = crewDetails.SquadName;
+                    const crewJson = crewDetails.SquadJSON;
 
-                    // create the task prompt
-                  //  var taskPrompt = await replacePlaceholders.generateContent(isFilePath = false, agents.generalPainsIdentifierTaskPrompt, { INITIAL_RESEARCH: rawReport, PAINS_LIST: JSON.stringify(allPains) });
+                    //replace placeholders in the payload
+                    var crewPayload = await replacePlaceholders.generateContent(isFilePath = false, crewJson, {
+                        COMPANY: companyDetails.CompanyName,
+                        INITIAL_RESEARCH: jsonRawReport.replace(/"/g, '\\"'),
+                        PAINS_LIST: jsonPainsData.replace(/"/g, '\\"')
+                    });
 
-
-//--------------------------
-
-                // extract the crew JSON from Airtable, table WingmanAIsquads
-                // !!!--> HERE the hardcoded parameter "identify_pains" SHOULD BE CHANGED TO A CONFIG VARIABLE !!!!!!!!!!!!!
-                const crewRecordId = await airtableUtils.findRecordIdByIdentifier('WingmanAIsquads', 'SquadSKU', 'identify_pains');
-                const crewDetails = await airtableUtils.getFieldsForRecordById('WingmanAIsquads', crewRecordId);
-                const crewName = crewDetails.SquadName;
-                const crewJson = crewDetails.SquadJSON;
-
-                logger.info(crewJson);
-
-                //replace placeholders in the payload
-                var crewPayload = await replacePlaceholders.generateContent(isFilePath = false, crewJson, {
-                    COMPANY: companyDetails.CompanyName,
-                    INITIAL_RESEARCH: rawReport,
-                    PAINS_LIST: JSON.stringify(allPains)
-                });
-
-                logger.info(`Agent payload: \n${crewPayload}`);
-                logger.warn("Now calling agent...");
-
-                // Start tracking the agent activity
-                const runID = await airtableUtils.createAgentActivityRecord(companyDetails.companyRecordId, crewName, crewPayload);
-                logger.info(`Agent activity run ID: ${runID}, type: ${typeof runID}`);
-
-                // Call the agent army with the payload // schema path is used to validate the response
-                 const schemaPath = '../../schema/crewAiResponseSchema_pains.json'; 
-                const agentResponse = await wingmanAgentsService.callWingmanAgents(crewPayload, schemaPath);
-                var agentResponseResult = agentResponse.result;
-                logger.info(`Here is the response: \n ${JSON.stringify(agentResponse, null, 4)}`);
-
-                // Complete tracking the agent activity with the response
-                await airtableUtils.updateAgentActivityRecord(runID, JSON.stringify(agentResponse, null, 4));
-
-//------------------------------
-
-
-                    // // Prepare agent
-                    // const agentData = {
-                    //     CompanyID: companyDetails.companyRecordId,
-                    //     CrewName: "dataAnalytics",
-                    //     TaskDescription: agents.generalPainsIdentifierDescription,
-                    //     TaskPrompt: taskPrompt,
-                    //     Timestamp: new Date().toISOString()
-                    // };
+                    logger.info(`Agent payload: \n${crewPayload}`);
+                    logger.warn("Now calling agent...");
 
                     // Start tracking the agent activity
-                    //const runID = await airtableUtils.createAgentActivityRecord(agentData.CompanyID, agentData.CrewName, agentData.TaskDescription, agentData.TaskPrompt);
+                    const runID = await airtableUtils.createAgentActivityRecord(companyDetails.companyRecordId, crewName, crewPayload);
+                    logger.info(`Agent activity run ID: ${runID}, type: ${typeof runID}`);
 
-                    // Call the agent with the prompt
-                   // const agentResponse = await wingmanAgentsService.callWingmanAgentsApp(agentData.CrewName, agentData.TaskDescription, agentData.TaskPrompt, agents.generalPainsIdentifierEndpoint);
-                   // var agentResponseResult = agentResponse.result;
-                   // agentResponseResult = JSON.parse(agentResponseResult);
+                    // Call the agent army with the payload // schema path is used to validate the response
+                    const schemaPath = '../../schema/crewAiResponseSchema_pains.json';
+                    const agentResponse = await wingmanAgentsService.callWingmanAgents(crewPayload, schemaPath);
+                    var agentResponseResult = agentResponse.result;
+                    logger.info(`Here is the response: \n ${JSON.stringify(agentResponse, null, 4)}`);
 
-
+                    // Complete tracking the agent activity with the response
+                    await airtableUtils.updateAgentActivityRecord(runID, JSON.stringify(agentResponse, null, 4));
 
                     // insert the pains identified by the agent into the AssessmentDetails:Pains table
                     await airtableUtils.createPainAssessmentDetails(agentResponseResult, assessmentDetailsForPainsId, runID);
@@ -252,7 +224,7 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                     await updateAssessmentDetailsService.updateAssessmentDetailsAndStatus(assessmentId, assessmentRecordId, agentResponseResult, process.env.envDefaultGenAssessPainPointsId, assessmentDetailsStatus);
 
                     // update the status for the current assessment
-                    await airtableUtils.updateRecordField('Assessments', assessmentRecordId, 'AssessmentStatus', 'potential pains done');
+                    await airtableUtils.updateRecordField('Assessments', assessmentRecordId, 'AssessmentStatus', 'pains identified');
 
                     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                     //INFORM SOURCE OWNER!!
@@ -268,9 +240,10 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                 break
             }
 
-            case "potential pains done": {  // this means we can proceed with creating the final report
+            case "pains identified": { // pains identified --> proceed to signal identification
 
                 logger.yay(`entering the branch for a new assessment with assessmentStatus = ${assessmentStatus}`);
+                logger.info(`Proceeding to signal identification....`);
                 await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'case = web reserach', stepStatus: 'started', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
 
                 // find the ID of the record in AssessmentDetails where the record for potential pains is located
@@ -280,164 +253,185 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                 const potentialPainsStatus = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsForPainsId, 'Status');
                 logger.info(`potential pains status = ${potentialPainsStatus}`);
 
-                if (potentialPainsStatus == 'approved') { // --> this means we can proceed with the final report
+                if (potentialPainsStatus == 'approved') { // --> this means we can proceed signal identification
 
-                    const IDinAssessmentDetailsForPainsList = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsForPainsId, 'AssessmentDetails:Pains');
-                    logger.info(`IDinAssessmentDetailsForPainsList = ${IDinAssessmentDetailsForPainsList}`);
+                    // call the service to process signals from pains
+                    await processSignalsFromPains(engagementRecordId, assessmentRecordId, assessmentId, flowName, assessmentStatus);
 
-                    var painDetailsList = [];
-                    const seenPainSKUs = new Set(); // Set to track seen painSKUs
-
-                    for (const id of IDinAssessmentDetailsForPainsList) {
-                        console.log(id); // Log the current ID
-
-                        try {
-                            const painID = await airtableUtils.findFieldValueByRecordId('AssessmentDetails:Pains', id, 'PainID');
-                            const painSKU = await airtableUtils.findFieldValueByRecordId('Pains', painID, 'PainSKU');
-                            // Skip this iteration if we've already seen this painSKU
-                            if (seenPainSKUs.has(painSKU)) continue;
-                            // Since this painSKU is new, add it to the set
-                            seenPainSKUs.add(painSKU);
-                            const painStatement = await airtableUtils.findFieldValueByRecordId('Pains', painID, 'PainStatement');
-                            const painDescription = await airtableUtils.findFieldValueByRecordId('Pains', painID, 'What we feel');
-                            const painImpact = await airtableUtils.findFieldValueByRecordId('Pains', painID, 'Business impact');
-
-                            // Construct the object and push it to the list
-                            painDetailsList.push({
-                                painSKU: painSKU,
-                                painStatement: painStatement,
-                                painDescription: painDescription,
-                                painImpact: painImpact
-                            });
-
-                        } catch (error) {
-                            console.error(`Error processing ID ${id}:`, error);
-                        }
-                    }
-
-                    // Convert the array to JSON
-                    const painDetailsJson = JSON.stringify(painDetailsList);
-                    console.log(painDetailsJson);
-                    // Now you have your JSON ready to be sent to an agent
-
-
-                    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                    //- STEP 6 --> create the final report
-
-                    // find the ID of the record in AssessmentDetails where the record for raw report is located
-                    var assessmentDetailsForRawReportId = await airtableUtils.findAssessDetailsByAssessIDAndTemplate(assessmentId, process.env.envDefaultGenAssessRawResultId);
-                    assessmentDetailsForRawReportId = assessmentDetailsForRawReportId[0].id
-
-                    const rawReport = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsForRawReportId, 'Value');
-                    //const rawReportStatus = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsForRawReportId, 'Status');
-
-                    //extract company details, and put them in an object
-                    const companyDetails = await companyService.fetchCompanyDetailsFromEngagement(engagementRecordId);
-
-                    // replace placeholders, create task prompt
-                    var taskPrompt = await replacePlaceholders.generateContent(isFilePath = false, agents.generalReportTaskPrompt, { INITIAL_RESEARCH: rawReport, PAINS: painDetailsJson, COMPANY: companyDetails.companyName, DOMAIN: companyDetails.companyDomain });
-                    logger.info(`taskPrompt = ${taskPrompt}`);
-
-                    // create the agent data object --> this is the data that will be sent to the agent army
-                    const agentData = {
-                        CompanyID: companyDetails.companyRecordId,
-                        CrewName: 'copywriting',
-                        TaskDescription: agents.generalReportDescription,
-                        TaskPrompt: taskPrompt,
-                        Timestamp: new Date().toISOString()
-                    };
-
-                    // agent activity tracking - start
-                    const runID = await airtableUtils.createAgentActivityRecord(agentData.CompanyID, agentData.CrewName, agentData.TaskDescription, agentData.TaskPrompt);
-
-                    // call the agent army :)
-                    const agentResponse = await wingmanAgentsService.callWingmanAgentsApp(agentData.CrewName, agentData.TaskDescription, agentData.TaskPrompt, agents.generalReportAgentEndpoint);
-
-                    const agentResponseResult = agentResponse.result;
-                    //const agentResponseStatus = agentResponse.status;
-                    logger.info(`Agent result: ${agentResponseResult}`);
-
-                    // Complete tracking the agent activity with the response
-                    await airtableUtils.updateAgentActivityRecord(runID, agentResponse);
-
-                    // update with the agent result in Airtable
-                    const assessmentDetailsStatus = appConfig.generalreportRequireApproval ? 'pending' : 'approved';  // check if this step requires approaval or not --> so set the staus as 'approved' if doesn't require approaval
-                    await updateAssessmentDetailsService.updateAssessmentDetailsAndStatus(assessmentId, assessmentRecordId, agentResponseResult, process.env.envDefaultGenAssessFinalResultId, assessmentDetailsStatus);
-
-                    // update the status for the current assessment
-                    await airtableUtils.updateRecordField('Assessments', assessmentRecordId, 'AssessmentStatus', 'general report done');
-
-                    await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'case = web research', stepStatus: 'done', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
-                    logger.yay(`General assessment flow completed successfully for AssessmentID=${assessmentId}`);
+                    logger.yay(`case for assessmentStatus = ${assessmentStatus} is completed`);
+                    await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'closing the branch', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
 
                 }
                 else {
                     //something went wrong with the raw report, so we need to ask the user to provide more information
-                    logger.warn(`The raw research was not approved, so we need to ask the source owner to approve the raw research before we can continue with the general assessment`);
+                    logger.warn(`The pains were not approved, so we need to ask the source owner to approve the pains before we can continue with the general assessment`);
                 }
                 break;
-
-
             }
 
-            case "general report done": {   // this means the we can indentify and validate the signals (based on the report content and the pains)
-
-                logger.yay(`entering the branch for a new assessment with assessmentStatus = ${assessmentStatus}`);
-                await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'case = general report', stepStatus: 'started', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
-
-                // call the service to process signals from pains
-                await processSignalsFromPains(engagementRecordId, assessmentRecordId, assessmentId, flowName, assessmentStatus);
-
-                logger.yay(`case for assessmentStatus = ${assessmentStatus} is completed`);
-                await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'closing the branch', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
-                break;
-
-            }
-
-            case "signals done": {   // this means the we can indentify the questions and create the typeform
+            case "signals selected": { // signals done --> proceed with questions selections, question reformulation !!! NOT FINISHED YET
 
                 logger.yay(`entering the branch for a new assessment with assessmentStatus = ${assessmentStatus}`);
                 await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'initiatilization', stepStatus: 'started', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
 
-                // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                // prepare the context data for the AI validation
+                // find the ID of the record in AssessmentDetails where the record for signals is located
+                var assessmentDetailsForSignalsId = await airtableUtils.findAssessDetailsByAssessIDAndTemplate(assessmentId, process.env.envDefaultGenAssessSignalsId);
+                assessmentDetailsForSignalsId = assessmentDetailsForSignalsId[0].id
 
-                // get the report
-                var assessmentDetailsForReportId = await airtableUtils.findAssessDetailsByAssessIDAndTemplate(assessmentId, process.env.envDefaultGenAssessRawResultId);
-                assessmentDetailsForReportId = assessmentDetailsForReportId[0].id;
-                var reportContent = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsForReportId, 'Value');
-                logger.debug(`Report content: ${reportContent}`);
+                const signalsStatus = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsForSignalsId, 'Status');
+                logger.info(`Signals status = ${signalsStatus}`);
 
-                // get the strategic directions --> oare chair am nevoie??
+                if (signalsStatus == 'approved') { // --> this means we can proceed with the next step, the questions
 
+                    // call the service to process questions from signals
+                    await processQuestionsFromSignals(engagementRecordId, assessmentRecordId, assessmentId, flowName, assessmentStatus);
 
-                // get the internal notes
+                    logger.yay(`case for assessmentStatus = ${assessmentStatus} is completed`);
+                    await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'closing the branch', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
 
-
-                // get role details for this contact
-                const contactRecordId = await peopleUtils.findPrimaryContactID(engagementRecordId);
-                const contactDetails = await peopleUtils.fetchPeopleDetails(contactRecordId, 'contact');
-                const roleName = contactDetails.RoleName;
-                const roleDescription = contactDetails.RoleDescription;
-                logger.debug(`Role name: ${roleName}`);
-                logger.debug(`Role description: ${roleDescription}`);
-
-                // get all questions that fit with the signals for this assessment and put in a JSON string
-                const questionsJson = await processQuestionsFromSignals(engagementRecordId, assessmentRecordId, assessmentId, flowName, assessmentStatus);
-                logger.debug(`questionsJson = \n${questionsJson}`);
-
-                // ask agents to select the questions that fits with the whole context (assessment and role)
-                const validatedQuestions = await aiValidationUtils.analyzeQuestionsWithContext(questionsJson, context);
-
-
+                }
+                else {
+                    //something went wrong with the signals, so we need to ask the user to provide more information
+                    logger.warn(`The signals were not approved, so we need to ask the source owner to approve the signals before we can continue with the general assessment`);
+                }
                 break;
+            }
 
-                logger.yay(`case for assessmentStatus = ${assessmentStatus} is completed`);
-                await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'close the branch', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
+            case "questions selected": {   // questions selected --> create the survey, create form in Typeform
+
+                logger.yay(`entering the branch for a new assessment with assessmentStatus = ${assessmentStatus}`);
+                await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'initiatilization', stepStatus: 'started', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
+
+                // find the ID of the record in AssessmentDetails where the record for questions is located
+                var assessmentDetailsForQuestionsId = await airtableUtils.findAssessDetailsByAssessIDAndTemplate(assessmentId, process.env.envDefaultGenAssessQuestionsId);
+                assessmentDetailsForQuestionsId = assessmentDetailsForQuestionsId[0].id
+
+                const questionsStatus = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsForQuestionsId, 'Status');
+                logger.info(`Questions status = ${questionsStatus}`);
+
+                if (questionsStatus == 'approved') { // --> this means we can proceed with the next step, the survey and the typeform
+
+                    // call the service to create the survey and the typeform from questions
+                    await processQuestionsToSurvey(engagementRecordId, assessmentRecordId, assessmentId, flowName, assessmentStatus);
+
+                    logger.yay(`case for assessmentStatus = ${assessmentStatus} is completed`);
+                    await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'closing the branch', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
+
+                }
+                else {
+                    //something went wrong with the questions, so we need to ask the user to provide more information
+                    logger.warn(`The questions were not approved, so we need to ask the source owner to approve the questions before we can continue with the general assessment`);
+                }
                 break;
+            }
+
+            case "survey responded": {   // survey submitted --> process the responses and generate the final report
+
+                /*
+                                              if (potentialPainsStatus == 'approved') { // --> this means we can proceed signal identification
+                              
+                                                  const IDinAssessmentDetailsForPainsList = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsForPainsId, 'AssessmentDetails:Pains');
+                                                  logger.info(`IDinAssessmentDetailsForPainsList = ${IDinAssessmentDetailsForPainsList}`);
+                              
+                                                  var painDetailsList = [];
+                                                  const seenPainSKUs = new Set(); // Set to track seen painSKUs
+                              
+                                                  for (const id of IDinAssessmentDetailsForPainsList) {
+                                                      console.log(id); // Log the current ID
+                              
+                                                      try {
+                                                          const painID = await airtableUtils.findFieldValueByRecordId('AssessmentDetails:Pains', id, 'PainID');
+                                                          const painSKU = await airtableUtils.findFieldValueByRecordId('Pains', painID, 'PainSKU');
+                                                          // Skip this iteration if we've already seen this painSKU
+                                                          if (seenPainSKUs.has(painSKU)) continue;
+                                                          // Since this painSKU is new, add it to the set
+                                                          seenPainSKUs.add(painSKU);
+                                                          const painStatement = await airtableUtils.findFieldValueByRecordId('Pains', painID, 'PainStatement');
+                                                          const painDescription = await airtableUtils.findFieldValueByRecordId('Pains', painID, 'What we feel');
+                                                          const painImpact = await airtableUtils.findFieldValueByRecordId('Pains', painID, 'Business impact');
+                              
+                                                          // Construct the object and push it to the list
+                                                          painDetailsList.push({
+                                                              painSKU: painSKU,
+                                                              painStatement: painStatement,
+                                                              painDescription: painDescription,
+                                                              painImpact: painImpact
+                                                          });
+                              
+                                                      } catch (error) {
+                                                          console.error(`Error processing ID ${id}:`, error);
+                                                      }
+                                                  }
+                              
+                                                  // Convert the array to JSON
+                                                  const painDetailsJson = JSON.stringify(painDetailsList);
+                                                  console.log(painDetailsJson);
+                                                  // Now you have your JSON ready to be sent to an agent
+                              
+                              
+                                                  //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                                                  //- STEP 6 --> create the final report
+                              
+                                                  // find the ID of the record in AssessmentDetails where the record for raw report is located
+                                                  var assessmentDetailsForRawReportId = await airtableUtils.findAssessDetailsByAssessIDAndTemplate(assessmentId, process.env.envDefaultGenAssessRawResultId);
+                                                  assessmentDetailsForRawReportId = assessmentDetailsForRawReportId[0].id
+                              
+                                                  const rawReport = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsForRawReportId, 'Value');
+                                                  //const rawReportStatus = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsForRawReportId, 'Status');
+                              
+                                                  //extract company details, and put them in an object
+                                                  const companyDetails = await companyService.fetchCompanyDetailsFromEngagement(engagementRecordId);
+                              
+                                                  // replace placeholders, create task prompt
+                                                  var taskPrompt = await replacePlaceholders.generateContent(isFilePath = false, agents.generalReportTaskPrompt, { INITIAL_RESEARCH: rawReport, PAINS: painDetailsJson, COMPANY: companyDetails.companyName, DOMAIN: companyDetails.companyDomain });
+                                                  logger.info(`taskPrompt = ${taskPrompt}`);
+                              
+                                                  // create the agent data object --> this is the data that will be sent to the agent army
+                                                  const agentData = {
+                                                      CompanyID: companyDetails.companyRecordId,
+                                                      CrewName: 'copywriting',
+                                                      TaskDescription: agents.generalReportDescription,
+                                                      TaskPrompt: taskPrompt,
+                                                      Timestamp: new Date().toISOString()
+                                                  };
+                              
+                                                  // agent activity tracking - start
+                                                  const runID = await airtableUtils.createAgentActivityRecord(agentData.CompanyID, agentData.CrewName, agentData.TaskDescription, agentData.TaskPrompt);
+                              
+                                                  // call the agent army :)
+                                                  const agentResponse = await wingmanAgentsService.callWingmanAgentsApp(agentData.CrewName, agentData.TaskDescription, agentData.TaskPrompt, agents.generalReportAgentEndpoint);
+                              
+                                                  const agentResponseResult = agentResponse.result;
+                                                  //const agentResponseStatus = agentResponse.status;
+                                                  logger.info(`Agent result: ${agentResponseResult}`);
+                              
+                                                  // Complete tracking the agent activity with the response
+                                                  await airtableUtils.updateAgentActivityRecord(runID, agentResponse);
+                              
+                                                  // update with the agent result in Airtable
+                                                  const assessmentDetailsStatus = appConfig.generalreportRequireApproval ? 'pending' : 'approved';  // check if this step requires approaval or not --> so set the staus as 'approved' if doesn't require approaval
+                                                  await updateAssessmentDetailsService.updateAssessmentDetailsAndStatus(assessmentId, assessmentRecordId, agentResponseResult, process.env.envDefaultGenAssessFinalResultId, assessmentDetailsStatus);
+                              
+                                                  // update the status for the current assessment
+                                                  await airtableUtils.updateRecordField('Assessments', assessmentRecordId, 'AssessmentStatus', 'general report done');
+                              
+                                                  await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'case = web research', stepStatus: 'done', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
+                                                  logger.yay(`General assessment flow completed successfully for AssessmentID=${assessmentId}`);
+                              
+                                              }
+                                              else {
+                                                  //something went wrong with the raw report, so we need to ask the user to provide more information
+                                                  logger.warn(`The raw research was not approved, so we need to ask the source owner to approve the raw research before we can continue with the general assessment`);
+                                              }
+                                              break;
+                              
+                              */
 
             }
 
+            case "general report done": {   // ????
+
+            }
 
             case "flow concluded": {   // this means we can send the report
 

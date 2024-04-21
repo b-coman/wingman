@@ -5,10 +5,13 @@ const app = express();
 const isDevelopment = process.env.NODE_ENV === 'development';
 
 const appConfig = {
-    rawreportRequireApproval: true, // Whether to require approval for raw report
-    painRequireApproval: true, // Whether to require approval for pains
-    generalreportRequireApproval: true, // Whether to require approval for general report
-    signalRequireApproval: false, // Whether to require approval for signals
+    rawreportRequireApproval: true, // raw report requires approval?
+    painRequireApproval: true, // pains require approval?
+    signalRequireApproval: true, // signals require approval?
+    questionRequireApproval: true, // questions require approval?
+    surveyRequireApproval: true, // questions require approval?
+    generalreportRequireApproval: true, // final report requires approval?
+
 };
 
 const systemRules = {

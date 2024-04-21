@@ -5,21 +5,21 @@
         "result": {
             "type": "object",
             "properties": {
-                "pains": {
+                "signals": {
                     "type": "array",
                     "items": {
                         "type": "object",
                         "properties": {
-                            "painSKU": {"type": "string"},
+                            "signalSKU": {"type": "string"},
                             "reason": {"type": "string"},
                             "confidenceScore": { "type": "number", "minimum": 0, "maximum": 1 }
                         },
-                        "required": ["painSKU", "reason", "confidenceScore"],
+                        "required": ["signalSKU", "reason", "confidenceScore"],
                         "additionalProperties": false
                     }
                 }
             },
-            "required": ["pains"],
+            "required": ["signals"],
             "additionalProperties": false
         },
         "status": {"type": "string"}

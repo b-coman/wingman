@@ -333,6 +333,44 @@ exports.findPainRecordIdBySKU = async (painSKU) => {
 };
 
 
+exports.findSignalRecordIdBySKU = async (signalSKU) => {
+    const table = base('Signals');
+    try {
+        const records = await table.select({
+            filterByFormula: `{SignalSKU} = '${signalSKU}'`,
+            maxRecords: 1
+        }).firstPage();
+
+        if (records.length > 0) {
+            return records[0].id; // Return the first record's ID
+        } else {
+            throw new Error(`No record found with QuestionSKU: ${signalSKU}`);
+        }
+    } catch (error) {
+        logger.error(`Error finding record by QuestionSKU: ${signalSKU}: ${error}`);
+        throw error;
+    }
+};
+
+exports.findQuestionRecordIdBySKU = async (questionsSKU) => {
+    const table = base('Questions');
+    try {
+        const records = await table.select({
+            filterByFormula: `{QuestionSKU} = '${questionsSKU}'`,
+            maxRecords: 1
+        }).firstPage();
+
+        if (records.length > 0) {
+            return records[0].id; // Return the first record's ID
+        } else {
+            throw new Error(`No record found with QuestionSKU: ${questionsSKU}`);
+        }
+    } catch (error) {
+        logger.error(`Error finding record by QuestionSKU: ${questionsSKU}: ${error}`);
+        throw error;
+    }
+};
+
 /**
  * Creates entries in the AssessmentDetails:Pains table for each item in the agent's response.
  * @param {Array} agentResponseResult - The response from the agent as an array of objects.
@@ -347,7 +385,6 @@ exports.createPainAssessmentDetails = async (jsonData, assessmentDetailsId, runI
 
     // Define a regex for painSKU format validation
     const painSKURegex = /^P-\d{2}$/;
-    console.log(agentResponseResult);
 
     // Iterate through each pain item
     for (const item of agentResponseResult) {
@@ -378,34 +415,73 @@ exports.createPainAssessmentDetails = async (jsonData, assessmentDetailsId, runI
 
 
 
-
 /**
  * Creates entries in the AssessmentDetails:Signals table for each item in the agent's response.
  * @param {Array} agentResponseResult - The response from the agent as an array of objects.
  * @param {String} assessmentDetailsId - The ID for the AssessmentDetail linked to these entries.
  * @returns {Promise<void>}
  */
-exports.createSignalAssessmentDetails = async (agentResponseResult, assessmentDetailsId, runID) => {
+exports.createSignalAssessmentDetails = async (jsonData, assessmentDetailsId, runID) => {
     const assessmentDetailsSignalsTable = base('AssessmentDetails:Signals');
+
+    // Check if the passed data is the whole object and extract the pains array
+    const agentResponseResult = jsonData.signals || jsonData;
 
     // Iterate through each result item
     for (const item of agentResponseResult) {
         try {
-            const signalRecordID = item.SignalRecordId; 
-            const reasoning = item.reasoning;
+
+            const signalRecordID = await exports.findSignalRecordIdBySKU(item.signalSKU); 
             const confidenceScore = parseFloat(item.confidenceScore); // Convert to number
 
             await assessmentDetailsSignalsTable.create({
                 'AssessmentDetailID': [assessmentDetailsId],
                 'SignalID': [signalRecordID],
                 'ConfidenceScore': confidenceScore,
-                'Reason': reasoning,
+                'Reason': item.reason,
                 'AgentRunID': [runID]
             });
            // logger.info(`Entry created with Signal ID: ${signalRecordID}`);
 
         } catch (error) {
             logger.error(`Error creating entry with Signal ID: ${assessmentDetailsId}: ${error}`);
+            console.error(error);
+        }
+    }
+};
+
+
+/**
+ * Creates entries in the AssessmentDetails:Questions table for each item in the agent's response.
+ * @param {Object} jsonData - The response from the agent as a JSON object containing an array of questions.
+ * @param {String} assessmentDetailsId - The ID for the AssessmentDetail linked to these entries.
+ * @param {String} runID - The run identifier for tracking.
+ * @returns {Promise<void>}
+ */
+exports.createQuestionAssessmentDetails = async (jsonData, assessmentDetailsId, runID) => {
+    const assessmentDetailsQuestionsTable = base('AssessmentDetails:Questions');
+
+    // Extract the questions array from the jsonData object
+    const agentResponseResult = jsonData.questions || jsonData;
+
+    // Iterate through each question item
+    for (const item of agentResponseResult) {
+        try {
+            const questionRecordID = await exports.findQuestionRecordIdBySKU(item.questionSKU);
+
+            // Create a new record in the AssessmentDetails:Questions table
+            await assessmentDetailsQuestionsTable.create({
+                'AssessmentDetailID': [assessmentDetailsId],
+                'QuestionID': [questionRecordID],
+                'ReformulatedQuestionStatement': item.questionBody,  // Assuming there is a 'question' field
+                'AgentRunID': [runID]
+            });
+
+             logger.info(`Entry created in AssessmentDetails:Questions for QuestionSKU: ${item.questionSKU}`);
+
+        } catch (error) {
+            // Log any errors encountered during the process
+            logger.error(`Error creating entry with QuestionSKU: ${item.questionSKU}: ${error}`);
             console.error(error);
         }
     }
@@ -563,6 +639,7 @@ exports.getFieldsForRecordById = async (tableName, recordId) => {
 
         if (record) {
             // Return the fields of the found record
+            //console.log('Found record:', JSON.stringify(record.fields, null, 2));
             return record.fields;
         } else {
             // No record found

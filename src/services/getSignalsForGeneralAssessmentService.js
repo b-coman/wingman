@@ -1,12 +1,10 @@
 // Filename: /src/services/getSignalsForGeneralAssessmentService.js
 
 require('dotenv').config();
-const agents = require('../../templates/agents.json');
-const emails = require('../../templates/emails.json');
-const appConfig = require('../../config');
-const airtableUtils = require('../lib/airtableUtils'); 
+const { appConfig } = require('../../config');
+const airtableUtils = require('../lib/airtableUtils');
 const assetsUtils = require('../lib/knowledgeModelUtils');
-const logger = require('../../logger'); 
+const logger = require('../../logger');
 const logFlowTracking = require('./flowTrackingService');
 const wingmanAgentsService = require('./wingmanAgentsService');
 const replacePlaceholders = require('./replacePlaceholders');
@@ -26,15 +24,30 @@ async function processSignalsFromPains(engagementRecordId, assessmentRecordId, a
         var assessmentDetailsForPainsId = await airtableUtils.findAssessDetailsByAssessIDAndTemplate(assessmentId, process.env.envDefaultGenAssessPainPointsId);
         assessmentDetailsForPainsId = assessmentDetailsForPainsId[0].id;
 
-        // find the record ID in table AssessmentDetails where final result is stored
-        var assessmentDetailsForReportId = await airtableUtils.findAssessDetailsByAssessIDAndTemplate(assessmentId, process.env.envDefaultGenAssessFinalResultId);
+        // find the record ID in table AssessmentDetails where initial research is stored
+        var assessmentDetailsForReportId = await airtableUtils.findAssessDetailsByAssessIDAndTemplate(assessmentId, process.env.envDefaultGenAssessRawResultId);
         assessmentDetailsForReportId = assessmentDetailsForReportId[0].id
 
         // get the pain IDs from AssessmentDetails
-        const painIDs = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsForPainsId, 'AssessmentDetails:Pains');
+        const painRecordIDs = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsForPainsId, 'AssessmentDetails:Pains');
 
-        // get the signal record IDs from that relates to the pain IDs indentified before
-        const signalRecordIDs = await assetsUtils.getSignalIDsForPains(painIDs);
+        // get the signal record IDs that are connected to the pain IDs indentified before
+        const signalRecordIDs = await assetsUtils.getSignalIDsForPains(painRecordIDs);
+
+        //construct the object that store details about pains
+        var painsDescription = ""; var counter = 1;
+        for (const painRecordId of painRecordIDs) {
+            try {
+                const painData = await airtableUtils.getFieldsForRecordById('Pains', painRecordId);
+                const painStatement = painData['PainStatement (from PainID)'];        
+                painsDescription += `Pain point candidate ${counter}: ${painStatement}; \n`;
+                counter++;  
+            } catch (error) {
+                logger.error(`Error fetching data for pain record ID ${painRecordId}: ${error}`);
+            }
+        }
+        // seriailze pains data
+        var jsonPainDescription = JSON.stringify(painsDescription);
 
         //construct the object that store details about signals
         const signalsData = [];
@@ -43,45 +56,57 @@ async function processSignalsFromPains(engagementRecordId, assessmentRecordId, a
                 const signalData = await airtableUtils.getFieldsForRecordById('Signals', signalRecordId);
                 // Extract only the necessary fields
                 const filteredSignalData = {
-                    SignalRecordId: signalRecordId,
-                    SignalStatement: signalData['SignalStatement'] || 'No signal here',
-                    SignalDescription: signalData['SignalDescription'] || ''
+                    signalSKU: signalData['SignalSKU'],
+                    signalStatement: signalData['SignalStatement'] || 'No signal here',
+                    signalDescription: signalData['SignalDescription'] || ''
                 };
                 signalsData.push(filteredSignalData);
             } catch (error) {
                 logger.error(`Error fetching data for signal record ID ${signalRecordId}: ${error}`);
             }
         }
-
+        // serialiize signals data
         var jsonSignalsData = JSON.stringify(signalsData);
+        
 
         //prepare the agent call, the additional details needed
         const companyName = await airtableUtils.findFieldValueByRecordId('Assessments', assessmentRecordId, '*CompanyName (from CompanyID) (from assignedToEngagement)');
         var companyRecordId = await airtableUtils.findFieldValueByRecordId('Assessments', assessmentRecordId, '*CompanyID (from assignedToEngagement)');
         companyRecordId = companyRecordId[0];
-        const finalReport = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsForReportId, 'Value');
+        const rawReport = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsForReportId, 'Value');
+        // seriailze raw report
+        const jsonRawReport = JSON.stringify(rawReport);
 
-        // replace placeholders, create task prompt
-        var taskPrompt = await replacePlaceholders.generateContent(isFilePath = false, agents.validateSignals.prompt, { COMPANY: companyName, INITIAL_RESEARCH: finalReport, SIGNALS_LIST: jsonSignalsData });
+        const crewRecordId = await airtableUtils.findRecordIdByIdentifier('WingmanAIsquads', 'SquadSKU', 'identify_signals');
+        const crewDetails = await airtableUtils.getFieldsForRecordById('WingmanAIsquads', crewRecordId);
+        const crewName = crewDetails.SquadName;
+        const crewJson = crewDetails.SquadJSON;
 
-        // create the agent data object --> this is the data that will be sent to the agent army
-        const agentData = {
-            CompanyID: companyRecordId,
-            CrewName: 'analyse_data',
-            TaskDescription: agents.validateSignals.description,
-            TaskPrompt: taskPrompt,
-            Timestamp: new Date().toISOString()
-        };
+        //replace placeholders in the payload
+        var crewPayload = await replacePlaceholders.generateContent(isFilePath = false, crewJson, {
+            COMPANY: companyName,
+            INITIAL_RESEARCH: jsonRawReport.replace(/"/g, '\\"'),
+            PAINS_LIST: jsonPainDescription.replace(/"/g, '\\"'),
+            SIGNALS_LIST: jsonSignalsData.replace(/"/g, '\\"')
+        });
 
-        // agent activity tracking - start
-        const runID = await airtableUtils.createAgentActivityRecord(agentData.CompanyID, agentData.CrewName, agentData.TaskDescription, agentData.TaskPrompt);
+        logger.info(`Agent payload: \n${crewPayload}`);
+        logger.warn("Now calling agent...");
 
-        // call the agent army :)
-        logger.info(`Calling crew: ${agentData.CrewName}`);
-        const agentResponse = await wingmanAgentsService.callWingmanAgentsApp(agentData.CrewName, agentData.TaskDescription, agentData.TaskPrompt, agents.validateSignals.baseUrl);
+        // Start tracking the agent activity
+        const runID = await airtableUtils.createAgentActivityRecord(companyRecordId, crewName, crewPayload);
+        logger.info(`Agent activity run ID: ${runID}, type: ${typeof runID}`);
 
+        // Call the agent army with the payload // schema path is used to validate the response
+        const schemaPath = '../../schema/crewAiResponseSchema_signals.json';
+        const agentResponse = await wingmanAgentsService.callWingmanAgents(crewPayload, schemaPath);
+
+        // extract the signals from the response
         var agentResponseResult = agentResponse.result;
-        agentResponseResult = JSON.parse(agentResponseResult);
+        logger.info(`Here is the response: \n ${JSON.stringify(agentResponse, null, 4)}`);
+
+        // Complete tracking the agent activity with the response
+        await airtableUtils.updateAgentActivityRecord(runID, JSON.stringify(agentResponse, null, 4));
 
         // insert the signals identified by the agent into the AssessmentDetails:Signals table
         await airtableUtils.createSignalAssessmentDetails(agentResponseResult, assessmentDetailsForSignalsId, runID);
@@ -95,7 +120,7 @@ async function processSignalsFromPains(engagementRecordId, assessmentRecordId, a
         await updateAssessmentDetailsService.updateAssessmentDetailsAndStatus(assessmentId, assessmentRecordId, agentResponseResult, process.env.envDefaultGenAssessSignalsId, assessmentDetailsStatus);
 
         // update the status for the current assessment
-        await airtableUtils.updateRecordField('Assessments', assessmentRecordId, 'AssessmentStatus', 'signals done');
+        await airtableUtils.updateRecordField('Assessments', assessmentRecordId, 'AssessmentStatus', 'signals selected');
 
         logger.yay('Signals processing completed successfully.');
 

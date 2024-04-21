@@ -5,21 +5,20 @@
         "result": {
             "type": "object",
             "properties": {
-                "pains": {
+                "questions": {
                     "type": "array",
                     "items": {
                         "type": "object",
                         "properties": {
-                            "painSKU": {"type": "string"},
-                            "reason": {"type": "string"},
-                            "confidenceScore": { "type": "number", "minimum": 0, "maximum": 1 }
+                            "questionSKU": {"type": "string"},
+                            "questionBody": {"type": "string"}
                         },
-                        "required": ["painSKU", "reason", "confidenceScore"],
+                        "required": ["questionSKU", "questionBody"],
                         "additionalProperties": false
                     }
                 }
             },
-            "required": ["pains"],
+            "required": ["questions"],
             "additionalProperties": false
         },
         "status": {"type": "string"}
