@@ -12,6 +12,7 @@ const updateAssessmentDetailsService = require('../services/updateAssessmentDeta
 const companyService = require('../services/companyService');
 const wingmanAgentsService = require('../services/wingmanAgentsService');
 const airtableUtils = require('../lib/airtableUtils');
+const flowOutputsUtils = require('../lib/flowOutputsUtils');
 const peopleUtils = require('../lib/peopleUtils');
 const aiValidationUtils = require('../lib/aiValidationUtils');
 const logger = require('../../logger');
@@ -312,7 +313,35 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                 if (questionsStatus == 'approved') { // --> this means we can proceed with the next step, the survey and the typeform
 
                     // call the service to create the survey and the typeform from questions
-                    await processQuestionsToSurvey(engagementRecordId, assessmentRecordId, assessmentId, flowName, assessmentStatus);
+                    const processQuestionsResult = await processQuestionsToSurvey(engagementRecordId, assessmentRecordId, assessmentId, flowName, assessmentStatus);
+                    const surveyRecordId = processQuestionsResult.surveyRecordId;
+                    const typeformId = processQuestionsResult.typeformId;
+                    const typerformUrl = processQuestionsResult.typeformUrl;
+
+
+                    // inform the contact on client side that survey is ready
+
+                    await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'send the survey', stepStatus: 'started', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
+                    const companyName = companyDetails.companyName;
+                    const contactFirstName = await airtableUtils.findFieldValueByRecordId('Engagements', engagementRecordId, '*PrimaryContactFirstName (from CompanyID)');
+                    const contactLastName = await airtableUtils.findFieldValueByRecordId('Engagements', engagementRecordId, '*PrimaryContactLastName (from CompanyID)');
+                    const contactEmail = await airtableUtils.findFieldValueByRecordId('Engagements', engagementRecordId, '*PrimaryContactEmail (from CompanyID)');
+
+
+                    // Generate the email body using the emailBodyMaker service
+                    const emailSubject = await replacePlaceholders.generateContent(isFilePath = false, emails.surveyEmailSubject, { COMPANY_NAME: companyName });
+                    const emailContent = await replacePlaceholders.generateContent(isFilePath = false, emails.surveyEmailContent, { COMPANY_NAME: companyDetails.companyName, TYPEFORM_URL: typerformUrl });
+                    const emailBody = await replacePlaceholders.generateContent(isFilePath = true, 'email_client', { CONTACT_FIRSTNAME: contactFirstName, MESSAGE_BODY: emailContent });
+
+                    //logger.info(`emailBody = ${emailBody}`);
+
+                    // Send the email 
+                    await sendEmail(contactEmail, emailSubject, emailBody);
+
+                    // log the step
+                    await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'Email sent to the client', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: { contactFirstName, contactLastName, contactEmail } });
+
+
 
                     logger.yay(`case for assessmentStatus = ${assessmentStatus} is completed`);
                     await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'closing the branch', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
@@ -327,105 +356,138 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
 
             case "survey responded": {   // survey submitted --> process the responses and generate the final report
 
-                /*
-                                              if (potentialPainsStatus == 'approved') { // --> this means we can proceed signal identification
-                              
-                                                  const IDinAssessmentDetailsForPainsList = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsForPainsId, 'AssessmentDetails:Pains');
-                                                  logger.info(`IDinAssessmentDetailsForPainsList = ${IDinAssessmentDetailsForPainsList}`);
-                              
-                                                  var painDetailsList = [];
-                                                  const seenPainSKUs = new Set(); // Set to track seen painSKUs
-                              
-                                                  for (const id of IDinAssessmentDetailsForPainsList) {
-                                                      console.log(id); // Log the current ID
-                              
-                                                      try {
-                                                          const painID = await airtableUtils.findFieldValueByRecordId('AssessmentDetails:Pains', id, 'PainID');
-                                                          const painSKU = await airtableUtils.findFieldValueByRecordId('Pains', painID, 'PainSKU');
-                                                          // Skip this iteration if we've already seen this painSKU
-                                                          if (seenPainSKUs.has(painSKU)) continue;
-                                                          // Since this painSKU is new, add it to the set
-                                                          seenPainSKUs.add(painSKU);
-                                                          const painStatement = await airtableUtils.findFieldValueByRecordId('Pains', painID, 'PainStatement');
-                                                          const painDescription = await airtableUtils.findFieldValueByRecordId('Pains', painID, 'What we feel');
-                                                          const painImpact = await airtableUtils.findFieldValueByRecordId('Pains', painID, 'Business impact');
-                              
-                                                          // Construct the object and push it to the list
-                                                          painDetailsList.push({
-                                                              painSKU: painSKU,
-                                                              painStatement: painStatement,
-                                                              painDescription: painDescription,
-                                                              painImpact: painImpact
-                                                          });
-                              
-                                                      } catch (error) {
-                                                          console.error(`Error processing ID ${id}:`, error);
-                                                      }
-                                                  }
-                              
-                                                  // Convert the array to JSON
-                                                  const painDetailsJson = JSON.stringify(painDetailsList);
-                                                  console.log(painDetailsJson);
-                                                  // Now you have your JSON ready to be sent to an agent
-                              
-                              
-                                                  //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                                                  //- STEP 6 --> create the final report
-                              
-                                                  // find the ID of the record in AssessmentDetails where the record for raw report is located
-                                                  var assessmentDetailsForRawReportId = await airtableUtils.findAssessDetailsByAssessIDAndTemplate(assessmentId, process.env.envDefaultGenAssessRawResultId);
-                                                  assessmentDetailsForRawReportId = assessmentDetailsForRawReportId[0].id
-                              
-                                                  const rawReport = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsForRawReportId, 'Value');
-                                                  //const rawReportStatus = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsForRawReportId, 'Status');
-                              
-                                                  //extract company details, and put them in an object
-                                                  const companyDetails = await companyService.fetchCompanyDetailsFromEngagement(engagementRecordId);
-                              
-                                                  // replace placeholders, create task prompt
-                                                  var taskPrompt = await replacePlaceholders.generateContent(isFilePath = false, agents.generalReportTaskPrompt, { INITIAL_RESEARCH: rawReport, PAINS: painDetailsJson, COMPANY: companyDetails.companyName, DOMAIN: companyDetails.companyDomain });
-                                                  logger.info(`taskPrompt = ${taskPrompt}`);
-                              
-                                                  // create the agent data object --> this is the data that will be sent to the agent army
-                                                  const agentData = {
-                                                      CompanyID: companyDetails.companyRecordId,
-                                                      CrewName: 'copywriting',
-                                                      TaskDescription: agents.generalReportDescription,
-                                                      TaskPrompt: taskPrompt,
-                                                      Timestamp: new Date().toISOString()
-                                                  };
-                              
-                                                  // agent activity tracking - start
-                                                  const runID = await airtableUtils.createAgentActivityRecord(agentData.CompanyID, agentData.CrewName, agentData.TaskDescription, agentData.TaskPrompt);
-                              
-                                                  // call the agent army :)
-                                                  const agentResponse = await wingmanAgentsService.callWingmanAgentsApp(agentData.CrewName, agentData.TaskDescription, agentData.TaskPrompt, agents.generalReportAgentEndpoint);
-                              
-                                                  const agentResponseResult = agentResponse.result;
-                                                  //const agentResponseStatus = agentResponse.status;
-                                                  logger.info(`Agent result: ${agentResponseResult}`);
-                              
-                                                  // Complete tracking the agent activity with the response
-                                                  await airtableUtils.updateAgentActivityRecord(runID, agentResponse);
-                              
-                                                  // update with the agent result in Airtable
-                                                  const assessmentDetailsStatus = appConfig.generalreportRequireApproval ? 'pending' : 'approved';  // check if this step requires approaval or not --> so set the staus as 'approved' if doesn't require approaval
-                                                  await updateAssessmentDetailsService.updateAssessmentDetailsAndStatus(assessmentId, assessmentRecordId, agentResponseResult, process.env.envDefaultGenAssessFinalResultId, assessmentDetailsStatus);
-                              
-                                                  // update the status for the current assessment
-                                                  await airtableUtils.updateRecordField('Assessments', assessmentRecordId, 'AssessmentStatus', 'general report done');
-                              
-                                                  await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'case = web research', stepStatus: 'done', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
-                                                  logger.yay(`General assessment flow completed successfully for AssessmentID=${assessmentId}`);
-                              
-                                              }
-                                              else {
-                                                  //something went wrong with the raw report, so we need to ask the user to provide more information
-                                                  logger.warn(`The raw research was not approved, so we need to ask the source owner to approve the raw research before we can continue with the general assessment`);
-                                              }
-                                              break;
-                              
-                              */
+                // aici ar trebui un test sa vedem daca survey-ul a fost completat sau nu, si daca da atunci:
+
+                logger.yay("Survey completed! Let's process responses and generate the final report.");
+
+                // find the ID of the record in AssessmentDetails where the record for potential pains is located
+                var assessmentDetailsForPainsId = await airtableUtils.findAssessDetailsByAssessIDAndTemplate(assessmentId, process.env.envDefaultGenAssessPainPointsId);
+                assessmentDetailsForPainsId = assessmentDetailsForPainsId[0].id
+
+                // find the record ID in table AssessmentDetails where initial research is stored
+                var assessmentDetailsForReportId = await airtableUtils.findAssessDetailsByAssessIDAndTemplate(assessmentId, process.env.envDefaultGenAssessRawResultId);
+                assessmentDetailsForReportId = assessmentDetailsForReportId[0].id
+
+                // get the refference to pains from AssessmentDetails
+                const referenceToPainsRecordIDs = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsForPainsId, 'AssessmentDetails:Pains');
+                //logger.info(`painRecordIDs = ${referenceToPainsRecordIDs}`);
+
+                //construct the object that store details about pains
+                var painsDescription = ""; var counter = 1;
+                for (const referenceToPainsRecordId of referenceToPainsRecordIDs) {
+                    try {
+
+                        const painData = await airtableUtils.getFieldsForRecordById('Pains', referenceToPainsRecordId);
+                        const painRecordId = painData['PainID'];
+                        logger.info(`painRecordId = ${painRecordId}`);
+                        const painStatement = painData['PainStatement (from PainID)'];
+                        const painImpact = painData['Business impact (from PainID)']
+                        const painWhatWeFeel = painData['What we feel (from PainID)']
+                        const painReason = await airtableUtils.findFieldValueByRecordId('AssessmentDetails:Pains', referenceToPainsRecordId, 'Reason');
+                        painsDescription += `${counter}. ${painStatement};\n`
+                            + `What happens when is pain is present: ${painImpact};\n`
+                            + `What we feel when is pain is present: ${painWhatWeFeel};\n`
+                            + `Why this pain was identified for this company: ${painReason}.\n`
+
+                        counter++;
+                    } catch (error) {
+                        logger.error(`Error fetching data for pain record ID ${error}`);
+                    }
+                }
+                // seriailze pains data
+                var jsonPainDescription = JSON.stringify(painsDescription);
+                console.log(jsonPainDescription);
+
+                var assessmentDetailsForQuestionsId = await airtableUtils.findAssessDetailsByAssessIDAndTemplate(assessmentId, process.env.envDefaultGenAssessQuestionsId);
+                assessmentDetailsForQuestionsId = assessmentDetailsForQuestionsId[0].id
+
+                // fetch the questions and the answrs from the survey submisions
+                const surveyData = await flowOutputsUtils.fetchSurveyDataByAssessmentID(assessmentRecordId);
+                let reportQuestionsAnswers = [];  // Array to hold all the formatted strings
+
+                // Iterate through each survey, construct the string that it will be used to populate the report
+                surveyData.forEach(survey => {
+                    // Iterate through each submission in the survey
+                    survey.submissions.forEach(submission => {
+                        // Format the submission date to show only the date part
+                        const date = new Date(submission.SubmissionDate);
+                        const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+
+                        // Start a new section for each submission with the formatted submission date
+                        let submissionDetails = `Submission Date: ${formattedDate}\n`;
+
+                        // Counter for questions/answers
+                        let counter = 1;
+
+                        // Gather all questions and answers for this submission
+                        submission.responses.forEach(response => {
+                            submissionDetails += `  Question-${counter}: ${response.questionStatement}\n  Answer-${counter}: ${response.responseValue}\n`;
+                            counter++; // Increment the counter for the next question/answer
+                        });
+
+                        // Add the complete details of one submission to the report strings array
+                        reportQuestionsAnswers.push(submissionDetails);
+                    });
+                });
+
+                // Return all the constructed strings or process them as needed
+                reportQuestionsAnswers = reportQuestionsAnswers.join('\n');  // Join all strings with a newline character for readability
+                logger.info(reportQuestionsAnswers); 
+                //seriailze questions and answers data
+                reportQuestionsAnswers = JSON.stringify(reportQuestionsAnswers); 
+
+                //prepare the agent call, the additional details needed
+                const companyName = await airtableUtils.findFieldValueByRecordId('Assessments', assessmentRecordId, '*CompanyName (from CompanyID) (from assignedToEngagement)');
+                var companyRecordId = await airtableUtils.findFieldValueByRecordId('Assessments', assessmentRecordId, '*CompanyID (from assignedToEngagement)');
+                companyRecordId = companyRecordId[0];
+                const rawReport = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsForReportId, 'Value');
+                // seriailze raw report
+                const jsonRawReport = JSON.stringify(rawReport);
+
+                const crewRecordId = await airtableUtils.findRecordIdByIdentifier('WingmanAIsquads', 'SquadSKU', 'final_report');
+                const crewDetails = await airtableUtils.getFieldsForRecordById('WingmanAIsquads', crewRecordId);
+                const crewName = crewDetails.SquadName;
+                const crewJson = crewDetails.SquadJSON;
+
+                //replace placeholders in the payload
+                var crewPayload = await replacePlaceholders.generateContent(isFilePath = false, crewJson, {
+                    COMPANY: companyName,
+                    INITIAL_RESEARCH: jsonRawReport.replace(/"/g, '\\"'),
+                    PAINS_LIST: jsonPainDescription.replace(/"/g, '\\"'),
+                    QUESTIONS_LIST: reportQuestionsAnswers.replace(/"/g, '\\"')
+
+                });
+
+                logger.info(`Agent payload: \n${crewPayload}`);
+                logger.warn("Now calling agent...");
+
+                // Start tracking the agent activity
+                const runID = await airtableUtils.createAgentActivityRecord(companyRecordId, crewName, crewPayload);
+                logger.info(`Agent activity run ID: ${runID}, type: ${typeof runID}`);
+
+                // Call the agent army with the payload // schema path is used to validate the response
+                // const schemaPath = '../../schema/crewAiResponseSchema_questions.json';
+                const agentResponse = await wingmanAgentsService.callWingmanAgents(crewPayload);
+
+                // Complete tracking the agent activity with the response
+                await airtableUtils.updateAgentActivityRecord(runID, agentResponse);
+
+                // extract the questions from the response
+                var agentResponseResult = agentResponse.result;
+                logger.info(`Here is the response: \n ${JSON.stringify(agentResponse, null, 4)}`);
+
+                // update with the agent result in Airtable
+                const assessmentDetailsStatus = appConfig.generalreportRequireApproval ? 'pending' : 'approved';  // check if this step requires approaval or not --> so set the staus as 'approved' if doesn't require approaval
+                await updateAssessmentDetailsService.updateAssessmentDetailsAndStatus(assessmentId, assessmentRecordId, agentResponseResult, process.env.envDefaultGenAssessFinalResultId, assessmentDetailsStatus);
+
+                // update the status for the current assessment
+                await airtableUtils.updateRecordField('Assessments', assessmentRecordId, 'AssessmentStatus', 'general report done');
+
+                await logFlowTracking({ flowName: flowName, flowStatus: assessmentStatus, flowStep: 'case = web research', stepStatus: 'done', timestamp: new Date().toISOString(), engagementId: engagementRecordId, assessmentId: assessmentRecordId, additionalInfo: {} });
+                logger.yay(`General assessment flow completed successfully for AssessmentID=${assessmentId}`);
+
+
+                break;
 
             }
 

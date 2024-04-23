@@ -128,6 +128,12 @@ const emails = {
     <br><br>
     Welcome aboard,`,
 
+    surveyEmailSubject: 'Short survey for {{{COMPANY_NAME}}}',
+    surveyEmailContent: `I hope this message finds you well.
+    <br><br>
+    {{{TYPEFORM_URL}}}.`,
+
+
     genReportEmailSubject: 'Preliminary assessment report for {{{COMPANY_NAME}}}',
     genReportEmailContent: `I hope this message finds you well.
     <br><br>

@@ -676,6 +676,34 @@ exports.findRecordIdByIdentifier = async (tableName, fieldName, identifier) => {
     }
 };
 
+
+
+exports.findRecordsByField = async (tableName, fieldName, fieldValue) => {
+    const targetTable = base(tableName);
+    try {
+        // Construct the correct filter formula for linked records
+        const filterFormula = `FIND('${fieldValue}', {${fieldName}})`;
+
+        const records = await targetTable.select({
+            filterByFormula: filterFormula
+        }).all();
+
+        return records.map(record => ({
+            id: record.id,
+            ...record.fields
+        }));
+    } catch (error) {
+        console.error(`Error finding records in ${tableName} by ${fieldName}:`, error);
+        throw error;
+    }
+};
+
+
+
+
+
+
+
 // Function to find the value of a certain field based on the Airtable record ID
 exports.findFieldValueByRecordId = async (tableName, recordId, fieldName) => {
     const targetTable = base(tableName);
@@ -722,3 +750,18 @@ exports.updateRecordField = async (tableName, recordId, fieldName, newValue) => 
     }
 };
 
+// generic function for creating a new record in a certain table sent as parameter
+exports.createRecord = async (tableName, fields) => {
+    try {
+        const records = await base(tableName).create([
+            {
+                fields: fields
+            }
+        ]);
+        logger.info(`Created record in ${tableName}: ${records[0].getId()}`);
+        return records[0].getId();
+    } catch (error) {
+        logger.error(`Error creating record in ${tableName}: ${error}`);
+        throw error;
+    }
+}
