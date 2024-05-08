@@ -31,11 +31,11 @@ async function processQuestionsFromSignals(engagementRecordId, assessmentRecordI
         assessmentDetailsForReportId = assessmentDetailsForReportId[0].id
 
         // get the signal IDs from AssessmentDetails
-        const signalRecordIDs = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsForSignalsId, 'AssessmentDetails:Signals');
+        const signalReferenceRecordIDs = await airtableUtils.findFieldValueByRecordId('AssessmentDetails', assessmentDetailsForSignalsId, 'AssessmentDetails:Signals');
         // logger.debug(JSON.stringify(signalRecordIDs, null, 2));
 
         // get the question record IDs that are connected to the signal IDs indentified before
-        const questionRecordIDs = await assetsUtils.getQuestionIDsForSignals(signalRecordIDs);
+        const questionRecordIDs = await assetsUtils.getQuestionIDsForSignals(signalReferenceRecordIDs);
         // logger.debug(`Questions found: ${JSON.stringify(questionRecordIDs, null, 2)}`);
 
         //construct the object that store details about role
@@ -47,14 +47,21 @@ async function processQuestionsFromSignals(engagementRecordId, assessmentRecordI
 
         //construct the object that store details about signals
         var signalsDescription = ""; var counter = 1;
-        for (const signalRecordId of signalRecordIDs) {
+        for (const signalReferenceRecordId of signalReferenceRecordIDs) {
             try {
+                var signalRecordId = await airtableUtils.findFieldValueByRecordId('AssessmentDetails:Signals', signalReferenceRecordId, 'SignalID');
+                signalRecordId = signalRecordId[0];
                 const signalData = await airtableUtils.getFieldsForRecordById('Signals', signalRecordId);
-                const signalStatement = signalData['SignalStatement (from SignalID)'];
-                signalsDescription += `Signal ${counter}: ${signalStatement}; \n`;
+                const signalStatement = signalData['SignalStatement'];
+                const signalDescription = signalData['SignalDescription'];
+                const signalReason = await airtableUtils.findFieldValueByRecordId('AssessmentDetails:Signals', signalReferenceRecordId, 'Reason');
+                signalsDescription += `Signal ${counter}:
+                Signal Statement: ${signalStatement};
+                Signal Description: ${signalDescription} 
+                Reason why we follow this signal: ${signalReason}\n`;
                 counter++;
             } catch (error) {
-                logger.error(`Error fetching data for signal record ID ${signalRecordId}: ${error}`);
+                logger.error(`Error fetching data for signal record ID ${signalReferenceRecordId}: ${error}`);
             }
         }
         // seriailze signal data
@@ -69,7 +76,7 @@ async function processQuestionsFromSignals(engagementRecordId, assessmentRecordI
                 // Extract only the necessary fields
                 const filteredQuestionData = {
                     questionSKU: questionData['QuestionSKU'],
-                    questionBody: questionData['QuestionStatement'] || 'No question here',
+                    questionBody: questionData['QuestionStatement'],
                     isQuantitative: questionData['isQuantitative'] || false
                 };
                 questionsData.push(filteredQuestionData);

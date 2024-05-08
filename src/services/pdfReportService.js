@@ -47,7 +47,7 @@ async function generatePDFWithPDFShift(htmlContent, pdfFileName) {
             filename: pdfFileName,
             format: 'A4',
             use_print: true,
-            margin: '50px',
+            margin: '80px',
             zoom: 0.8,
 
         }, {

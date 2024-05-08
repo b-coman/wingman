@@ -33,10 +33,20 @@ const doSubmissionFlow = async (formId, answers) => {
             });
         }
 
+
         // update status for assessment in Assessments table
+        logger.info(`....updating assessment status for assessment record ("survey responded")`);
         const assessmentRecord = await airtableUtils.findFieldValueByRecordId('Surveys', surveyRecordId, 'AssessmentID');
         const assessmentRecordId = assessmentRecord[0];
         await airtableUtils.updateRecordField('Assessments', assessmentRecordId, 'AssessmentStatus', 'survey responded');
+
+        // update status for assessment detail for survey in AssessmentDetails table  
+        logger.info(`....updating assessment status for assessment detail record ("pending")`);      
+        const assessmentId = await airtableUtils.findFieldValueByRecordId('Assessments', assessmentRecordId, 'AssessmentID');
+        var assessmentDetailsId = await airtableUtils.findAssessDetailsByAssessIDAndTemplate(assessmentId, process.env.envDefaultGenAssessSurveyId);
+        assessmentDetailsId = assessmentDetailsId[0].id
+        await airtableUtils.updateRecordField('AssessmentDetails', assessmentDetailsId, 'Status', 'approved');
+
 
         logger.info(`Submission and responses recorded successfully for SurveyID ${surveyRecordId}`);
     } catch (error) {

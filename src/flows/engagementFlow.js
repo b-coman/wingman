@@ -1,6 +1,7 @@
 // Filename: /src/flows/doAssessmentGeneral.js
 
 require('dotenv').config();
+const marked = require('marked');
 const replacePlaceholders = require('../services/replacePlaceholders');
 const { sendEmail } = require('../services/emailService');
 const wingmanAgentsService = require('../services/wingmanAgentsService');
@@ -34,8 +35,8 @@ const doEngagementFlow = async (engagementRecordId, engagementId, engagementStat
                 sourceId = sourceId[0];
 
                 // identify the decription about the article, the EngagementSourceDetails
-                const engagementSourceDetails = await airtableUtils.findFieldValueByRecordId('WingmanSources', sourceId, 'EngagementSourceDetails');
-
+                var engagementSourceDetails = await airtableUtils.findFieldValueByRecordId('WingmanSources', sourceId, 'EngagementSourceDetails') || '';
+                engagementSourceDetails = JSON.stringify(engagementSourceDetails);
                 // log status, end of step
                 await logFlowTracking({ flowName: flowName, flowStatus: 'In Progress', flowStep: 'identify source details', stepStatus: 'OK', timestamp: new Date().toISOString(), engagementId: engagementRecordId, additionalInfo: { engagementStatus, sourceId, engagementSourceDetails } });
 
@@ -44,8 +45,16 @@ const doEngagementFlow = async (engagementRecordId, engagementId, engagementStat
                 //- STEP 2 --> call the agents to ask about research areas 
 
                 const engagementDetails = await airtableUtils.getFieldsForRecordById('Engagements', engagementRecordId);
-                const companyRecordId = engagementDetails.CompanyID[0];
+                const companyRecordId = engagementDetails.CompanyID[0] || '';
                 const companyDetails = await airtableUtils.getFieldsForRecordById('Companies', companyRecordId);
+                var companyNotes = companyDetails.CompanyNotes || '';
+                companyNotes = JSON.stringify(companyNotes);
+                var engagementContext = engagementDetails.EngagementSalesContext || '';
+                engagementContext = JSON.stringify(engagementContext);
+                var campaignContext = engagementDetails.EngagementInitialContext || '';
+                campaignContext = JSON.stringify(campaignContext);
+                const jsonSystemRules = JSON.stringify(systemRules.rule1);
+               // const engagementSourceDetails = engagementDetails.['*EngagementSourceDetails (from SourceID)'];
 
                 // extract the crew JSON from Airtable, table WingmanAIsquads
                 // !!!--> HERE the hardcoded parameter "first_research" SHOULD BE CHANGED TO A CONFIG VARIABLE !!!!!!!!!!!!!
@@ -54,17 +63,17 @@ const doEngagementFlow = async (engagementRecordId, engagementId, engagementStat
                 const crewName = crewDetails.SquadName;
                 const crewJson = crewDetails.SquadJSON;
 
-                logger.info(crewJson);
+               // logger.info(crewJson);
 
                 //replace placeholders in the payload
                 var crewPayload = await replacePlaceholders.generateContent(isFilePath = false, crewJson, {
                     COMPANY: companyDetails.CompanyName,
                     DOMAIN: companyDetails.CompanyDomain,
-                    SOURCE_DETAILS: engagementSourceDetails,
-                    COMPANY_CONTEXT: companyDetails.CompanyNotes,
-                    ENGAGEMENT_CONTEXT: engagementDetails.EngagementSalesContext,
-                    CAMPAIGN_CONTEXT: engagementDetails.EngagementInitialContext,
-                    SYSTEM_RULES: systemRules.rule1
+                    SOURCE_DETAILS: engagementSourceDetails.replace(/"/g, '\\"'),
+                    COMPANY_CONTEXT: companyNotes.replace(/"/g, '\\"'),
+                    ENGAGEMENT_CONTEXT: engagementContext.replace(/"/g, '\\"'),
+                    CAMPAIGN_CONTEXT: campaignContext.replace(/"/g, '\\"'),
+                    SYSTEM_RULES: jsonSystemRules.replace(/"/g, '\\"')
                 });
 
                 logger.info(`Agent payload: \n${crewPayload}`);

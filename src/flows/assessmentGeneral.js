@@ -42,6 +42,7 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
         logger.info(`   AssessmentID:           value = ${assessmentId}, type = ${typeof assessmentId}`);
         logger.info(`   AssessmentStatus:       value = ${assessmentStatus}, type = ${typeof assessmentStatus}`);
         logger.info(`   ApprovedPromptID:       value = ${approvedPromptRecordId}, type = ${typeof approvedPromptRecordId}`);
+        logger.info(`   CompanyDetails:         value = ${JSON.stringify(companyDetails)}, type = ${typeof companyDetails}`);
 
         switch (assessmentStatus) {
             case "requested": { // new assessment --> do the initial reserach, create raw report
@@ -80,7 +81,8 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 //- STEP 3 --> call the generalAssess agent to receive the initial report that will be sent to the client contact
 
-                const approvedPromptDescription = await airtableUtils.findFieldValueByRecordId('EngagementPrompts', approvedPromptRecordId, 'EngagementPromptDescription');
+                var approvedPromptDescription = await airtableUtils.findFieldValueByRecordId('EngagementPrompts', approvedPromptRecordId, 'EngagementPromptDescription');
+                approvedPromptDescription = JSON.stringify(approvedPromptDescription);
 
                 // extract the crew JSON from Airtable, table WingmanAIsquads
                 // !!!--> HERE the hardcoded parameter "first_research" SHOULD BE CHANGED TO A CONFIG VARIABLE !!!!!!!!!!!!!
@@ -89,13 +91,14 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                 const crewName = crewDetails.SquadName;
                 const crewJson = crewDetails.SquadJSON;
 
-                logger.info(crewJson);
+                //logger.info(crewJson);
+                logger.info(`Company Name: ${companyDetails.companyName}`);
 
                 //replace placeholders in the payload
                 var crewPayload = await replacePlaceholders.generateContent(isFilePath = false, crewJson, {
-                    COMPANY: companyDetails.CompanyName,
-                    DOMAIN: companyDetails.CompanyDomain,
-                    APPROVED_PROMPT: approvedPromptDescription
+                    COMPANY: companyDetails.companyName,
+                    DOMAIN: companyDetails.companyDomain,
+                    APPROVED_PROMPT: approvedPromptDescription.replace(/"/g, '\\"')
                 });
 
                 logger.info(`Agent payload: \n${crewPayload}`);
@@ -122,7 +125,7 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                 await updateAssessmentDetailsService.updateAssessmentDetailsAndStatus(assessmentId, assessmentRecordId, agentResponseResult, process.env.envDefaultGenAssessRawResultId, assessmentDetailsStatus);
 
                 // update the status for the current assessment
-                await airtableUtils.updateRecordField('Assessments', assessmentRecordId, 'AssessmentStatus', 'web research done');
+                await airtableUtils.updateRecordField('Assessments', assessmentRecordId, 'AssessmentStatus', 'research done');
 
 
                 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -142,7 +145,7 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                 emailBody = await replacePlaceholders.generateContent(isPath = true, 'email_admin', { MESSAGE_BODY: emailContent, USER_FIRSTNAME: sourceOwnerFirstName, AGENT_RESPONSE: agentResponseResultHTML });
 
                 // Send the email 
-                await sendEmail(contactEmail, emailSubject, emailBody);
+                await sendEmail(sourceOwnerEmail, emailSubject, emailBody);
                 logger.info(`Email sent successfully to: ${sourceOwnerEmail}`);
 
                 // log the flow status --> email sent
@@ -316,7 +319,7 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                     const processQuestionsResult = await processQuestionsToSurvey(engagementRecordId, assessmentRecordId, assessmentId, flowName, assessmentStatus);
                     const surveyRecordId = processQuestionsResult.surveyRecordId;
                     const typeformId = processQuestionsResult.typeformId;
-                    const typerformUrl = processQuestionsResult.typeformUrl;
+                    var typerformUrl = processQuestionsResult.typeformUrl;
 
 
                     // inform the contact on client side that survey is ready
@@ -327,6 +330,8 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                     const contactLastName = await airtableUtils.findFieldValueByRecordId('Engagements', engagementRecordId, '*PrimaryContactLastName (from CompanyID)');
                     const contactEmail = await airtableUtils.findFieldValueByRecordId('Engagements', engagementRecordId, '*PrimaryContactEmail (from CompanyID)');
 
+                    // put first name and company name in typeform url
+                    typerformUrl = typerformUrl + `?fname=${contactFirstName}`;
 
                     // Generate the email body using the emailBodyMaker service
                     const emailSubject = await replacePlaceholders.generateContent(isFilePath = false, emails.surveyEmailSubject, { COMPANY_NAME: companyName });
@@ -396,10 +401,10 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                 }
                 // seriailze pains data
                 var jsonPainDescription = JSON.stringify(painsDescription);
-                console.log(jsonPainDescription);
 
                 var assessmentDetailsForQuestionsId = await airtableUtils.findAssessDetailsByAssessIDAndTemplate(assessmentId, process.env.envDefaultGenAssessQuestionsId);
                 assessmentDetailsForQuestionsId = assessmentDetailsForQuestionsId[0].id
+
 
                 // fetch the questions and the answrs from the survey submisions
                 const surveyData = await flowOutputsUtils.fetchSurveyDataByAssessmentID(assessmentRecordId);
@@ -421,7 +426,11 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
 
                         // Gather all questions and answers for this submission
                         submission.responses.forEach(response => {
-                            submissionDetails += `  Question-${counter}: ${response.questionStatement}\n  Answer-${counter}: ${response.responseValue}\n`;
+                            submissionDetails += `  Question #${counter}: ${response.questionStatement}\n`;
+                            if (response.questionType === 'rating') {
+                                submissionDetails += `  Rating scale: ${response.questionDescription}\n`;
+                            }
+                            submissionDetails += `  Answer: ${response.responseValue}\n`;
                             counter++; // Increment the counter for the next question/answer
                         });
 
@@ -430,11 +439,24 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                     });
                 });
 
-                // Return all the constructed strings or process them as needed
                 reportQuestionsAnswers = reportQuestionsAnswers.join('\n');  // Join all strings with a newline character for readability
-                logger.info(reportQuestionsAnswers); 
+                logger.info(reportQuestionsAnswers);
                 //seriailze questions and answers data
-                reportQuestionsAnswers = JSON.stringify(reportQuestionsAnswers); 
+                reportQuestionsAnswers = JSON.stringify(reportQuestionsAnswers);
+
+
+                //construct the Modus offering list
+                const offeringData = await airtableUtils.fetchAllRecordsFromTable('ModusPracticesOfferings');
+                var modusOfferingList = '';
+                offeringData.forEach(offering => {
+                    modusOfferingList += `Practice name: ${offering.Practice} (lead by ${offering.AssignedTo})\n`;
+                    modusOfferingList += `Offering: ${offering.OfferingName}\n`;
+                    modusOfferingList += `Offering description: ${offering.OfferingDescription}\n\n`;
+                });
+                //seriailze offering data
+                modusOfferingList = JSON.stringify(modusOfferingList);
+                //logger.info(modusOfferingList);
+
 
                 //prepare the agent call, the additional details needed
                 const companyName = await airtableUtils.findFieldValueByRecordId('Assessments', assessmentRecordId, '*CompanyName (from CompanyID) (from assignedToEngagement)');
@@ -454,8 +476,8 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                     COMPANY: companyName,
                     INITIAL_RESEARCH: jsonRawReport.replace(/"/g, '\\"'),
                     PAINS_LIST: jsonPainDescription.replace(/"/g, '\\"'),
-                    QUESTIONS_LIST: reportQuestionsAnswers.replace(/"/g, '\\"')
-
+                    QUESTIONS_LIST: reportQuestionsAnswers.replace(/"/g, '\\"'),
+                    MODUS_OFFERINGS: modusOfferingList.replace(/"/g, '\\"')
                 });
 
                 logger.info(`Agent payload: \n${crewPayload}`);
@@ -466,8 +488,7 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
                 logger.info(`Agent activity run ID: ${runID}, type: ${typeof runID}`);
 
                 // Call the agent army with the payload // schema path is used to validate the response
-                // const schemaPath = '../../schema/crewAiResponseSchema_questions.json';
-                const agentResponse = await wingmanAgentsService.callWingmanAgents(crewPayload);
+                const agentResponse = await wingmanAgentsService.callWingmanAgents(crewPayload); // no validation schema for the response
 
                 // Complete tracking the agent activity with the response
                 await airtableUtils.updateAgentActivityRecord(runID, agentResponse);
@@ -513,7 +534,7 @@ const doAssessmentGeneral = async (engagementRecordId, engagementId, assessmentR
 
                     // PDF FILE STEP
                     const companyName = companyDetails.companyName;
-                    const companyNameFile = companyName.replace(/\s/g, "-");
+                    const companyNameFile = companyName.replace(/\s/g, "-").replace(/[\\/:*?"<>|&]/g, '');
 
                     // replace placeholders and convert to html
                     const genReportHTML = await replacePlaceholders.generateContent(isPath = false, htmlTemplates.pdfReport, { REPORT: marked.parse(genReport) });

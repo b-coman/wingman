@@ -742,7 +742,6 @@ exports.updateRecordField = async (tableName, recordId, fieldName, newValue) => 
 
         // Perform the update operation
         const updatedRecord = await table.update(recordId, updateObject);
-        //console.log('Record updated successfully:', updatedRecord);
         return updatedRecord;
     } catch (error) {
         console.error('Error updating record:', error);
@@ -765,3 +764,30 @@ exports.createRecord = async (tableName, fields) => {
         throw error;
     }
 }
+
+
+// Fetches all records and all fields from a specified table
+exports.fetchAllRecordsFromTable = async (tableName) => {
+    const targetTable = base(tableName);
+    const records = [];
+    const processPage = (partialRecords, fetchNextPage) => {
+        records.push(...partialRecords.map(record => ({
+            id: record.id,
+            ...record.fields
+        })));
+        fetchNextPage();
+    };
+
+    const fetchOptions = {
+        view: "Grid view"  // Specify the view if needed, or remove this line
+    };
+
+    try {
+        await targetTable.select(fetchOptions).eachPage(processPage);
+        console.log(`Fetched ${records.length} records from ${tableName}`);
+        return records;
+    } catch (error) {
+        console.error(`Error fetching all records from ${tableName}:`, error);
+        throw error;
+    }
+};

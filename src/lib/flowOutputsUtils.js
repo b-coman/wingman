@@ -62,57 +62,63 @@ exports.fetchPainReason = async (painId, assessmentDetailId) => {
   }
 }
 
-
-
 exports.fetchSurveyDataByAssessmentID = async (assessmentRecordId) => {
   logger.warn('Fetching submission data ...');
   // Retrieve all surveys associated with the given AssessmentID
-  const surveyIds = await airtableUtils.findFieldValueByRecordId('Assessments', assessmentRecordId, '*Surveys');
+  const rawSurveyIds = await airtableUtils.findFieldValueByRecordId('Assessments', assessmentRecordId, '*Surveys');
+  const surveyIds = Array.isArray(rawSurveyIds) ? rawSurveyIds : [];
   logger.info(`Fetched ${surveyIds.length} surveys associated with assessment ${assessmentRecordId}`);
   logger.info(`Surveys: ${JSON.stringify(surveyIds)}`);
 
   const surveys = [];
 
-  // Iterate over each survey ID to fetch detailed data
   for (let surveyId of surveyIds) {
-    // Fetch the full survey record by ID
     const survey = await airtableUtils.getFieldsForRecordById('Surveys', surveyId);
     survey.submissions = [];
 
-    // Retrieve all submission IDs linked to this survey
-    const submissionIds = await airtableUtils.findFieldValueByRecordId('Surveys', surveyId, '*Submissions');
+    const rawSubmissionIds = await airtableUtils.findFieldValueByRecordId('Surveys', surveyId, '*Submissions');
+    const submissionIds = Array.isArray(rawSubmissionIds) ? rawSubmissionIds : [];
+    if (submissionIds.length === 0) {
+      logger.warn(`No submissions found for survey ${surveyId}`);
+      continue;  // Skip this survey if no submissions are found
+    }
 
-    // Iterate over each submission ID to fetch detailed data
     for (let submissionId of submissionIds) {
       const submission = await airtableUtils.getFieldsForRecordById('Surveys:Submissions', submissionId);
       submission.responses = [];
 
-      // Retrieve all response IDs linked to this submission
-      const responseIds = await airtableUtils.findFieldValueByRecordId('Surveys:Submissions', submissionId, '*Responses');
+      const rawResponseIds = await airtableUtils.findFieldValueByRecordId('Surveys:Submissions', submissionId, '*Responses');
+      const responseIds = Array.isArray(rawResponseIds) ? rawResponseIds : [];
+      if (responseIds.length === 0) {
+        logger.warn(`No responses found for submission ${submissionId}`);
+        continue;  // Skip this submission if no responses are found
+      }
 
-      // Iterate over each response ID to fetch detailed data
       for (let responseId of responseIds) {
-        const response = await airtableUtils.getFieldsForRecordById('Surveys:Submissions:Responses', responseId);
-        const questionId = response.QuestionID;
-        const questionStatement = await airtableUtils.findFieldValueByRecordId('Questions', questionId, 'QuestionStatement');
+        const response = {};
+        const questionData = await airtableUtils.getFieldsForRecordById('Surveys:Submissions:Responses', responseId);
+        if (!questionData) {
+          logger.error(`Data for response ${responseId} could not be fetched.`);
+          continue;  // Skip this response if data is null
+        }
+        const questionRecordId = questionData.QuestionID;
+        const questionStatement = await airtableUtils.findFieldValueByRecordId('Questions', questionRecordId, 'QuestionStatement');
+        const questionAnswerType = await airtableUtils.findFieldValueByRecordId('Questions', questionRecordId, 'AnswerType');
+        const questionDescription = await airtableUtils.findFieldValueByRecordId('Questions', questionRecordId, 'Description');
 
-        // Attach question statement and response value to the response object
         response.questionStatement = questionStatement;
-        response.responseValue = response.ResponseValue;
+        response.responseValue = questionData.ResponseValue;
+        response.questionType = questionAnswerType;
+        response.questionDescription = questionDescription;
 
-        // Attach the detailed response object to the submission
         submission.responses.push(response);
       }
 
-      // Attach the detailed submission object to the survey
       survey.submissions.push(submission);
     }
 
-    // Attach the detailed survey object to the final list of surveys
     surveys.push(survey);
   }
 
-  // Return the complete list of structured survey data
-  // logger.info(`Final structured survey data: ${JSON.stringify(surveys)}`);
   return surveys;
-}
+};

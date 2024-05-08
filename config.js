@@ -130,8 +130,14 @@ const emails = {
 
     surveyEmailSubject: 'Short survey for {{{COMPANY_NAME}}}',
     surveyEmailContent: `I hope this message finds you well.
+    <br><br>    
+    Please take a few minutes to complete <a href={{{TYPEFORM_URL}}}>this short survey</a>. 
+    <br>
+    Your insights are important to us and will help shape our understanding and recommendations. We appreciate you taking the time to provide your feedback.
     <br><br>
-    {{{TYPEFORM_URL}}}.`,
+    Thank you for your time, 
+    <br>
+    Your Modus' Wingman`,
 
 
     genReportEmailSubject: 'Preliminary assessment report for {{{COMPANY_NAME}}}',
@@ -182,9 +188,10 @@ const htmlTemplates = {
         line-height: 1.6;
         color: #4A4A4A;
         background-color: #fff;
-        width: 80%; /* This will make the content width 80% of the page */
-        margin: 0 auto;
-        padding: 2.5em;
+        width: 100%; /* This will make the content width 80% of the page */
+        margin: 0 auto; /* This centers the content */
+        padding: 0 2.8em 0 0; /* top | right | bottom | left */
+        text-align: justify; /* Justify text for the entire body, affects all text within */
     }
     h1 {
         font-size: 2em; /* Equivalent to 26px */
@@ -193,6 +200,7 @@ const htmlTemplates = {
         padding-bottom: 0.25em; /* Equivalent to 4px */
         margin-bottom: 1.25em; /* Equivalent to 20px */
         border-bottom: 3px solid #4CAF50;
+        text-align: left; /* Override justify for headings if desired */
     }
     h2 {
         font-size: 1.5em; /* Equivalent to 22px */
@@ -200,12 +208,14 @@ const htmlTemplates = {
         color: #000;
         margin-top: 2.5em; /* Equivalent to 40px */
         margin-bottom: 0.625em; /* Equivalent to 10px */
+        text-align: left; /* Override justify for headings if desired */
     }
     h3 {
         font-size: 1.2em; /* Equivalent to 18px */
         font-weight: bold;
         margin-top: 1.25em; /* Equivalent to 20px */
         margin-bottom: 0.5em; /* Equivalent to 8px */
+        text-align: left; /* Override justify for headings if desired */
     }
     p, ul, li {
         font-size: 1em; /* Equivalent to 14px */
